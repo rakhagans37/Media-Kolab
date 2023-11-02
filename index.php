@@ -190,7 +190,7 @@ if (!isset($_COOKIE['loginStatus']) && !isset($_SESSION['loginStatus'])) {
 									<li>
 										<hr class="dropdown-divider">
 									</li>
-									<li><a class="dropdown-item" href="login.php">Log Out</a></li>
+									<li><a class="dropdown-item" href="logout.php" id="logout">Log Out</a></li>
 								</ul>
 							</div>
 							<!--//app-user-dropdown-->
@@ -859,7 +859,6 @@ if (!isset($_COOKIE['loginStatus']) && !isset($_SESSION['loginStatus'])) {
 
 	<!-- Page Specific JS -->
 	<script src="assets/js/app.js"></script>
-
 </body>
 
 </html>

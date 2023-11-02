@@ -12,7 +12,6 @@ try {
 
     $request->bindParam('idAdmin', $idAdmin);
     $request->execute();
-
     if ($result = $request->fetch()) {
         $name = $result['username'];
         $email = $result['email'];
@@ -209,7 +208,7 @@ try {
                                     <li>
                                         <hr class="dropdown-divider">
                                     </li>
-                                    <li><a class="dropdown-item" href="login.php">Log Out</a></li>
+                                    <li><a class="dropdown-item" href="logout.php">Log Out</a></li>
                                 </ul>
                             </div>
                             <!--//app-user-dropdown-->
