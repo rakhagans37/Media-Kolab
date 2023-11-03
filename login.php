@@ -1,11 +1,13 @@
 <?php
 require_once 'connection/getConnection.php';
-if (isset($_COOKIE['loginStatus'])) {
+if (isset($_COOKIE['loginStatus']) && isset($_SESSION['loginStatus'])) {
 	header('Location:index.php');
 	exit;
 }
 
 session_start();
+$loginFail = false;
+
 if (isset($_POST['login'])) {
 	$email = $_POST['signin-email'];
 	$password = $_POST['signin-password'];
@@ -15,7 +17,7 @@ if (isset($_POST['login'])) {
 		$conn = getConnection();
 		$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-		$sql = "SELECT * FROM admin where email = :email and password = :password";
+		$sql = "SELECT * FROM tb_admin where email = :email and password = :password";
 		$request = $conn->prepare($sql);
 
 		$request->bindParam('email', $email);
@@ -23,22 +25,24 @@ if (isset($_POST['login'])) {
 		$request->execute();
 
 		if ($result = $request->fetch()) {
-			$idAdmin = $result['idAdmin'];
+			$idAdmin = $result['admin_id'];
 			$loginStatus = true;
 
 			if ($remember) {
-				setcookie('idAdmin', $idAdmin, time() + (86400 * 30));
-				setcookie('loginStatus', $loginStatus, time() + (86400 * 30));
+				setcookie('idAdmin', $idAdmin, time() + (86400 * 7));
+				setcookie('loginStatus', $loginStatus, time() + (86400 * 7));
 			} else {
 				$_SESSION['loginStatus'] = $loginStatus;
 				$_SESSION['idAdmin'] = $idAdmin;
-				echo $_SESSION['loginStatus'] . $_COOKIE['loginStatus'];
 			}
-			$conn = null;
+
+			header('Location:index.php');
+			exit;
+		} else {
+			$loginFail = true;
 		}
 
-		header('Location:index.php');
-		exit;
+		$conn = null;
 	} catch (PDOException $error) {
 		$error = "Terjadi Error " . $error->getMessage();
 	}
@@ -152,7 +156,11 @@ if (isset($_POST['login'])) {
 	</div>
 	<!--//row-->
 
-
+	<?php
+	if ($loginFail) {
+		echo "<script> alert('Password Salah') </script>";
+	}
+	?>
 </body>
 
 </html>

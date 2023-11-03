@@ -1,5 +1,5 @@
 <?php
-function getConnection()
+function getConnectionMysqli()
 {
     $server = 'localhost';
     $host = 3306;
@@ -7,5 +7,5 @@ function getConnection()
     $password = '';
     $dbName =  'db_medkolab';
 
-    return new PDO("mysql:host=$server;dbname=$dbName", $username, $password);
+    return mysqli_connect($server, $username, $password, $dbName);
 }

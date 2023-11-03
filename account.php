@@ -7,7 +7,7 @@ try {
     $conn = getConnection();
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    $sql = "SELECT * FROM ADMIN WHERE idAdmin = :idAdmin";
+    $sql = "SELECT * FROM TB_ADMIN WHERE admin_id = :idAdmin";
     $request = $conn->prepare($sql);
 
     $request->bindParam('idAdmin', $idAdmin);
