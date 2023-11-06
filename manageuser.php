@@ -23,7 +23,8 @@ require_once "connection/getConnectionMsqli.php";
     <script defer src="assets/plugins/fontawesome/js/all.min.js"></script>
 
     <!-- App CSS -->
-    <link id="theme-style" rel="stylesheet" href="assets/css/portal.css">
+    <!-- <link id="theme-style" rel="stylesheet" href="assets/css/portal.css"> -->
+    <link id="theme-style" rel="stylesheet" href="assets\scss\portal.css">
 
 </head>
 
@@ -321,7 +322,7 @@ require_once "connection/getConnectionMsqli.php";
 
                 <nav id="orders-table-tab" class="orders-table-tab app-nav-tabs nav shadow-sm flex-column flex-sm-row mb-4">
                     <a class="flex-sm-fill text-sm-center nav-link active" id="orders-all-tab" data-bs-toggle="tab" href="#orders-all" role="tab" aria-controls="orders-all" aria-selected="true">Active</a>
-                    <a class="flex-sm-fill border-danger text-danger text-sm-center nav-link" id="banned-tab" data-bs-toggle="tab" href="#banned" role="tab" aria-controls="banned" aria-selected="false">Banned</a>
+                    <a class="flex-sm-fill text-sm-center nav-link-danger" id="banned-tab" data-bs-toggle="tab" href="#banned" role="tab" aria-controls="banned" aria-selected="false">Banned</a>
                 </nav>
 
                 <div class="tab-content" id="orders-table-tab-content">

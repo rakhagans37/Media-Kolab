@@ -23,8 +23,8 @@ require_once "connection/getConnectionMsqli.php";
 	<script defer src="assets/plugins/fontawesome/js/all.min.js"></script>
 
 	<!-- App CSS -->
-	<link id="theme-style" rel="stylesheet" href="assets/css/portal.css">
-
+	<!-- <link id="theme-style" rel="stylesheet" href="assets/css/portal.css"> -->
+	<link id="theme-style" rel="stylesheet" href="assets\scss\portal.css">
 </head>
 
 <body class="app">
@@ -345,6 +345,8 @@ require_once "connection/getConnectionMsqli.php";
 												<th class="cell">Category</th>
 												<th class="cell">Date Release</th>
 												<th class="cell">Tag</th>
+												<th class="cell">Publisher</th>
+												<th class="cell"></th>
 												<th class="cell"></th>
 											</tr>
 										</thead>
@@ -353,9 +355,9 @@ require_once "connection/getConnectionMsqli.php";
 											$conn = getConnectionMysqli();
 											if (isset($_GET['search-news'])) {
 												$searchNews = $_GET['searchorders'];
-												$sql = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_category.category_name, tb_blog.date_release FROM tb_blog INNER JOIN tb_category ON tb_blog.category_id = tb_category.category_id WHERE tb_blog.blog_title LIKE '%$searchNews%'";
+												$sql = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_category.category_name, tb_blog.date_release, tb_publisher.username FROM ((tb_blog INNER JOIN tb_category ON tb_blog.category_id = tb_category.category_id) INNER JOIN tb_publisher ON tb_blog.publisher_id = tb_publisher.publisher_id) WHERE tb_blog.blog_title LIKE '%$searchNews%'";
 											} else {
-												$sql = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_category.category_name, tb_blog.date_release FROM tb_blog INNER JOIN tb_category ON tb_blog.category_id = tb_category.category_id";
+												$sql = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_category.category_name, tb_blog.date_release, tb_publisher.username FROM ((tb_blog INNER JOIN tb_category ON tb_blog.category_id = tb_category.category_id) INNER JOIN tb_publisher ON tb_blog.publisher_id = tb_publisher.publisher_id)";
 											}
 
 											$request = mysqli_query($conn, $sql);
@@ -366,6 +368,7 @@ require_once "connection/getConnectionMsqli.php";
 													$blogTitle = $index[1];
 													$category = $index[2];
 													$dateRelease = $index[3];
+													$publisher = $index[4];
 													echo <<<TULIS
 															<tr>
 																<td class="cell">$blogId</td>
@@ -373,7 +376,13 @@ require_once "connection/getConnectionMsqli.php";
 																<td class="cell">$category</td>
 																<td class="cell"><span>$dateRelease</span><span class="note">2:16 PM</span></td>
 																<td class="cell"><span class="badge bg-success">Paid</span></td>
-																<td class="cell"><a class="btn-sm app-btn-secondary" href="#">View</a></td>
+																<td class="cell">$publisher</td>
+																<td class="cell">
+																	<a class="btn-sm app-btn-secondary" href="#">View</a>
+																</td>
+																<td class="cell">
+																	<a class="btn-sm app-btn-danger" data-toggle="modal" href="#exampleModal">Delete</a>
+																</td>
 															</tr>
 														TULIS;
 												}
@@ -387,6 +396,7 @@ require_once "connection/getConnectionMsqli.php";
 
 							</div><!--//app-card-body-->
 						</div><!--//app-card-->
+
 						<nav class="app-pagination">
 							<ul class="pagination justify-content-center">
 								<li class="page-item disabled">
@@ -400,145 +410,29 @@ require_once "connection/getConnectionMsqli.php";
 								</li>
 							</ul>
 						</nav><!--//app-pagination-->
-
-					</div><!--//tab-pane-->
-
-					<div class="tab-pane fade" id="orders-paid" role="tabpanel" aria-labelledby="orders-paid-tab">
-						<div class="app-card app-card-orders-table mb-5">
-							<div class="app-card-body">
-								<div class="table-responsive">
-
-									<table class="table mb-0 text-left">
-										<thead>
-											<tr>
-												<th class="cell">Order</th>
-												<th class="cell">Product</th>
-												<th class="cell">Customer</th>
-												<th class="cell">Date</th>
-												<th class="cell">Status</th>
-												<th class="cell">Total</th>
-												<th class="cell"></th>
-											</tr>
-										</thead>
-										<tbody>
-											<tr>
-												<td class="cell">#15346</td>
-												<td class="cell"><span class="truncate">Lorem ipsum dolor sit amet eget volutpat erat</span></td>
-												<td class="cell">John Sanders</td>
-												<td class="cell"><span>17 Oct</span><span class="note">2:16 PM</span></td>
-												<td class="cell"><span class="badge bg-success">Paid</span></td>
-												<td class="cell">$259.35</td>
-												<td class="cell"><a class="btn-sm app-btn-secondary" href="#">View</a></td>
-											</tr>
-
-											<tr>
-												<td class="cell">#15344</td>
-												<td class="cell"><span class="truncate">Pellentesque diam imperdiet</span></td>
-												<td class="cell">Teresa Holland</td>
-												<td class="cell"><span class="cell-data">16 Oct</span><span class="note">01:16 AM</span></td>
-												<td class="cell"><span class="badge bg-success">Paid</span></td>
-												<td class="cell">$123.00</td>
-												<td class="cell"><a class="btn-sm app-btn-secondary" href="#">View</a></td>
-											</tr>
-
-											<tr>
-												<td class="cell">#15343</td>
-												<td class="cell"><span class="truncate">Vestibulum a accumsan lectus sed mollis ipsum</span></td>
-												<td class="cell">Jayden Massey</td>
-												<td class="cell"><span class="cell-data">15 Oct</span><span class="note">8:07 PM</span></td>
-												<td class="cell"><span class="badge bg-success">Paid</span></td>
-												<td class="cell">$199.00</td>
-												<td class="cell"><a class="btn-sm app-btn-secondary" href="#">View</a></td>
-											</tr>
-
-
-											<tr>
-												<td class="cell">#15341</td>
-												<td class="cell"><span class="truncate">Morbi vulputate lacinia neque et sollicitudin</span></td>
-												<td class="cell">Raymond Atkins</td>
-												<td class="cell"><span class="cell-data">11 Oct</span><span class="note">11:18 AM</span></td>
-												<td class="cell"><span class="badge bg-success">Paid</span></td>
-												<td class="cell">$678.26</td>
-												<td class="cell"><a class="btn-sm app-btn-secondary" href="#">View</a></td>
-											</tr>
-
-										</tbody>
-									</table>
-								</div><!--//table-responsive-->
-							</div><!--//app-card-body-->
-						</div><!--//app-card-->
-					</div><!--//tab-pane-->
-
-					<div class="tab-pane fade" id="orders-pending" role="tabpanel" aria-labelledby="orders-pending-tab">
-						<div class="app-card app-card-orders-table mb-5">
-							<div class="app-card-body">
-								<div class="table-responsive">
-									<table class="table mb-0 text-left">
-										<thead>
-											<tr>
-												<th class="cell">Order</th>
-												<th class="cell">Product</th>
-												<th class="cell">Customer</th>
-												<th class="cell">Date</th>
-												<th class="cell">Status</th>
-												<th class="cell">Total</th>
-												<th class="cell"></th>
-											</tr>
-										</thead>
-										<tbody>
-											<tr>
-												<td class="cell">#15345</td>
-												<td class="cell"><span class="truncate">Consectetur adipiscing elit</span></td>
-												<td class="cell">Dylan Ambrose</td>
-												<td class="cell"><span class="cell-data">16 Oct</span><span class="note">03:16 AM</span></td>
-												<td class="cell"><span class="badge bg-warning">Pending</span></td>
-												<td class="cell">$96.20</td>
-												<td class="cell"><a class="btn-sm app-btn-secondary" href="#">View</a></td>
-											</tr>
-										</tbody>
-									</table>
-								</div><!--//table-responsive-->
-							</div><!--//app-card-body-->
-						</div><!--//app-card-->
-					</div><!--//tab-pane-->
-					<div class="tab-pane fade" id="orders-cancelled" role="tabpanel" aria-labelledby="orders-cancelled-tab">
-						<div class="app-card app-card-orders-table mb-5">
-							<div class="app-card-body">
-								<div class="table-responsive">
-									<table class="table mb-0 text-left">
-										<thead>
-											<tr>
-												<th class="cell">Order</th>
-												<th class="cell">Product</th>
-												<th class="cell">Customer</th>
-												<th class="cell">Date</th>
-												<th class="cell">Status</th>
-												<th class="cell">Total</th>
-												<th class="cell"></th>
-											</tr>
-										</thead>
-										<tbody>
-
-											<tr>
-												<td class="cell">#15342</td>
-												<td class="cell"><span class="truncate">Justo feugiat neque</span></td>
-												<td class="cell">Reina Brooks</td>
-												<td class="cell"><span class="cell-data">12 Oct</span><span class="note">04:23 PM</span></td>
-												<td class="cell"><span class="badge bg-danger">Cancelled</span></td>
-												<td class="cell">$59.00</td>
-												<td class="cell"><a class="btn-sm app-btn-secondary" href="#">View</a></td>
-											</tr>
-
-										</tbody>
-									</table>
-								</div><!--//table-responsive-->
-							</div><!--//app-card-body-->
-						</div><!--//app-card-->
 					</div><!--//tab-pane-->
 				</div><!--//tab-content-->
 
-
-
+				<!-- Modal -->
+				<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+					<div class="modal-dialog" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<p>Apakah anda yakin ingin menghapus berita ini?</p>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn app-btn-secondary" data-dismiss="modal">Close</button>
+								<button type="button" class="btn app-btn-confirmation">Ya, Saya yakin</button>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div><!--//container-fluid-->
 		</div><!--//app-content-->
 
@@ -560,7 +454,8 @@ require_once "connection/getConnectionMsqli.php";
 
 	<!-- Page Specific JS -->
 	<script src="assets/js/app.js"></script>
-
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 </body>
 
 </html>

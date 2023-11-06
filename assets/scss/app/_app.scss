@@ -371,6 +371,24 @@
 			color: $theme-color-primary;
 		}
 	}
+
+	.nav-link-danger {
+		color: $theme-text-color-secondary;
+		font-size: 0.875rem;
+		font-weight: bold;
+		&.active {
+			color: red;
+			border-bottom: 2px solid red;
+			&:hover {
+				background: none;
+				
+			}
+		}
+		&:hover {
+			background: rgba(255, 0, 0, 0.125);
+			color: red;
+		}
+	}
 	
 }
 
