@@ -24,9 +24,9 @@ if (isset($_GET['deleteButton'])) {
 //Script Php untuk membuat request yuang mengambil detail data blog dari database
 if (isset($_GET['search-news'])) {
 	$searchNews = $_GET['searchorders'];
-	$sql = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_category.category_name, tb_blog.date_release, tb_publisher.username FROM ((tb_blog INNER JOIN tb_category ON tb_blog.category_id = tb_category.category_id) INNER JOIN tb_publisher ON tb_blog.publisher_id = tb_publisher.publisher_id) WHERE tb_blog.blog_title LIKE '%$searchNews%'";
+	$sql = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_category.category_name, tb_blog.date_release, tb_editor.username FROM ((tb_blog INNER JOIN tb_category ON tb_blog.category_id = tb_category.category_id) INNER JOIN tb_editor ON tb_blog.editor_id = tb_editor.editor_id) WHERE tb_blog.blog_title LIKE '%$searchNews%'";
 } else {
-	$sql = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_category.category_name, tb_blog.date_release, tb_publisher.username FROM ((tb_blog INNER JOIN tb_category ON tb_blog.category_id = tb_category.category_id) INNER JOIN tb_publisher ON tb_blog.publisher_id = tb_publisher.publisher_id)";
+	$sql = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_category.category_name, tb_blog.date_release, tb_editor.username FROM ((tb_blog INNER JOIN tb_category ON tb_blog.category_id = tb_category.category_id) INNER JOIN tb_editor ON tb_blog.editor_id = tb_editor.editor_id)";
 }
 
 $request = mysqli_query($conn, $sql);
@@ -270,6 +270,7 @@ $request = mysqli_query($conn, $sql);
 								<ul class="submenu-list list-unstyled">
 									<li class="submenu-item"><a class="submenu-link active" href="news.php">News</a></li>
 									<li class="submenu-item"><a class="submenu-link" href="manageCategory.php">News Category</a></li>
+									<li class="submenu-item"><a class="submenu-link" href="manageAds.php">Ads</a></li>
 								</ul>
 							</div>
 						</li>

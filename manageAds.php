@@ -6,17 +6,17 @@ $conn = getConnectionMysqli();
 
 //Script php untuk delete blog
 if (isset($_GET['deleteButton'])) {
-    $blogId = $_GET['blogId'];
+    $adsId = $_GET['adsId'];
 
-    $sqlDelete = "DELETE FROM tb_blog WHERE blog_id = ?";
+    $sqlDelete = "DELETE FROM tb_ad WHERE ad_id = ?";
     $requestDelete = mysqli_prepare($conn, $sqlDelete);
 
-    mysqli_stmt_bind_param($requestDelete, "s", $blogId);
+    mysqli_stmt_bind_param($requestDelete, "s", $adsId);
     mysqli_stmt_execute($requestDelete);
     mysqli_stmt_close($requestDelete);
     mysqli_close($conn);
 
-    header("Location:news.php");
+    header("Location:manageAds.php");
     exit;
 }
 //End script delete blog
@@ -24,9 +24,9 @@ if (isset($_GET['deleteButton'])) {
 //Script Php untuk membuat request yuang mengambil detail data blog dari database
 if (isset($_GET['search-ads'])) {
     $searchAds = $_GET['searchorders'];
-    $sql = "SELECT ad_id, ad_title, date_published FROM tb_ad WHERE ad_title LIKE %$searchAds%'";
+    $sql = "SELECT ad_id, ad_title, date_published, date_expired FROM tb_ad WHERE ad_title LIKE %$searchAds%'";
 } else {
-    $sql = "SELECT ad_id, ad_title, date_published FROM tb_ad";
+    $sql = "SELECT ad_id, ad_title, date_published, date_expired FROM tb_ad";
 }
 
 $request = mysqli_query($conn, $sql);
@@ -270,7 +270,7 @@ $request = mysqli_query($conn, $sql);
                                 <ul class="submenu-list list-unstyled">
                                     <li class="submenu-item"><a class="submenu-link" href="news.php">News</a></li>
                                     <li class="submenu-item"><a class="submenu-link" href="manageCategory.php">News Category</a></li>
-                                    <li class="submenu-item"><a class="submenu-link active" href="manageCategory.php">Ads</a></li>
+                                    <li class="submenu-item"><a class="submenu-link active" href="manageAds.php">Ads</a></li>
                                 </ul>
                             </div>
                         </li>
@@ -384,6 +384,7 @@ $request = mysqli_query($conn, $sql);
                                                 <th class="cell">Ads ID</th>
                                                 <th class="cell">Title</th>
                                                 <th class="cell">Date Release</th>
+                                                <th class="cell">Date Expired</th>
                                                 <th class="cell"></th>
                                                 <th class="cell"></th>
                                             </tr>
@@ -396,16 +397,17 @@ $request = mysqli_query($conn, $sql);
                                                     $adsId = $index[0];
                                                     $adsTitle = $index[1];
                                                     $datePublished = $index[2];
+                                                    $dateExpired = $index[3];
                                                     echo <<<TULIS
 															<tr>
 																<td class="cell">$adsId</td>
 																<td class="cell"><span class="truncate">$adsTitle</span></td>
-																<td class="cell"><span>$datePublished</span><span class="note">2:16 PM</span></td>
+																<td class="cell"><span>$datePublished</span><span class="note">2:16 PM</span></td> <td class="cell"><span>$dateExpired</span><span class="note">2:16 PM</span></td>
 																<td class="cell">
 																	<a class="btn-sm app-btn-secondary" href="#">View</a>
 																</td>
 																<td class="cell">
-																	<a class="btn-sm app-btn-danger" data-toggle="modal" href="#delete-blog" onclick="getBlogId('$adsId')">Delete</a>
+																	<a class="btn-sm app-btn-danger" data-toggle="modal" href="#delete-ads" onclick="getAdsId('$adsId')">Delete</a>
 																</td>
 															</tr>
 														TULIS;
@@ -438,7 +440,7 @@ $request = mysqli_query($conn, $sql);
                 </div><!--//tab-content-->
 
                 <!-- Modal -->
-                <div class="modal fade" id="delete-blog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal fade" id="delete-ads" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -452,7 +454,7 @@ $request = mysqli_query($conn, $sql);
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn app-btn-secondary" data-dismiss="modal">Close</button>
-                                <form action="news.php" method="GET" id="conDeleteBlog">
+                                <form action="manageAds.php" method="GET" id="conDeleteAds">
                                     <input type="submit" id="submit" name="deleteButton" class="btn app-btn-confirmation" value="Ya, saya yakin">
                                 </form>
                             </div>
@@ -483,14 +485,14 @@ $request = mysqli_query($conn, $sql);
     <!-- Page Specific JS -->
     <script src="assets/js/app.js"></script>
     <script>
-        function getBlogId(blogId) {
-            console.log(blogId);
-            const formDelete = document.getElementById("conDeleteBlog");
+        function getAdsId(adsId) {
+            console.log(adsId);
+            const formDelete = document.getElementById("conDeleteAds");
             const createInput = document.createElement("input");
 
             createInput.setAttribute("type", "hidden");
-            createInput.setAttribute("name", "blogId");
-            createInput.setAttribute("value", blogId);
+            createInput.setAttribute("name", "adsId");
+            createInput.setAttribute("value", adsId);
 
             formDelete.appendChild(createInput);
         }

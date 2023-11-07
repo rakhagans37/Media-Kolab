@@ -277,6 +277,7 @@ require_once "connection/validateLogin.php";
 								<ul class="submenu-list list-unstyled">
 									<li class="submenu-item"><a class="submenu-link" href="news.php">News</a></li>
 									<li class="submenu-item"><a class="submenu-link" href="manageCategory.php">News Category</a></li>
+									<li class="submenu-item"><a class="submenu-link" href="manageAds.php">Ads</a></li>
 								</ul>
 							</div>
 						</li>

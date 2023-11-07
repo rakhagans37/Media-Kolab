@@ -241,6 +241,7 @@ require_once "connection/getConnectionMsqli.php";
                                 <ul class="submenu-list list-unstyled">
                                     <li class="submenu-item"><a class="submenu-link" href="news.php">News</a></li>
                                     <li class="submenu-item"><a class="submenu-link" href="manageCategory.php">News Category</a></li>
+                                    <li class="submenu-item"><a class="submenu-link" href="manageAds.php">Ads</a></li>
                                 </ul>
                             </div>
                         </li>
@@ -356,9 +357,9 @@ require_once "connection/getConnectionMsqli.php";
                                             $conn = getConnectionMysqli();
                                             if (isset($_GET['search-news'])) {
                                                 $searchUser = $_GET['searchorders'];
-                                                $sql = "SELECT tb_publisher.publisher_id, tb_publisher.username, tb_publisher.email, tb_publisher.phone_number, tb_role.role_name FROM tb_publisher INNER JOIN tb_role ON tb_publisher.role_id = tb_role.role_id WHERE username LIKE '%$searchUser%'";
+                                                $sql = "SELECT tb_editor.editor_id, tb_editor.username, tb_editor.email, tb_editor.phone_number, tb_role.role_name FROM tb_editor INNER JOIN tb_role ON tb_editor.role_id = tb_role.role_id WHERE username LIKE '%$searchUser%'";
                                             } else {
-                                                $sql = "SELECT tb_publisher.role_id, tb_role.role_name, COUNT(tb_publisher.role_id) AS jumlah_member FROM tb_publisher JOIN tb_role ON tb_publisher.role_id = tb_role.role_id GROUP BY tb_role.role_id";
+                                                $sql = "SELECT tb_editor.role_id, tb_role.role_name, COUNT(tb_editor.role_id) AS jumlah_member FROM tb_editor JOIN tb_role ON tb_editor.role_id = tb_role.role_id GROUP BY tb_role.role_id";
                                             }
 
                                             $request1 = mysqli_query($conn, $sql);
