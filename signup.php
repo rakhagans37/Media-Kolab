@@ -94,7 +94,7 @@ if (isset($_POST['signup-submit'])) {
 							</div>
 							<div class="phone-number mb-3">
 								<label class="sr-only" for="signup-phone-number">phone-number</label>
-								<input id="signup-phone-number" name="signup-phone-number" type="phone-number" class="form-control signup-phone-number" placeholder="Input your phonenumber" name="singup-phone-number required=" required">
+								<input id="signup-phone-number" name="signup-phone-number" type="phone-number" class="form-control signup-phone-number" placeholder="Input your phonenumber, ex : 081234567890" name="singup-phone-number required=" required">
 							</div>
 							<div class="role mb-3">
 								<select class="form-select" name="signup-role">
@@ -130,7 +130,7 @@ if (isset($_POST['signup-submit'])) {
 							</div>
 						</form><!--//auth-form-->
 
-						<div class="auth-option text-center pt-5">Already have an account? <a class="text-link" href="login.html">Log in</a></div>
+						<div class="auth-option text-center pt-5">Already have an account? <a class="text-link" href="loginPublisher.php">Log in</a></div>
 					</div><!--//auth-form-container-->
 
 

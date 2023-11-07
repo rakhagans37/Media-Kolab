@@ -2,6 +2,21 @@
 require_once "connection/getConnection.php";
 require_once "connection/validateLogin.php";
 require_once "connection/getConnectionMsqli.php";
+
+$conn = getConnectionMysqli();
+if (isset($_GET['add-category'])) {
+    $id = random_int(1, 99999);
+    $categoryName = $_GET['new-category'];
+    $sqlAdd = "INSERT INTO tb_category VALUES(?,?)";
+
+    $requestAddCat = mysqli_prepare($conn, $sqlAdd);
+    mysqli_stmt_bind_param($requestAddCat, "ss", $id, $categoryName);
+    mysqli_stmt_execute($requestAddCat);
+    mysqli_stmt_close($requestAddCat);
+
+    header("Location:manageCategory.php");
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -23,7 +38,8 @@ require_once "connection/getConnectionMsqli.php";
     <script defer src="assets/plugins/fontawesome/js/all.min.js"></script>
 
     <!-- App CSS -->
-    <link id="theme-style" rel="stylesheet" href="assets/css/portal.css">
+    <!-- <link id="theme-style" rel="stylesheet" href="assets/css/portal.css"> -->
+    <link id="theme-style" rel="stylesheet" href="assets\scss\portal.css">
 
 </head>
 
@@ -208,10 +224,10 @@ require_once "connection/getConnectionMsqli.php";
                                 <!--//submenu-arrow-->
                             </a>
                             <!--//nav-link-->
-                            <div id="submenu-1" class="collapse submenu submenu-1 show" data-bs-parent="#menu-accordion">
+                            <div id="submenu-1" class="collapse submenu submenu-1" data-bs-parent="#menu-accordion">
                                 <ul class="submenu-list list-unstyled">
                                     <li class="submenu-item"><a class="submenu-link" href="manageuser.php">Users Account</a></li>
-                                    <li class="submenu-item"><a class="submenu-link active" href="roles.php">Users Roles</a></li>
+                                    <li class="submenu-item"><a class="submenu-link" href="roles.php">Users Roles</a></li>
                                 </ul>
                             </div>
                         </li>
@@ -237,10 +253,10 @@ require_once "connection/getConnectionMsqli.php";
                                 <!--//submenu-arrow-->
                             </a>
                             <!--//nav-link-->
-                            <div id="submenu-2" class="collapse submenu submenu-2" data-bs-parent="#menu-accordion">
+                            <div id="submenu-2" class="collapse submenu submenu-2 show" data-bs-parent="#menu-accordion">
                                 <ul class="submenu-list list-unstyled">
                                     <li class="submenu-item"><a class="submenu-link" href="news.php">News</a></li>
-                                    <li class="submenu-item"><a class="submenu-link" href="manageCategory.php">News Category</a></li>
+                                    <li class="submenu-item"><a class="submenu-link active" href="manageCategory.php">News Category</a></li>
                                 </ul>
                             </div>
                         </li>
@@ -312,30 +328,32 @@ require_once "connection/getConnectionMsqli.php";
 
                 <div class="row g-3 mb-4 align-items-center justify-content-between">
                     <div class="col-auto">
-                        <h1 class="app-page-title mb-0">Roles</h1>
+                        <h1 class="app-page-title mb-0">News Category</h1>
                     </div>
                     <div class="col-auto">
                         <div class="page-utilities">
                             <div class="row g-2 justify-content-start justify-content-md-end align-items-center">
                                 <div class="col-auto">
-                                    <form class="table-search-form row gx-1 align-items-center" action="manageuser.php" method="GET">
+                                    <form class="table-search-form row gx-1 align-items-center" action="manageCategory.php" method="GET">
                                         <div class="col-auto">
                                             <input type="text" id="search-orders" name="searchorders" class="form-control search-orders" placeholder="Search">
                                         </div>
                                         <div class="col-auto">
                                             <button type="submit" class="btn app-btn-secondary" name="search-news">Search</button>
                                         </div>
+                                        <div class="col-auto">
+                                            <a class="btn app-btn-secondary" data-toggle="modal" href="#add-category" onclick="getBlogId($blogId)">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                                                    <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z" />
+                                                </svg>
+                                            </a>
+                                        </div>
                                     </form>
-
                                 </div><!--//col-->
                             </div><!--//row-->
                         </div><!--//table-utilities-->
                     </div><!--//col-auto-->
                 </div><!--//row-->
-
-                <nav id="orders-table-tab" class="orders-table-tab app-nav-tabs nav shadow-sm flex-column flex-sm-row mb-4">
-                    <a class="flex-sm-fill  text-sm-center nav-link active" id="orders-all-tab" data-bs-toggle="tab" href="#orders-all" role="tab" aria-controls="orders-all" aria-selected="true">User Roles</a>
-                </nav>
 
                 <div class="tab-content" id="orders-table-tab-content">
                     <div class="tab-pane fade show active" id="orders-all" role="tabpanel" aria-labelledby="orders-all-tab">
@@ -345,20 +363,19 @@ require_once "connection/getConnectionMsqli.php";
                                     <table class="table app-table-hover mb-0 text-left">
                                         <thead>
                                             <tr>
-                                                <th class="cell">Roles ID</th>
-                                                <th class="cell">Roles Name</th>
+                                                <th class="cell">Category ID</th>
+                                                <th class="cell">Category Name</th>
                                                 <th class="cell">Members</th>
                                                 <th class="cell"></th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php
-                                            $conn = getConnectionMysqli();
                                             if (isset($_GET['search-news'])) {
                                                 $searchUser = $_GET['searchorders'];
-                                                $sql = "SELECT tb_publisher.publisher_id, tb_publisher.username, tb_publisher.email, tb_publisher.phone_number, tb_role.role_name FROM tb_publisher INNER JOIN tb_role ON tb_publisher.role_id = tb_role.role_id WHERE username LIKE '%$searchUser%'";
+                                                $sql = "SELECT tb_category.category_id, tb_category.category_name, COUNT(tb_category.category_id) AS jumlah_member FROM tb_blog JOIN tb_category ON tb_blog.category_id = tb_category.category_id GROUP BY tb_category.category_id HAVING tb_category.category_name LIKE '%$searchUser%'";
                                             } else {
-                                                $sql = "SELECT tb_publisher.role_id, tb_role.role_name, COUNT(tb_publisher.role_id) AS jumlah_member FROM tb_publisher JOIN tb_role ON tb_publisher.role_id = tb_role.role_id GROUP BY tb_role.role_id";
+                                                $sql = "SELECT tb_category.category_id, tb_category.category_name, COUNT(tb_blog.category_id) AS jumlah_member FROM tb_blog RIGHT JOIN tb_category ON tb_blog.category_id = tb_category.category_id GROUP BY tb_category.category_id";
                                             }
 
                                             $request1 = mysqli_query($conn, $sql);
@@ -539,8 +556,28 @@ require_once "connection/getConnectionMsqli.php";
                     </div><!--//tab-pane-->
                 </div><!--//tab-content-->
 
-
-
+                <div class="modal fade" id="add-category" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Tambah Kategori Baru</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Masukkan kategori baru</p>
+                                <form class="row g-2 justify-content-start justify-content-md-end align-items-center" action="manageCategory.php" method="GET">
+                                    <input class="form-control app-btn-secondary" type="text" id="new-category" name="new-category">
+                                    <input type="submit" id="submit" name="add-category" class="btn app-btn-primary" value="Ya, saya yakin">
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn app-btn-secondary" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div><!--//container-fluid-->
         </div><!--//app-content-->
 
@@ -548,7 +585,6 @@ require_once "connection/getConnectionMsqli.php";
             <div class="container text-center py-3">
                 <!--/* This template is free as long as you keep the footer attribution link. If you'd like to use the template without the attribution link, you can buy the commercial license via our website: themes.3rdwavemedia.com Thank you for your support. :) */-->
                 <small class="copyright">Designed with <span class="sr-only">love</span><i class="fas fa-heart" style="color: #fb866a;"></i> by <a class="app-link" href="http://themes.3rdwavemedia.com" target="_blank">Xiaoying Riley</a> for developers</small>
-
             </div>
         </footer><!--//app-footer-->
 
@@ -557,6 +593,8 @@ require_once "connection/getConnectionMsqli.php";
 
     <!-- Javascript -->
     <script src="assets/plugins/popper.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
 
 

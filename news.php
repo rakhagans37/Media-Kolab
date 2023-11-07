@@ -2,6 +2,35 @@
 require_once "connection/getConnection.php";
 require_once "connection/validateLogin.php";
 require_once "connection/getConnectionMsqli.php";
+$conn = getConnectionMysqli();
+
+//Script php untuk delete blog
+if (isset($_GET['deleteButton'])) {
+	$blogId = $_GET['blogId'];
+
+	$sqlDelete = "DELETE FROM tb_blog WHERE blog_id = ?";
+	$requestDelete = mysqli_prepare($conn, $sqlDelete);
+
+	mysqli_stmt_bind_param($requestDelete, "s", $blogId);
+	mysqli_stmt_execute($requestDelete);
+	mysqli_stmt_close($requestDelete);
+	mysqli_close($conn);
+
+	header("Location:news.php");
+	exit;
+}
+//End script delete blog
+
+//Script Php untuk membuat request yuang mengambil detail data blog dari database
+if (isset($_GET['search-news'])) {
+	$searchNews = $_GET['searchorders'];
+	$sql = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_category.category_name, tb_blog.date_release, tb_publisher.username FROM ((tb_blog INNER JOIN tb_category ON tb_blog.category_id = tb_category.category_id) INNER JOIN tb_publisher ON tb_blog.publisher_id = tb_publisher.publisher_id) WHERE tb_blog.blog_title LIKE '%$searchNews%'";
+} else {
+	$sql = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_category.category_name, tb_blog.date_release, tb_publisher.username FROM ((tb_blog INNER JOIN tb_category ON tb_blog.category_id = tb_category.category_id) INNER JOIN tb_publisher ON tb_blog.publisher_id = tb_publisher.publisher_id)";
+}
+
+$request = mysqli_query($conn, $sql);
+//End script mengambil data blog
 ?>
 
 <!DOCTYPE html>
@@ -215,10 +244,11 @@ require_once "connection/getConnectionMsqli.php";
 								</ul>
 							</div>
 						</li>
-						<li class="nav-item">
+						<li class="nav-item has-submenu">
 							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-							<a class="nav-link active" href="orders.php">
+							<a class="nav-link submenu-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#submenu-2" aria-expanded="false" aria-controls="submenu-2">
 								<span class="nav-icon">
+									<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
 									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-card-list" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
 										<path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z" />
 										<path fill-rule="evenodd" d="M5 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 5 8zm0-2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0 5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5z" />
@@ -227,14 +257,25 @@ require_once "connection/getConnectionMsqli.php";
 										<circle cx="3.5" cy="10.5" r=".5" />
 									</svg>
 								</span>
-								<span class="nav-link-text">News</span>
-							</a><!--//nav-link-->
-						</li><!--//nav-item-->
-
-
+								<span class="nav-link-text">Manage News</span>
+								<span class="submenu-arrow">
+									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-chevron-down" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+										<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+									</svg>
+								</span>
+								<!--//submenu-arrow-->
+							</a>
+							<!--//nav-link-->
+							<div id="submenu-2" class="collapse submenu submenu-2 show" data-bs-parent="#menu-accordion">
+								<ul class="submenu-list list-unstyled">
+									<li class="submenu-item"><a class="submenu-link active" href="news.php">News</a></li>
+									<li class="submenu-item"><a class="submenu-link" href="manageCategory.php">News Category</a></li>
+								</ul>
+							</div>
+						</li>
 						<li class="nav-item has-submenu">
 							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-							<a class="nav-link submenu-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#submenu-2" aria-expanded="false" aria-controls="submenu-2">
+							<a class="nav-link submenu-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#submenu-3" aria-expanded="false" aria-controls="submenu-3">
 								<span class="nav-icon">
 									<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
 									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-files" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -249,10 +290,9 @@ require_once "connection/getConnectionMsqli.php";
 									</svg>
 								</span><!--//submenu-arrow-->
 							</a><!--//nav-link-->
-							<div id="submenu-2" class="collapse submenu submenu-2" data-bs-parent="#menu-accordion">
+							<div id="submenu-3" class="collapse submenu submenu-3" data-bs-parent="#menu-accordion">
 								<ul class="submenu-list list-unstyled">
 									<li class="submenu-item"><a class="submenu-link" href="account.php">Account</a></li>
-
 								</ul>
 							</div>
 						</li><!--//nav-item-->
@@ -352,16 +392,7 @@ require_once "connection/getConnectionMsqli.php";
 										</thead>
 										<tbody>
 											<?php
-											$conn = getConnectionMysqli();
-											if (isset($_GET['search-news'])) {
-												$searchNews = $_GET['searchorders'];
-												$sql = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_category.category_name, tb_blog.date_release, tb_publisher.username FROM ((tb_blog INNER JOIN tb_category ON tb_blog.category_id = tb_category.category_id) INNER JOIN tb_publisher ON tb_blog.publisher_id = tb_publisher.publisher_id) WHERE tb_blog.blog_title LIKE '%$searchNews%'";
-											} else {
-												$sql = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_category.category_name, tb_blog.date_release, tb_publisher.username FROM ((tb_blog INNER JOIN tb_category ON tb_blog.category_id = tb_category.category_id) INNER JOIN tb_publisher ON tb_blog.publisher_id = tb_publisher.publisher_id)";
-											}
-
-											$request = mysqli_query($conn, $sql);
-
+											// Print data detail blog dari request yang telah dibuat sebelumnya
 											if (mysqli_num_rows($request) > 0) {
 												foreach ($result = mysqli_fetch_all($request) as $index) {
 													$blogId = $index[0];
@@ -381,7 +412,7 @@ require_once "connection/getConnectionMsqli.php";
 																	<a class="btn-sm app-btn-secondary" href="#">View</a>
 																</td>
 																<td class="cell">
-																	<a class="btn-sm app-btn-danger" data-toggle="modal" href="#exampleModal">Delete</a>
+																	<a class="btn-sm app-btn-danger" data-toggle="modal" href="#delete-blog" onclick="getBlogId('$blogId')">Delete</a>
 																</td>
 															</tr>
 														TULIS;
@@ -414,11 +445,11 @@ require_once "connection/getConnectionMsqli.php";
 				</div><!--//tab-content-->
 
 				<!-- Modal -->
-				<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+				<div class="modal fade" id="delete-blog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 					<div class="modal-dialog" role="document">
 						<div class="modal-content">
 							<div class="modal-header">
-								<h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+								<h5 class="modal-title" id="exampleModalLabel">Konfirmasi</h5>
 								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 									<span aria-hidden="true">&times;</span>
 								</button>
@@ -428,7 +459,9 @@ require_once "connection/getConnectionMsqli.php";
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn app-btn-secondary" data-dismiss="modal">Close</button>
-								<button type="button" class="btn app-btn-confirmation">Ya, Saya yakin</button>
+								<form action="news.php" method="GET" id="conDeleteBlog">
+									<input type="submit" id="submit" name="deleteButton" class="btn app-btn-confirmation" value="Ya, saya yakin">
+								</form>
 							</div>
 						</div>
 					</div>
@@ -449,13 +482,27 @@ require_once "connection/getConnectionMsqli.php";
 
 	<!-- Javascript -->
 	<script src="assets/plugins/popper.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 	<script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
 
 
 	<!-- Page Specific JS -->
 	<script src="assets/js/app.js"></script>
-	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+	<script>
+		function getBlogId(blogId) {
+			console.log(blogId);
+			const formDelete = document.getElementById("conDeleteBlog");
+			const createInput = document.createElement("input");
+
+			createInput.setAttribute("type", "hidden");
+			createInput.setAttribute("name", "blogId");
+			createInput.setAttribute("value", blogId);
+
+			formDelete.appendChild(createInput);
+		}
+	</script>
+
 </body>
 
 </html>

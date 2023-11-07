@@ -2,6 +2,18 @@
 require_once "connection/getConnection.php";
 require_once "connection/validateLogin.php";
 require_once "connection/getConnectionMsqli.php";
+
+$conn = getConnectionMysqli();
+
+//Script untuk mengambil data publisher dari database
+if (isset($_GET['search-news'])) {
+    $searchUser = $_GET['search-orders'];
+    $sql = "SELECT tb_publisher.publisher_id, tb_publisher.username, tb_publisher.email, tb_publisher.phone_number, tb_role.role_name FROM tb_publisher INNER JOIN tb_role ON tb_publisher.role_id = tb_role.role_id WHERE username LIKE '%$searchUser%'";
+} else {
+    $sql = "SELECT tb_publisher.publisher_id, tb_publisher.username, tb_publisher.email, tb_publisher.phone_number, tb_role.role_name FROM tb_publisher INNER JOIN tb_role ON tb_publisher.role_id = tb_role.role_id";
+}
+
+$request = mysqli_query($conn, $sql);
 ?>
 
 <!DOCTYPE html>
@@ -216,10 +228,11 @@ require_once "connection/getConnectionMsqli.php";
                                 </ul>
                             </div>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item has-submenu">
                             <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-                            <a class="nav-link" href="news.php">
+                            <a class="nav-link submenu-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#submenu-2" aria-expanded="false" aria-controls="submenu-2">
                                 <span class="nav-icon">
+                                    <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
                                     <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-card-list" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                         <path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z" />
                                         <path fill-rule="evenodd" d="M5 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 5 8zm0-2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0 5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5z" />
@@ -228,12 +241,25 @@ require_once "connection/getConnectionMsqli.php";
                                         <circle cx="3.5" cy="10.5" r=".5" />
                                     </svg>
                                 </span>
-                                <span class="nav-link-text">News</span>
-                            </a><!--//nav-link-->
-                        </li><!--//nav-item-->
+                                <span class="nav-link-text">Manage News</span>
+                                <span class="submenu-arrow">
+                                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-chevron-down" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+                                    </svg>
+                                </span>
+                                <!--//submenu-arrow-->
+                            </a>
+                            <!--//nav-link-->
+                            <div id="submenu-2" class="collapse submenu submenu-2" data-bs-parent="#menu-accordion">
+                                <ul class="submenu-list list-unstyled">
+                                    <li class="submenu-item"><a class="submenu-link" href="news.php">News</a></li>
+                                    <li class="submenu-item"><a class="submenu-link" href="manageCategory.php">News Category</a></li>
+                                </ul>
+                            </div>
+                        </li>
                         <li class="nav-item has-submenu">
                             <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-                            <a class="nav-link submenu-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#submenu-2" aria-expanded="false" aria-controls="submenu-2">
+                            <a class="nav-link submenu-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#submenu-3" aria-expanded="false" aria-controls="submenu-3">
                                 <span class="nav-icon">
                                     <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
                                     <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-files" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -248,25 +274,11 @@ require_once "connection/getConnectionMsqli.php";
                                     </svg>
                                 </span><!--//submenu-arrow-->
                             </a><!--//nav-link-->
-                            <div id="submenu-2" class="collapse submenu submenu-2" data-bs-parent="#menu-accordion">
+                            <div id="submenu-3" class="collapse submenu submenu-3" data-bs-parent="#menu-accordion">
                                 <ul class="submenu-list list-unstyled">
                                     <li class="submenu-item"><a class="submenu-link" href="account.php">Account</a></li>
                                 </ul>
                             </div>
-                        </li><!--//nav-item-->
-
-
-                        <li class="nav-item">
-                            <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-                            <a class="nav-link" href="help.php">
-                                <span class="nav-icon">
-                                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-question-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                        <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
-                                        <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z" />
-                                    </svg>
-                                </span>
-                                <span class="nav-link-text">Help</span>
-                            </a><!--//nav-link-->
                         </li><!--//nav-item-->
                     </ul><!--//app-menu-->
                 </nav><!--//app-nav-->
@@ -307,7 +319,7 @@ require_once "connection/getConnectionMsqli.php";
                                 <div class="col-auto">
                                     <form class="table-search-form row gx-1 align-items-center" action="manageuser.php" method="GET">
                                         <div class="col-auto">
-                                            <input type="text" id="search-orders" name="searchorders" class="form-control search-orders" placeholder="Search">
+                                            <input type="text" id="search-orders" name="search-orders" class="form-control search-orders" placeholder="Search">
                                         </div>
                                         <div class="col-auto">
                                             <button type="submit" class="btn app-btn-secondary" name="search-news">Search</button>
@@ -343,31 +355,21 @@ require_once "connection/getConnectionMsqli.php";
                                         </thead>
                                         <tbody>
                                             <?php
-                                            $conn = getConnectionMysqli();
-                                            if (isset($_GET['search-news'])) {
-                                                $searchUser = $_GET['searchorders'];
-                                                $sql = "SELECT tb_publisher.publisher_id, tb_publisher.username, tb_publisher.email, tb_publisher.phone_number, tb_role.role_name FROM tb_publisher INNER JOIN tb_role ON tb_publisher.role_id = tb_role.role_id WHERE username LIKE '%$searchUser%'";
-                                            } else {
-                                                $sql = "SELECT tb_publisher.publisher_id, tb_publisher.username, tb_publisher.email, tb_publisher.phone_number, tb_role.role_name FROM tb_publisher INNER JOIN tb_role ON tb_publisher.role_id = tb_role.role_id";
-                                            }
-
-                                            $request = mysqli_query($conn, $sql);
-
                                             if (mysqli_num_rows($request) > 0) {
                                                 foreach ($result = mysqli_fetch_all($request) as $index) {
-                                                    $PublisherId = $index[0];
-                                                    $Username = $index[1];
-                                                    $Email = $index[2];
-                                                    $PhoneNumber = $index[3];
-                                                    $Role = $index[4];
+                                                    $publisherId = $index[0];
+                                                    $username = $index[1];
+                                                    $email = $index[2];
+                                                    $phoneNumber = $index[3];
+                                                    $role = $index[4];
                                                     echo <<<TULIS
 															<tr>
-																<td class="cell">$PublisherId</td>
-																<td class="cell"><span class="truncate">$Username</span></td>
-																<td class="cell">$Email</td>
-																<td class="cell"><span>$PhoneNumber</span><span class="note">2:16 PM</span></td>
-																<td class="cell"><span class="badge bg-success">$Role</span></td>
-																<td class="cell"><a class="btn-sm app-btn-secondary" href="#">View</a></td>
+																<td class="cell">$publisherId</td>
+																<td class="cell"><span class="truncate">$username</span></td>
+																<td class="cell">$email</td>
+																<td class="cell"><span>$phoneNumber</span><span class="note">2:16 PM</span></td>
+																<td class="cell"><span class="badge bg-success">$role</span></td>
+																<td class="cell"><a class="btn-sm app-btn-danger" href="#">Ban User</a></td>
 															</tr>
 														TULIS;
                                                 }

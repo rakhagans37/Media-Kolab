@@ -7,6 +7,7 @@ if (isset($_COOKIE['loginStatus']) && isset($_SESSION['loginStatus'])) {
 
 session_start();
 $loginFail = false;
+$loginFailByPassword = false;
 
 if (isset($_POST['login'])) {
     $email = $_POST['signin-email'];
@@ -35,10 +36,10 @@ if (isset($_POST['login'])) {
                     $_SESSION['loginStatus'] = $loginStatus;
                     $_SESSION['publisherId'] = $publisherId;
                 }
-                header('Location:index.php');
+                header('Location:indexPublisher.php');
                 exit;
             } else {
-                echo password_verify($password, $passwordHashed);
+                $loginFailByPassword = true;
             }
         } else {
             $loginFail = true;
@@ -160,7 +161,9 @@ if (isset($_POST['login'])) {
 
     <?php
     if ($loginFail) {
-        echo "<script> alert('Password Salah') </script>";
+        echo "<script> alert('Akun tidak ditemukan') </script>";
+    } else if ($loginFailByPassword) {
+        echo "<script> alert('Password salah') </script>";
     }
     ?>
 </body>
