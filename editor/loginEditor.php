@@ -1,5 +1,5 @@
 <?php
-require_once 'connection/getConnection.php';
+require_once '../connection/getConnection.php';
 if (isset($_COOKIE['loginStatus']) && isset($_SESSION['loginStatus'])) {
     header('Location:index.php');
     exit;
@@ -18,25 +18,25 @@ if (isset($_POST['login'])) {
         $conn = getConnection();
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        $sql = "SELECT * FROM tb_publisher where email = :email";
+        $sql = "SELECT * FROM tb_editor where email = :email";
         $request = $conn->prepare($sql);
 
         $request->bindParam('email', $email);
         $request->execute();
 
         if ($result = $request->fetchAll()) {
-            $publisherId = $result[0]['publisher_id'];
+            $editorId = $result[0]['editor_id'];
             $passwordHashed = $result[0]['password'];
             $loginStatus = true;
             if (password_verify($password, $passwordHashed)) {
                 if ($remember) {
-                    setcookie('publisherId', $publisherId, time() + (86400 * 7));
+                    setcookie('editorId', $editorId, time() + (86400 * 7));
                     setcookie('loginStatus', $loginStatus, time() + (86400 * 7));
                 } else {
                     $_SESSION['loginStatus'] = $loginStatus;
-                    $_SESSION['publisherId'] = $publisherId;
+                    $_SESSION['editorId'] = $editorId;
                 }
-                header('Location:indexPublisher.php');
+                header('Location:indexEditor.php');
                 exit;
             } else {
                 $loginFailByPassword = true;
@@ -68,10 +68,10 @@ if (isset($_POST['login'])) {
     <link rel="shortcut icon" href="favicon.ico">
 
     <!-- FontAwesome JS-->
-    <script defer src="assets/plugins/fontawesome/js/all.min.js"></script>
+    <script defer src="../assets/plugins/fontawesome/js/all.min.js"></script>
 
     <!-- App CSS -->
-    <link id="theme-style" rel="stylesheet" href="assets/css/portal.css">
+    <link id="theme-style" rel="stylesheet" href="../assets/css/portal.css">
 
 </head>
 
@@ -80,7 +80,7 @@ if (isset($_POST['login'])) {
         <div class="col-12 col-md-7 col-lg-6 auth-main-col text-center p-5">
             <div class="d-flex flex-column align-content-end">
                 <div class="app-auth-body mx-auto">
-                    <div class="app-auth-branding mb-4"><a class="app-logo" href="index.php"><img class="logo-icon me-2" src="assets/images/app-logo.svg" alt="logo"></a></div>
+                    <div class="app-auth-branding mb-4"><a class="app-logo" href="index.php"><img class="logo-icon me-2" src="../assets/images/app-logo.svg" alt="logo"></a></div>
                     <h2 class="auth-heading text-center mb-5">Log in to Portal</h2>
                     <div class="auth-form-container text-start">
                         <form class="auth-form login-form" method="POST">

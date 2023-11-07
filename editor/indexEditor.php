@@ -1,5 +1,5 @@
 <?php
-require_once "connection/validateLoginPublisher.php";
+require_once "../connection/validateLoginPublisher.php";
 ?>
 
 <!DOCTYPE html>
@@ -18,10 +18,10 @@ require_once "connection/validateLoginPublisher.php";
     <link rel="shortcut icon" href="favicon.ico">
 
     <!-- FontAwesome JS-->
-    <script defer src="assets/plugins/fontawesome/js/all.min.js"></script>
+    <script defer src="../assets/plugins/fontawesome/js/all.min.js"></script>
 
     <!-- App CSS -->
-    <link id="theme-style" rel="stylesheet" href="assets/css/portal.css">
+    <link id="theme-style" rel="stylesheet" href="../assets/css/portal.css">
 
 </head>
 
@@ -178,14 +178,14 @@ require_once "connection/validateLoginPublisher.php";
                             <!--//app-utility-item-->
 
                             <div class="app-utility-item app-user-dropdown dropdown">
-                                <a class="dropdown-toggle" id="user-dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false"><img src="assets/images/user.png" alt="user profile"></a>
+                                <a class="dropdown-toggle" id="user-dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false"><img src="../assets/images/user.png" alt="user profile"></a>
                                 <ul class="dropdown-menu" aria-labelledby="user-dropdown-toggle">
                                     <li><a class="dropdown-item" href="account.php">Account</a></li>
                                     <li><a class="dropdown-item" href="settings.php">Settings</a></li>
                                     <li>
                                         <hr class="dropdown-divider">
                                     </li>
-                                    <li><a class="dropdown-item" href="logout.php" id="logout">Log Out</a></li>
+                                    <li><a class="dropdown-item" href="logoutEditor.php" id="logout">Log Out</a></li>
                                 </ul>
                             </div>
                             <!--//app-user-dropdown-->
@@ -204,7 +204,7 @@ require_once "connection/validateLoginPublisher.php";
             <div class="sidepanel-inner d-flex flex-column">
                 <a href="#" id="sidepanel-close" class="sidepanel-close d-xl-none">&times;</a>
                 <div class="app-branding">
-                    <a class="app-logo" href="index.php"><img class="logo-icon me-2" src="assets/images/app-logo.svg" alt="logo"><span class="logo-text">PORTAL</span></a>
+                    <a class="app-logo" href="index.php"><img class="logo-icon me-2" src="../assets/images/app-logo.svg" alt="logo"><span class="logo-text">PORTAL</span></a>
 
                 </div>
                 <!--//app-branding-->
@@ -846,15 +846,15 @@ require_once "connection/validateLoginPublisher.php";
 
 
     <!-- Javascript -->
-    <script src="assets/plugins/popper.min.js"></script>
-    <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../assets/plugins/popper.min.js"></script>
+    <script src="../assets/plugins/bootstrap/js/bootstrap.min.js"></script>
 
     <!-- Charts JS -->
-    <script src="assets/plugins/chart.js/chart.min.js"></script>
-    <script src="assets/js/index-charts.js"></script>
+    <script src="../assets/plugins/chart.js/chart.min.js"></script>
+    <script src="../assets/js/index-charts.js"></script>
 
     <!-- Page Specific JS -->
-    <script src="assets/js/app.js"></script>
+    <script src="../assets/js/app.js"></script>
 </body>
 
 </html>
