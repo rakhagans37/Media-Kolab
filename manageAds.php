@@ -271,6 +271,7 @@ $request = mysqli_query($conn, $sql);
                                     <li class="submenu-item"><a class="submenu-link" href="news.php">News</a></li>
                                     <li class="submenu-item"><a class="submenu-link" href="manageCategory.php">News Category</a></li>
                                     <li class="submenu-item"><a class="submenu-link active" href="manageAds.php">Ads</a></li>
+                                    <li class="submenu-item"><a class="submenu-link" href="event.php">Event</a></li>
                                 </ul>
                             </div>
                         </li>

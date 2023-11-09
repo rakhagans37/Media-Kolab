@@ -2,35 +2,23 @@
 require_once "connection/getConnection.php";
 require_once "connection/validateLogin.php";
 require_once "connection/getConnectionMsqli.php";
+
 $conn = getConnectionMysqli();
 
-//Script php untuk delete blog
 if (isset($_GET['deleteButton'])) {
-	$blogId = $_GET['blogId'];
+	$eventId = $_GET['eventId'];
 
-	$sqlDelete = "DELETE FROM tb_blog WHERE blog_id = ?";
+	$sqlDelete = "DELETE FROM tb_event WHERE event_id = ?";
 	$requestDelete = mysqli_prepare($conn, $sqlDelete);
 
-	mysqli_stmt_bind_param($requestDelete, "s", $blogId);
+	mysqli_stmt_bind_param($requestDelete, "s", $eventId);
 	mysqli_stmt_execute($requestDelete);
 	mysqli_stmt_close($requestDelete);
 	mysqli_close($conn);
 
-	header("Location:news.php");
+	header("Location:event.php");
 	exit;
 }
-//End script delete blog
-
-//Script Php untuk membuat request yuang mengambil detail data blog dari database
-if (isset($_GET['search-news'])) {
-	$searchNews = $_GET['searchorders'];
-	$sql = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_category.category_name, tb_blog.date_release, tb_editor.username FROM ((tb_blog INNER JOIN tb_category ON tb_blog.category_id = tb_category.category_id) INNER JOIN tb_editor ON tb_blog.editor_id = tb_editor.editor_id) WHERE tb_blog.blog_title LIKE '%$searchNews%'";
-} else {
-	$sql = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_category.category_name, tb_blog.date_release, tb_editor.username FROM ((tb_blog INNER JOIN tb_category ON tb_blog.category_id = tb_category.category_id) INNER JOIN tb_editor ON tb_blog.editor_id = tb_editor.editor_id)";
-}
-
-$request = mysqli_query($conn, $sql);
-//End script mengambil data blog
 ?>
 
 <!DOCTYPE html>
@@ -206,112 +194,116 @@ $request = mysqli_query($conn, $sql);
 				</div><!--//app-branding-->
 				<nav id="app-nav-main" class="app-nav app-nav-main flex-grow-1">
 					<ul class="app-menu list-unstyled accordion" id="menu-accordion">
-						<li class="nav-item">
-							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-							<a class="nav-link" href="index.php">
-								<span class="nav-icon">
-									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-house-door" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-										<path fill-rule="evenodd" d="M7.646 1.146a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 .146.354v7a.5.5 0 0 1-.5.5H9.5a.5.5 0 0 1-.5-.5v-4H7v4a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .146-.354l6-6zM2.5 7.707V14H6v-4a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v4h3.5V7.707L8 2.207l-5.5 5.5z" />
-										<path fill-rule="evenodd" d="M13 2.5V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z" />
-									</svg>
-								</span>
-								<span class="nav-link-text">Overview</span>
-							</a><!--//nav-link-->
-						</li><!--//nav-item-->
-						<li class="nav-item has-submenu">
-							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-							<a class="nav-link submenu-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#submenu-1" aria-expanded="false" aria-controls="submenu-1">
-								<span class="nav-icon">
+						<nav id="app-nav-main" class="app-nav app-nav-main flex-grow-1">
+							<ul class="app-menu list-unstyled accordion" id="menu-accordion">
+								<li class="nav-item">
 									<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-files" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-										<path fill-rule="evenodd" d="M4 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4z" />
-										<path d="M6 0h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2v-1a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H6a1 1 0 0 0-1 1H4a2 2 0 0 1 2-2z" />
-									</svg>
-								</span>
-								<span class="nav-link-text">Manage User</span>
-								<span class="submenu-arrow">
-									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-chevron-down" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-										<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
-									</svg>
-								</span>
-								<!--//submenu-arrow-->
-							</a>
-							<!--//nav-link-->
-							<div id="submenu-1" class="collapse submenu submenu-1" data-bs-parent="#menu-accordion">
-								<ul class="submenu-list list-unstyled">
-									<li class="submenu-item"><a class="submenu-link" href="manageuser.php">Users Account</a></li>
-									<li class="submenu-item"><a class="submenu-link" href="roles.php">Users Roles</a></li>
-								</ul>
-							</div>
-						</li>
-						<li class="nav-item has-submenu">
-							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-							<a class="nav-link submenu-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#submenu-2" aria-expanded="false" aria-controls="submenu-2">
-								<span class="nav-icon">
+									<a class="nav-link" href="index.php">
+										<span class="nav-icon">
+											<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-house-door" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+												<path fill-rule="evenodd" d="M7.646 1.146a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 .146.354v7a.5.5 0 0 1-.5.5H9.5a.5.5 0 0 1-.5-.5v-4H7v4a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .146-.354l6-6zM2.5 7.707V14H6v-4a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v4h3.5V7.707L8 2.207l-5.5 5.5z" />
+												<path fill-rule="evenodd" d="M13 2.5V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z" />
+											</svg>
+										</span>
+										<span class="nav-link-text">Overview</span>
+									</a><!--//nav-link-->
+								</li><!--//nav-item-->
+								<li class="nav-item has-submenu">
 									<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-card-list" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-										<path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z" />
-										<path fill-rule="evenodd" d="M5 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 5 8zm0-2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0 5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5z" />
-										<circle cx="3.5" cy="5.5" r=".5" />
-										<circle cx="3.5" cy="8" r=".5" />
-										<circle cx="3.5" cy="10.5" r=".5" />
-									</svg>
-								</span>
-								<span class="nav-link-text">Manage News</span>
-								<span class="submenu-arrow">
-									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-chevron-down" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-										<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
-									</svg>
-								</span>
-								<!--//submenu-arrow-->
-							</a>
-							<!--//nav-link-->
-							<div id="submenu-2" class="collapse submenu submenu-2 show" data-bs-parent="#menu-accordion">
-								<ul class="submenu-list list-unstyled">
-									<li class="submenu-item"><a class="submenu-link active" href="news.php">News</a></li>
-									<li class="submenu-item"><a class="submenu-link" href="manageCategory.php">News Category</a></li>
-									<li class="submenu-item"><a class="submenu-link" href="manageAds.php">Ads</a></li>
-									<li class="submenu-item"><a class="submenu-link" href="event.php">Event</a></li>
-								</ul>
-							</div>
-						</li>
-						<li class="nav-item has-submenu">
-							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-							<a class="nav-link submenu-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#submenu-3" aria-expanded="false" aria-controls="submenu-3">
-								<span class="nav-icon">
+									<a class="nav-link submenu-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#submenu-1" aria-expanded="false" aria-controls="submenu-1">
+										<span class="nav-icon">
+											<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+											<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-files" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+												<path fill-rule="evenodd" d="M4 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4z" />
+												<path d="M6 0h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2v-1a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H6a1 1 0 0 0-1 1H4a2 2 0 0 1 2-2z" />
+											</svg>
+										</span>
+										<span class="nav-link-text">Manage User</span>
+										<span class="submenu-arrow">
+											<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-chevron-down" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+												<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+											</svg>
+										</span>
+										<!--//submenu-arrow-->
+									</a>
+									<!--//nav-link-->
+									<div id="submenu-1" class="collapse submenu submenu-1" data-bs-parent="#menu-accordion">
+										<ul class="submenu-list list-unstyled">
+											<li class="submenu-item"><a class="submenu-link" href="manageuser.php">Users Account</a></li>
+											<li class="submenu-item"><a class="submenu-link" href="roles.php">Users Roles</a></li>
+										</ul>
+									</div>
+								</li>
+								<li class="nav-item has-submenu">
 									<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-files" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-										<path fill-rule="evenodd" d="M4 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4z" />
-										<path d="M6 0h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2v-1a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H6a1 1 0 0 0-1 1H4a2 2 0 0 1 2-2z" />
-									</svg>
-								</span>
-								<span class="nav-link-text">Pages</span>
-								<span class="submenu-arrow">
-									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-chevron-down" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-										<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
-									</svg>
-								</span><!--//submenu-arrow-->
-							</a><!--//nav-link-->
-							<div id="submenu-3" class="collapse submenu submenu-3" data-bs-parent="#menu-accordion">
-								<ul class="submenu-list list-unstyled">
-									<li class="submenu-item"><a class="submenu-link" href="account.php">Account</a></li>
-								</ul>
-							</div>
-						</li><!--//nav-item-->
+									<a class="nav-link submenu-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#submenu-2" aria-expanded="false" aria-controls="submenu-2">
+										<span class="nav-icon">
+											<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+											<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-card-list" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+												<path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z" />
+												<path fill-rule="evenodd" d="M5 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 5 8zm0-2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0 5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5z" />
+												<circle cx="3.5" cy="5.5" r=".5" />
+												<circle cx="3.5" cy="8" r=".5" />
+												<circle cx="3.5" cy="10.5" r=".5" />
+											</svg>
+										</span>
+										<span class="nav-link-text">Manage News</span>
+										<span class="submenu-arrow">
+											<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-chevron-down" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+												<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+											</svg>
+										</span>
+										<!--//submenu-arrow-->
+									</a>
+									<!--//nav-link-->
+									<div id="submenu-2" class="collapse submenu submenu-2 show" data-bs-parent="#menu-accordion">
+										<ul class="submenu-list list-unstyled">
+											<li class="submenu-item"><a class="submenu-link" href="news.php">News</a></li>
+											<li class="submenu-item"><a class="submenu-link" href="manageCategory.php">News Category</a></li>
+											<li class="submenu-item"><a class="submenu-link" href="manageAds.php">Ads</a></li>
+											<li class="submenu-item"><a class="submenu-link active" href="event.php">Event</a></li>
+										</ul>
+									</div>
+								</li>
+								<li class="nav-item has-submenu">
+									<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+									<a class="nav-link submenu-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#submenu-3" aria-expanded="false" aria-controls="submenu-3">
+										<span class="nav-icon">
+											<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+											<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-files" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+												<path fill-rule="evenodd" d="M4 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4z" />
+												<path d="M6 0h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2v-1a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H6a1 1 0 0 0-1 1H4a2 2 0 0 1 2-2z" />
+											</svg>
+										</span>
+										<span class="nav-link-text">Pages</span>
+										<span class="submenu-arrow">
+											<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-chevron-down" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+												<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+											</svg>
+										</span><!--//submenu-arrow-->
+									</a><!--//nav-link-->
+									<div id="submenu-3" class="collapse submenu submenu-3" data-bs-parent="#menu-accordion">
+										<ul class="submenu-list list-unstyled">
+											<li class="submenu-item"><a class="submenu-link" href="account.php">Account</a></li>
+										</ul>
+									</div>
+								</li><!--//nav-item-->
 
 
-						<li class="nav-item">
-							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-							<a class="nav-link" href="help.php">
-								<span class="nav-icon">
-									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-question-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-										<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
-										<path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z" />
-									</svg>
-								</span>
-								<span class="nav-link-text">Help</span>
-							</a><!--//nav-link-->
-						</li><!--//nav-item-->
+								<li class="nav-item">
+									<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+									<a class="nav-link" href="help.php">
+										<span class="nav-icon">
+											<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-question-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+												<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+												<path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z" />
+											</svg>
+										</span>
+										<span class="nav-link-text">Help</span>
+									</a><!--//nav-link-->
+								</li><!--//nav-item-->
+							</ul><!--//app-menu-->
+						</nav><!--//app-nav-->
 					</ul><!--//app-menu-->
 				</nav><!--//app-nav-->
 				<div class="app-sidepanel-footer">
@@ -343,8 +335,9 @@ $request = mysqli_query($conn, $sql);
 
 				<div class="row g-3 mb-4 align-items-center justify-content-between">
 					<div class="col-auto">
-						<h1 class="app-page-title mb-0">News</h1>
+						<h1 class="app-page-title mb-0">Event</h1>
 					</div>
+
 					<div class="col-auto">
 						<div class="page-utilities">
 							<div class="row g-2 justify-content-start justify-content-md-end align-items-center">
@@ -382,7 +375,7 @@ $request = mysqli_query($conn, $sql);
 									<table class="table app-table-hover mb-0 text-left">
 										<thead>
 											<tr>
-												<th class="cell">News ID</th>
+												<th class="cell">Event ID</th>
 												<th class="cell">Title</th>
 												<th class="cell">Category</th>
 												<th class="cell">Date Release</th>
@@ -394,35 +387,50 @@ $request = mysqli_query($conn, $sql);
 										</thead>
 										<tbody>
 											<?php
-											// Print data detail blog dari request yang telah dibuat sebelumnya
+											$conn = getConnectionMysqli();
+											if (isset($_GET['search-news'])) {
+												$searchNews = $_GET['searchorders'];
+												$sql = "SELECT tb_event.event_id, tb_event.event_title, tb_category.category_name, tb_event.date_release, tb_publisher.username FROM ((tb_event INNER JOIN tb_category ON tb_event.category_id = tb_category.category_id) INNER JOIN tb_editor ON tb_event.editor_id = tb_editor.editor_id) WHERE tb_event.event_title LIKE '%$searchNews%'";
+											} else {
+												$sql = "SELECT tb_event.event_id, tb_event.event_title, tb_category.category_name, tb_event.date_release, tb_editor.username FROM ((tb_event INNER JOIN tb_category ON tb_event.category_id = tb_category.category_id) INNER JOIN tb_editor ON tb_event.editor_id = tb_editor.editor_id)";
+											}
+
+											$request = mysqli_query($conn, $sql);
+
 											if (mysqli_num_rows($request) > 0) {
 												foreach ($result = mysqli_fetch_all($request) as $index) {
-													$blogId = $index[0];
-													$blogTitle = $index[1];
+													$eventId = $index[0];
+													$eventTitle = $index[1];
 													$category = $index[2];
 													$dateRelease = $index[3];
 													$publisher = $index[4];
+
+
 													echo <<<TULIS
-															<tr>
-																<td class="cell">$blogId</td>
-																<td class="cell"><span class="truncate">$blogTitle</span></td>
-																<td class="cell">$category</td>
-																<td class="cell"><span>$dateRelease</span><span class="note">2:16 PM</span></td>
-																<td class="cell"><span class="badge bg-success">Paid</span></td>
-																<td class="cell">$publisher</td>
-																<td class="cell">
-																	<a class="btn-sm app-btn-secondary" href="#">View</a>
-																</td>
-																<td class="cell">
-																	<a class="btn-sm app-btn-danger" data-toggle="modal" href="#delete-blog" onclick="getBlogId('$blogId')">Delete</a>
-																</td>
-															</tr>
-														TULIS;
+                                                                <tr>
+                                                                    <td class="cell">$eventId</td>
+                                                                    <td class="cell"><span class="truncate">$eventTitle</span></td>
+                                                                    <td class="cell">$category</td>
+                                                                    <td class="cell"><span>$dateRelease</span><span class="note">2:16 PM</span></td>
+                                                                    <td class="cell"><span class="badge bg-success">Paid</span></td>
+                                                                    <td class="cell">$publisher</td>
+                                                                    <td class="cell">
+                                                                        <a class="btn-sm app-btn-secondary" href="#">View</a>
+                                                                    </td>
+                                                                    <td class="cell">
+
+                                                                        <a class="btn-sm app-btn-danger" data-toggle="modal" href="#exampleModal" onclick="getEventId('$eventId')">Delete</a>
+                                                                    </td>
+                                                                </tr>
+                                                            TULIS;
 												}
 											}
 
 											mysqli_close($conn);
 											?>
+
+
+
 										</tbody>
 									</table>
 								</div><!--//table-responsive-->
@@ -447,11 +455,13 @@ $request = mysqli_query($conn, $sql);
 				</div><!--//tab-content-->
 
 				<!-- Modal -->
-				<div class="modal fade" id="delete-blog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+
+				<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 					<div class="modal-dialog" role="document">
 						<div class="modal-content">
 							<div class="modal-header">
-								<h5 class="modal-title" id="exampleModalLabel">Konfirmasi</h5>
+								<h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
 								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 									<span aria-hidden="true">&times;</span>
 								</button>
@@ -461,13 +471,17 @@ $request = mysqli_query($conn, $sql);
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn app-btn-secondary" data-dismiss="modal">Close</button>
-								<form action="news.php" method="GET" id="conDeleteBlog">
-									<input type="submit" id="submit" name="deleteButton" class="btn app-btn-confirmation" value="Ya, saya yakin">
+								<form action="event.php" method="GET" id="conDeleteEvent">
+									<input href="$hapus" id="submit" type="submit" name="deleteButton" class="btn app-btn-confirmation" value="Ya, Saya yakin"></input>
 								</form>
 							</div>
 						</div>
 					</div>
 				</div>
+
+
+
+
 			</div><!--//container-fluid-->
 		</div><!--//app-content-->
 
@@ -484,27 +498,26 @@ $request = mysqli_query($conn, $sql);
 
 	<!-- Javascript -->
 	<script src="assets/plugins/popper.min.js"></script>
-	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 	<script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-
-
-	<!-- Page Specific JS -->
-	<script src="assets/js/app.js"></script>
 	<script>
-		function getBlogId(blogId) {
-			console.log(blogId);
-			const formDelete = document.getElementById("conDeleteBlog");
+		function getEventId(eventId) {
+			console.log(eventId);
+			const formDelete = document.getElementById("conDeleteEvent");
 			const createInput = document.createElement("input");
 
 			createInput.setAttribute("type", "hidden");
-			createInput.setAttribute("name", "blogId");
-			createInput.setAttribute("value", blogId);
+			createInput.setAttribute("name", "eventId");
+			createInput.setAttribute("value", eventId);
 
 			formDelete.appendChild(createInput);
 		}
 	</script>
 
+
+	<!-- Page Specific JS -->
+	<script src="assets/js/app.js"></script>
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 </body>
 
 </html>

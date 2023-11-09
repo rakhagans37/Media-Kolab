@@ -8,9 +8,9 @@ $conn = getConnectionMysqli();
 //Script untuk mengambil data publisher dari database
 if (isset($_GET['search-news'])) {
     $searchUser = $_GET['search-orders'];
-    $sql = "SELECT tb_editor.editor_id, tb_editor.username, tb_editor.email, tb_editor.phone_number, tb_role.role_name FROM tb_editor INNER JOIN tb_role ON tb_editor.role_id = tb_role.role_id WHERE username LIKE '%$searchUser%'";
+    $sql = "SELECT tb_editor.editor_id, tb_editor.username, tb_editor.email, tb_editor.phone_number, COUNT(tb_editor.editor_id) ,tb_role.role_name FROM tb_editor INNER JOIN tb_role ON tb_editor.role_id = tb_role.role_id LEFT JOIN tb_blog ON tb_blog.editor_id = tb_editor.editor_id WHERE username LIKE '%$searchUser%'";
 } else {
-    $sql = "SELECT tb_editor.editor_id, tb_editor.username, tb_editor.email, tb_editor.phone_number, tb_role.role_name FROM tb_editor INNER JOIN tb_role ON tb_editor.role_id = tb_role.role_id";
+    $sql = "SELECT tb_editor.editor_id, tb_editor.username, tb_editor.email, tb_editor.phone_number, COUNT(tb_blog.editor_id) ,tb_role.role_name FROM tb_editor INNER JOIN tb_role ON tb_editor.role_id = tb_role.role_id LEFT JOIN tb_blog ON tb_blog.editor_id = tb_editor.editor_id GROUP BY tb_editor.editor_id";
 }
 
 $request = mysqli_query($conn, $sql);
@@ -255,6 +255,7 @@ $request = mysqli_query($conn, $sql);
                                     <li class="submenu-item"><a class="submenu-link" href="news.php">News</a></li>
                                     <li class="submenu-item"><a class="submenu-link" href="manageCategory.php">News Category</a></li>
                                     <li class="submenu-item"><a class="submenu-link" href="manageAds.php">Ads</a></li>
+                                    <li class="submenu-item"><a class="submenu-link" href="event.php">Event</a></li>
                                 </ul>
                             </div>
                         </li>
@@ -350,6 +351,7 @@ $request = mysqli_query($conn, $sql);
                                                 <th class="cell">Username</th>
                                                 <th class="cell">Email</th>
                                                 <th class="cell">Phone Number</th>
+                                                <th class="cell">Partisipasi</th>
                                                 <th class="cell">Role</th>
                                                 <th class="cell"></th>
                                             </tr>
@@ -362,13 +364,14 @@ $request = mysqli_query($conn, $sql);
                                                     $username = $index[1];
                                                     $email = $index[2];
                                                     $phoneNumber = $index[3];
-                                                    $role = $index[4];
+                                                    $participation = $index[4];
+                                                    $role = $index[5];
                                                     echo <<<TULIS
 															<tr>
 																<td class="cell">$publisherId</td>
 																<td class="cell"><span class="truncate">$username</span></td>
 																<td class="cell">$email</td>
-																<td class="cell"><span>$phoneNumber</span><span class="note">2:16 PM</span></td>
+																<td class="cell"><span>$phoneNumber</span><span class="note">2:16 PM</span></td> <td class="cell">$participation Blog/Media</td>
 																<td class="cell"><span class="badge bg-success">$role</span></td>
 																<td class="cell"><a class="btn-sm app-btn-danger" href="#">Ban User</a></td>
 															</tr>

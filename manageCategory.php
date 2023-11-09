@@ -258,6 +258,7 @@ if (isset($_GET['add-category'])) {
                                     <li class="submenu-item"><a class="submenu-link" href="news.php">News</a></li>
                                     <li class="submenu-item"><a class="submenu-link active" href="manageCategory.php">News Category</a></li>
                                     <li class="submenu-item"><a class="submenu-link" href="manageAds.php">Ads</a></li>
+                                    <li class="submenu-item"><a class="submenu-link" href="event.php">Event</a></li>
                                 </ul>
                             </div>
                         </li>
@@ -570,7 +571,7 @@ if (isset($_GET['add-category'])) {
                                 <p>Masukkan kategori baru</p>
                                 <form class="row g-2 justify-content-start justify-content-md-end align-items-center" action="manageCategory.php" method="GET">
                                     <input class="form-control app-btn-secondary" type="text" id="new-category" name="new-category">
-                                    <input type="submit" id="submit" name="add-category" class="btn app-btn-primary" value="Ya, saya yakin">
+                                    <input type="submit" id="submit" name="add-category" class="btn app-btn-primary" value="Tambahkan">
                                 </form>
                             </div>
                             <div class="modal-footer">
