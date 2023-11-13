@@ -1,4 +1,5 @@
 <?php
+/* Koneksi database dengan metode PDO */
 function getConnection()
 {
     $server = 'localhost';

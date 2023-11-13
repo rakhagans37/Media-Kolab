@@ -1,4 +1,5 @@
 <?php
+/* Koneksi database dengan metode mysqli */
 function getConnectionMysqli()
 {
     $server = 'localhost';

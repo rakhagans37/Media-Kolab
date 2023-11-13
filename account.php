@@ -1,8 +1,88 @@
 <?php
+require_once 'connection/validateLogin.php';
 require_once 'connection/getConnection.php';
-session_start();
+require __DIR__ . '/vendor/autoload.php';
+
+// Use the Configuration class 
+use Cloudinary\Configuration\Configuration;
+// Use the UploadApi class for uploading assets
+use Cloudinary\Api\Upload\UploadApi;
+//Get Detailed Photo
+use Cloudinary\Api\Admin\AdminApi;
+// Use the AdminApi class for managing assets
+use Cloudinary\Transformation\Resize;
+use Cloudinary\Transformation\Gravity;
+use Cloudinary\Transformation\FocusOn;
+use Cloudinary\Transformation\RoundCorners;
+use Cloudinary\Transformation\Delivery;
+use Cloudinary\Transformation\Format;
+use Cloudinary\Tag\ImageTag;
+
+// Configure an instance of your Cloudinary cloud
+Configuration::instance('cloudinary://687349936855341:YYl-ARmSPNM0vXhBOL3SeY-bQcg@drmtgjbht');
 
 $idAdmin = $_SESSION['idAdmin'] ?? $_COOKIE['idAdmin'];
+
+if ($_SERVER['REQUEST_METHOD'] == "POST") {
+    if (isset($_POST['changePhotoButton'])) {
+        $newPhoto = $_FILES['new-photo']['tmp_name'];
+        $photoName = date("dmYHis") . $idAdmin;
+        $photoNameHashed = openssl_encrypt($photoName, 'AES-128-CTR', 'mediaKolab123', 0, '1234567891011121');
+        $upload = new UploadApi();
+        $upload->upload($newPhoto, [
+            'public_id' => $photoName,
+            'use_filename' => TRUE,
+            'overwrite' => TRUE
+        ]);
+
+        try {
+            $conn = getConnection();
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            $sql = "UPDATE tb_admin SET profile_photo = :newPhoto WHERE admin_id = :idAdmin";
+            $request = $conn->prepare($sql);
+
+            $request->bindParam('idAdmin', $idAdmin);
+            $request->bindParam('newPhoto', $photoNameHashed);
+            $request->execute();
+
+            //Saving profile photo into cookies
+            $decrypt = openssl_decrypt($photoNameHashed, 'AES-128-CTR', 'mediaKolab123', 0, '1234567891011121');
+            $admin = new AdminApi();
+            $assetData = $admin->asset($decrypt, [
+                'colors' => TRUE
+            ]);
+            $assetWidth = $assetData['width'];
+            $assetHeight = $assetData['height'];
+            $cropSize = $assetHeight <= $assetWidth ? $assetHeight : $assetWidth;
+
+            //Get Photo
+            $imgtag = (new ImageTag($decrypt))
+                ->resize(
+                    Resize::crop()->width($cropSize)
+                        ->height($cropSize)
+                        ->gravity(
+                            Gravity::focusOn(
+                                FocusOn::face()
+                            )
+                        )
+                )
+                ->roundCorners(RoundCorners::max())
+                ->resize(Resize::scale()->width(60))
+                ->delivery(Delivery::format(
+                    Format::auto()
+                ));
+
+            setcookie('profilePhoto', $imgtag, time() + (86400 * 7));
+
+            $conn = null;
+            header("Location:account.php");
+        } catch (PDOException $errorMessage) {
+            $error = $errorMessage->getMessage();
+        }
+    }
+}
+
 try {
     $conn = getConnection();
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -22,6 +102,7 @@ try {
     $error = $errorMessage->getMessage();
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -46,9 +127,6 @@ try {
 </head>
 
 <body class="app">
-    <script>
-        console.log(<?= $error ?? 'Aman' ?>);
-    </script>
     <header class="app-header fixed-top">
         <div class="app-header-inner">
             <div class="container-fluid py-2">
@@ -77,117 +155,6 @@ try {
                         <!--//app-search-box-->
 
                         <div class="app-utilities col-auto">
-                            <div class="app-utility-item app-notifications-dropdown dropdown">
-                                <a class="dropdown-toggle no-toggle-arrow" id="notifications-dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false" title="Notifications">
-                                    <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-                                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-bell icon" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2z" />
-                                        <path fill-rule="evenodd" d="M8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z" />
-                                    </svg>
-                                    <span class="icon-badge">3</span>
-                                </a>
-                                <!--//dropdown-toggle-->
-
-                                <div class="dropdown-menu p-0" aria-labelledby="notifications-dropdown-toggle">
-                                    <div class="dropdown-menu-header p-3">
-                                        <h5 class="dropdown-menu-title mb-0">Notifications</h5>
-                                    </div>
-                                    <!--//dropdown-menu-title-->
-                                    <div class="dropdown-menu-content">
-                                        <div class="item p-3">
-                                            <div class="row gx-2 justify-content-between align-items-center">
-                                                <div class="col-auto">
-                                                    <img class="profile-image" src="assets/images/profiles/profile-1.png" alt="">
-                                                </div>
-                                                <!--//col-->
-                                                <div class="col">
-                                                    <div class="info">
-                                                        <div class="desc">Amy shared a file with you. Lorem ipsum dolor
-                                                            sit amet, consectetur adipiscing elit. </div>
-                                                        <div class="meta"> 2 hrs ago</div>
-                                                    </div>
-                                                </div>
-                                                <!--//col-->
-                                            </div>
-                                            <!--//row-->
-                                            <a class="link-mask" href="#"></a>
-                                        </div>
-                                        <!--//item-->
-                                        <div class="item p-3">
-                                            <div class="row gx-2 justify-content-between align-items-center">
-                                                <div class="col-auto">
-                                                    <div class="app-icon-holder">
-                                                        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-receipt" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                                            <path fill-rule="evenodd" d="M1.92.506a.5.5 0 0 1 .434.14L3 1.293l.646-.647a.5.5 0 0 1 .708 0L5 1.293l.646-.647a.5.5 0 0 1 .708 0L7 1.293l.646-.647a.5.5 0 0 1 .708 0L9 1.293l.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .801.13l.5 1A.5.5 0 0 1 15 2v12a.5.5 0 0 1-.053.224l-.5 1a.5.5 0 0 1-.8.13L13 14.707l-.646.647a.5.5 0 0 1-.708 0L11 14.707l-.646.647a.5.5 0 0 1-.708 0L9 14.707l-.646.647a.5.5 0 0 1-.708 0L7 14.707l-.646.647a.5.5 0 0 1-.708 0L5 14.707l-.646.647a.5.5 0 0 1-.708 0L3 14.707l-.646.647a.5.5 0 0 1-.801-.13l-.5-1A.5.5 0 0 1 1 14V2a.5.5 0 0 1 .053-.224l.5-1a.5.5 0 0 1 .367-.27zm.217 1.338L2 2.118v11.764l.137.274.51-.51a.5.5 0 0 1 .707 0l.646.647.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.509.509.137-.274V2.118l-.137-.274-.51.51a.5.5 0 0 1-.707 0L12 1.707l-.646.647a.5.5 0 0 1-.708 0L10 1.707l-.646.647a.5.5 0 0 1-.708 0L8 1.707l-.646.647a.5.5 0 0 1-.708 0L6 1.707l-.646.647a.5.5 0 0 1-.708 0L4 1.707l-.646.647a.5.5 0 0 1-.708 0l-.509-.51z" />
-                                                            <path fill-rule="evenodd" d="M3 4.5a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5zm8-6a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5z" />
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                                <!--//col-->
-                                                <div class="col">
-                                                    <div class="info">
-                                                        <div class="desc">You have a new invoice. Proin venenatis
-                                                            interdum est.</div>
-                                                        <div class="meta"> 1 day ago</div>
-                                                    </div>
-                                                </div>
-                                                <!--//col-->
-                                            </div>
-                                            <!--//row-->
-                                            <a class="link-mask" href="#"></a>
-                                        </div>
-                                        <!--//item-->
-                                        <div class="item p-3">
-                                            <div class="row gx-2 justify-content-between align-items-center">
-                                                <div class="col-auto">
-                                                    <div class="app-icon-holder icon-holder-mono">
-                                                        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-bar-chart-line" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                                            <path fill-rule="evenodd" d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1V2zm1 12h2V2h-2v12zm-3 0V7H7v7h2zm-5 0v-3H2v3h2z" />
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                                <!--//col-->
-                                                <div class="col">
-                                                    <div class="info">
-                                                        <div class="desc">Your report is ready. Proin venenatis interdum
-                                                            est.</div>
-                                                        <div class="meta"> 3 days ago</div>
-                                                    </div>
-                                                </div>
-                                                <!--//col-->
-                                            </div>
-                                            <!--//row-->
-                                            <a class="link-mask" href="#"></a>
-                                        </div>
-                                        <!--//item-->
-                                        <div class="item p-3">
-                                            <div class="row gx-2 justify-content-between align-items-center">
-                                                <div class="col-auto">
-                                                    <img class="profile-image" src="assets/images/profiles/profile-2.png" alt="">
-                                                </div>
-                                                <!--//col-->
-                                                <div class="col">
-                                                    <div class="info">
-                                                        <div class="desc">James sent you a new message.</div>
-                                                        <div class="meta"> 7 days ago</div>
-                                                    </div>
-                                                </div>
-                                                <!--//col-->
-                                            </div>
-                                            <!--//row-->
-                                            <a class="link-mask" href="#"></a>
-                                        </div>
-                                        <!--//item-->
-                                    </div>
-                                    <!--//dropdown-menu-content-->
-
-                                    <div class="dropdown-menu-footer p-2 text-center">
-                                        <a href="#">View all</a>
-                                    </div>
-
-                                </div>
-                                <!--//dropdown-menu-->
-                            </div>
                             <!--//app-utility-item-->
                             <div class="app-utility-item">
                                 <a href="settings.php" title="Settings">
@@ -201,7 +168,7 @@ try {
                             <!--//app-utility-item-->
 
                             <div class="app-utility-item app-user-dropdown dropdown">
-                                <a class="dropdown-toggle" id="user-dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false"><img src="assets/images/user.png" alt="user profile"></a>
+                                <a class="dropdown-toggle" id="user-dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false"><?php echo $profilePhoto ?></a>
                                 <ul class="dropdown-menu" aria-labelledby="user-dropdown-toggle">
                                     <li><a class="dropdown-item" href="account.php">Account</a></li>
                                     <li><a class="dropdown-item" href="settings.php">Settings</a></li>
@@ -400,7 +367,14 @@ try {
                                     <div class="row justify-content-between align-items-center">
                                         <div class="col-auto">
                                             <div class="item-label mb-2"><strong>Photo</strong></div>
-                                            <div class="item-data"><img class="profile-image" src="assets/images/user.png" alt=""></div>
+                                            <div class="item-data mb-2">
+                                                <?php
+                                                echo $profilePhoto;
+                                                ?>
+                                            </div>
+                                            <div class="item-data">
+                                                <a class="btn-sm app-btn-secondary" data-toggle="modal" href="#change-photo">Change Profile Photo</a>
+                                            </div>
                                         </div>
                                         <!--//col-->
                                     </div>
@@ -463,6 +437,26 @@ try {
                     <!--//col-->
                 </div>
                 <!--//container-fluid-->
+                <!-- Modal -->
+                <div class="modal fade" id="change-photo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Change My Profile Photo</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Choose your photo</p>
+                                <form action="account.php" method="POST" id="change-photo-form" class="d-flex flex-row align-items-center justify-content-between" enctype="multipart/form-data">
+                                    <input type="file" name="new-photo" id="new-photo">
+                                    <input type="submit" id="submit" name="changePhotoButton" class="btn app-btn-primary" value="Change">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <!--//app-content-->
         </div>
@@ -471,12 +465,13 @@ try {
 
         <!-- Javascript -->
         <script src="assets/plugins/popper.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
         <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
 
 
         <!-- Page Specific JS -->
         <script src="assets/js/app.js"></script>
-
 </body>
 
 </html>
