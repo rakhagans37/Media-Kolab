@@ -2,6 +2,21 @@
 require_once "connection/getConnection.php";
 require_once "connection/validateLogin.php";
 require_once "connection/getConnectionMsqli.php";
+
+$conn = getConnectionMysqli();
+if (isset($_GET['add-roles'])) {
+    $id = random_int(1, 99999);
+    $rolesName = $_GET['new-roles'];
+    $sqlAdd = "INSERT INTO tb_role VALUES(?,?)";
+
+    $requestAddCat = mysqli_prepare($conn, $sqlAdd);
+    mysqli_stmt_bind_param($requestAddCat, "ss", $id, $rolesName);
+    mysqli_stmt_execute($requestAddCat);
+    mysqli_stmt_close($requestAddCat);
+
+    header("Location:roles.php");
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -152,6 +167,7 @@ require_once "connection/getConnectionMsqli.php";
                             <div id="submenu-2" class="collapse submenu submenu-2" data-bs-parent="#menu-accordion">
                                 <ul class="submenu-list list-unstyled">
                                     <li class="submenu-item"><a class="submenu-link" href="news.php">News</a></li>
+                                    <li class="submenu-item"><a class="submenu-link" href="managemedia.php">Media</a></li>
                                     <li class="submenu-item"><a class="submenu-link" href="manageCategory.php">News Category</a></li>
                                     <li class="submenu-item"><a class="submenu-link" href="manageAds.php">Ads</a></li>
                                     <li class="submenu-item"><a class="submenu-link" href="event.php">Event</a></li>
@@ -232,7 +248,7 @@ require_once "connection/getConnectionMsqli.php";
                         <div class="page-utilities">
                             <div class="row g-2 justify-content-start justify-content-md-end align-items-center">
                                 <div class="col-auto">
-                                    <form class="table-search-form row gx-1 align-items-center" action="manageuser.php" method="GET">
+                                    <form class="table-search-form row gx-1 align-items-center" action="roles.php" method="GET">
                                         <div class="col-auto">
                                             <input type="text" id="search-orders" name="searchorders" class="form-control search-orders" placeholder="Search">
                                         </div>
@@ -240,8 +256,14 @@ require_once "connection/getConnectionMsqli.php";
                                             <button type="submit" class="btn app-btn-secondary" name="search-news">Search</button>
                                         </div>
                                     </form>
-
                                 </div><!--//col-->
+                                <div class="col-auto">
+                                    <a class="btn app-btn-secondary" data-toggle="modal" href="#add-roles">
+                                        <svg xmlns=" http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z" />
+                                        </svg>
+                                    </a>
+                                </div>
                             </div><!--//row-->
                         </div><!--//table-utilities-->
                     </div><!--//col-auto-->
@@ -269,10 +291,10 @@ require_once "connection/getConnectionMsqli.php";
                                             <?php
                                             $conn = getConnectionMysqli();
                                             if (isset($_GET['search-news'])) {
-                                                $searchUser = $_GET['searchorders'];
-                                                $sql = "SELECT tb_editor.editor_id, tb_editor.username, tb_editor.email, tb_editor.phone_number, tb_role.role_name FROM tb_editor INNER JOIN tb_role ON tb_editor.role_id = tb_role.role_id WHERE username LIKE '%$searchUser%'";
+                                                $searchRole = $_GET['searchorders'];
+                                                $sql = "SELECT tb_role.role_id, tb_role.role_name, COUNT(tb_editor.role_id) AS jumlah_member FROM tb_editor RIGHT JOIN tb_role ON tb_editor.role_id = tb_role.role_id GROUP BY tb_role.role_id HAVING tb_role.role_name LIKE '%$searchRole%'";
                                             } else {
-                                                $sql = "SELECT tb_editor.role_id, tb_role.role_name, COUNT(tb_editor.role_id) AS jumlah_member FROM tb_editor JOIN tb_role ON tb_editor.role_id = tb_role.role_id GROUP BY tb_role.role_id";
+                                                $sql = "SELECT tb_role.role_id, tb_role.role_name, COUNT(tb_editor.role_id) AS jumlah_member FROM tb_editor RIGHT JOIN tb_role ON tb_editor.role_id = tb_role.role_id GROUP BY tb_role.role_id";
                                             }
 
                                             $request1 = mysqli_query($conn, $sql);
@@ -316,153 +338,38 @@ require_once "connection/getConnectionMsqli.php";
                                 </li>
                             </ul>
                         </nav><!--//app-pagination-->
-
-                    </div><!--//tab-pane-->
-
-                    <div class="tab-pane fade" id="banned" role="tabpanel" aria-labelledby="banned-tab">
-                        <div class="app-card app-card-orders-table mb-5">
-                            <div class="app-card-body">
-                                <div class="table-responsive">
-
-                                    <table class="table mb-0 text-left">
-                                        <thead>
-                                            <tr>
-                                                <th class="cell">Order</th>
-                                                <th class="cell">Product</th>
-                                                <th class="cell">Customer</th>
-                                                <th class="cell">Date</th>
-                                                <th class="cell">Status</th>
-                                                <th class="cell">Total</th>
-                                                <th class="cell"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td class="cell">#15346</td>
-                                                <td class="cell"><span class="truncate">Lorem ipsum dolor sit amet eget volutpat erat</span></td>
-                                                <td class="cell">John Sanders</td>
-                                                <td class="cell"><span>17 Oct</span><span class="note">2:16 PM</span></td>
-                                                <td class="cell"><span class="badge bg-success">Paid</span></td>
-                                                <td class="cell">$259.35</td>
-                                                <td class="cell"><a class="btn-sm app-btn-secondary" href="#">View</a></td>
-                                            </tr>
-
-                                            <tr>
-                                                <td class="cell">#15344</td>
-                                                <td class="cell"><span class="truncate">Pellentesque diam imperdiet</span></td>
-                                                <td class="cell">Teresa Holland</td>
-                                                <td class="cell"><span class="cell-data">16 Oct</span><span class="note">01:16 AM</span></td>
-                                                <td class="cell"><span class="badge bg-success">Paid</span></td>
-                                                <td class="cell">$123.00</td>
-                                                <td class="cell"><a class="btn-sm app-btn-secondary" href="#">View</a></td>
-                                            </tr>
-
-                                            <tr>
-                                                <td class="cell">#15343</td>
-                                                <td class="cell"><span class="truncate">Vestibulum a accumsan lectus sed mollis ipsum</span></td>
-                                                <td class="cell">Jayden Massey</td>
-                                                <td class="cell"><span class="cell-data">15 Oct</span><span class="note">8:07 PM</span></td>
-                                                <td class="cell"><span class="badge bg-success">Paid</span></td>
-                                                <td class="cell">$199.00</td>
-                                                <td class="cell"><a class="btn-sm app-btn-secondary" href="#">View</a></td>
-                                            </tr>
-
-
-                                            <tr>
-                                                <td class="cell">#15341</td>
-                                                <td class="cell"><span class="truncate">Morbi vulputate lacinia neque et sollicitudin</span></td>
-                                                <td class="cell">Raymond Atkins</td>
-                                                <td class="cell"><span class="cell-data">11 Oct</span><span class="note">11:18 AM</span></td>
-                                                <td class="cell"><span class="badge bg-success">Paid</span></td>
-                                                <td class="cell">$678.26</td>
-                                                <td class="cell"><a class="btn-sm app-btn-secondary" href="#">View</a></td>
-                                            </tr>
-
-                                        </tbody>
-                                    </table>
-                                </div><!--//table-responsive-->
-                            </div><!--//app-card-body-->
-                        </div><!--//app-card-->
-                    </div><!--//tab-pane-->
-
-                    <div class="tab-pane fade" id="orders-pending" role="tabpanel" aria-labelledby="orders-pending-tab">
-                        <div class="app-card app-card-orders-table mb-5">
-                            <div class="app-card-body">
-                                <div class="table-responsive">
-                                    <table class="table mb-0 text-left">
-                                        <thead>
-                                            <tr>
-                                                <th class="cell">Order</th>
-                                                <th class="cell">Product</th>
-                                                <th class="cell">Customer</th>
-                                                <th class="cell">Date</th>
-                                                <th class="cell">Status</th>
-                                                <th class="cell">Total</th>
-                                                <th class="cell"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td class="cell">#15345</td>
-                                                <td class="cell"><span class="truncate">Consectetur adipiscing elit</span></td>
-                                                <td class="cell">Dylan Ambrose</td>
-                                                <td class="cell"><span class="cell-data">16 Oct</span><span class="note">03:16 AM</span></td>
-                                                <td class="cell"><span class="badge bg-warning">Pending</span></td>
-                                                <td class="cell">$96.20</td>
-                                                <td class="cell"><a class="btn-sm app-btn-secondary" href="#">View</a></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div><!--//table-responsive-->
-                            </div><!--//app-card-body-->
-                        </div><!--//app-card-->
-                    </div><!--//tab-pane-->
-                    <div class="tab-pane fade" id="orders-cancelled" role="tabpanel" aria-labelledby="orders-cancelled-tab">
-                        <div class="app-card app-card-orders-table mb-5">
-                            <div class="app-card-body">
-                                <div class="table-responsive">
-                                    <table class="table mb-0 text-left">
-                                        <thead>
-                                            <tr>
-                                                <th class="cell">Order</th>
-                                                <th class="cell">Product</th>
-                                                <th class="cell">Customer</th>
-                                                <th class="cell">Date</th>
-                                                <th class="cell">Status</th>
-                                                <th class="cell">Total</th>
-                                                <th class="cell"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-
-                                            <tr>
-                                                <td class="cell">#15342</td>
-                                                <td class="cell"><span class="truncate">Justo feugiat neque</span></td>
-                                                <td class="cell">Reina Brooks</td>
-                                                <td class="cell"><span class="cell-data">12 Oct</span><span class="note">04:23 PM</span></td>
-                                                <td class="cell"><span class="badge bg-danger">Cancelled</span></td>
-                                                <td class="cell">$59.00</td>
-                                                <td class="cell"><a class="btn-sm app-btn-secondary" href="#">View</a></td>
-                                            </tr>
-
-                                        </tbody>
-                                    </table>
-                                </div><!--//table-responsive-->
-                            </div><!--//app-card-body-->
-                        </div><!--//app-card-->
                     </div><!--//tab-pane-->
                 </div><!--//tab-content-->
-
-
-
             </div><!--//container-fluid-->
         </div><!--//app-content-->
+
+        <div class="modal fade" id="add-roles" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Tambah Role Baru</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Masukkan roles baru</p>
+                        <form class="row g-2 justify-content-start justify-content-md-end align-items-center" action="roles.php" method="GET">
+                            <input class="form-control app-btn-secondary" type="text" id="new-roles" name="new-roles">
+                            <input type="submit" id="submit" name="add-roles" class="btn app-btn-primary" value="Tambahkan">
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn app-btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <footer class="app-footer">
             <div class="container text-center py-3">
                 <!--/* This template is free as long as you keep the footer attribution link. If you'd like to use the template without the attribution link, you can buy the commercial license via our website: themes.3rdwavemedia.com Thank you for your support. :) */-->
                 <small class="copyright">Designed with <span class="sr-only">love</span><i class="fas fa-heart" style="color: #fb866a;"></i> by <a class="app-link" href="http://themes.3rdwavemedia.com" target="_blank">Xiaoying Riley</a> for developers</small>
-
             </div>
         </footer><!--//app-footer-->
 
@@ -471,6 +378,8 @@ require_once "connection/getConnectionMsqli.php";
 
     <!-- Javascript -->
     <script src="assets/plugins/popper.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
 
 

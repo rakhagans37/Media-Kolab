@@ -88,3 +88,7 @@ function uploadImage($idAdmin, $location)
         echo $error;
     }
 }
+
+function deleteImage($idAdmin, $urlPhoto)
+{
+}

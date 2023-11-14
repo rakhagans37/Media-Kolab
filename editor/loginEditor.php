@@ -1,7 +1,7 @@
 <?php
 require_once '../connection/getConnection.php';
 if (isset($_COOKIE['loginStatus']) && isset($_SESSION['loginStatus'])) {
-    header('Location:index.php');
+    header('Location:indexEditor.php');
     exit;
 }
 

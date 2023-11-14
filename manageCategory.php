@@ -168,6 +168,7 @@ if (isset($_GET['add-category'])) {
                             <div id="submenu-2" class="collapse submenu submenu-2 show" data-bs-parent="#menu-accordion">
                                 <ul class="submenu-list list-unstyled">
                                     <li class="submenu-item"><a class="submenu-link" href="news.php">News</a></li>
+                                    <li class="submenu-item"><a class="submenu-link" href="managemedia.php">Media</a></li>
                                     <li class="submenu-item"><a class="submenu-link active" href="manageCategory.php">News Category</a></li>
                                     <li class="submenu-item"><a class="submenu-link" href="manageAds.php">Ads</a></li>
                                     <li class="submenu-item"><a class="submenu-link" href="event.php">Event</a></li>
@@ -287,9 +288,9 @@ if (isset($_GET['add-category'])) {
                                             <?php
                                             if (isset($_GET['search-news'])) {
                                                 $searchUser = $_GET['searchorders'];
-                                                $sql = "SELECT tb_category.category_id, tb_category.category_name, COUNT(tb_category.category_id) AS jumlah_member FROM tb_blog JOIN tb_category ON tb_blog.category_id = tb_category.category_id GROUP BY tb_category.category_id HAVING tb_category.category_name LIKE '%$searchUser%'";
+                                                $sql = "SELECT tb_category.category_id, tb_category.category_name, COUNT(tb_blog.category_id) + COUNT(tb_media.category_id) AS jumlah_member FROM tb_blog RIGHT JOIN tb_category ON tb_blog.category_id = tb_category.category_id LEFT JOIN tb_media ON tb_media.category_id = tb_category.category_id GROUP BY tb_category.category_id HAVING tb_category.category_name LIKE '%$searchUser%'";
                                             } else {
-                                                $sql = "SELECT tb_category.category_id, tb_category.category_name, COUNT(tb_blog.category_id) AS jumlah_member FROM tb_blog RIGHT JOIN tb_category ON tb_blog.category_id = tb_category.category_id GROUP BY tb_category.category_id";
+                                                $sql = "SELECT tb_category.category_id, tb_category.category_name, COUNT(tb_blog.category_id) + COUNT(tb_media.category_id) AS jumlah_member FROM tb_blog RIGHT JOIN tb_category ON tb_blog.category_id = tb_category.category_id LEFT JOIN tb_media ON tb_media.category_id = tb_category.category_id GROUP BY tb_category.category_id";
                                             }
 
                                             $request1 = mysqli_query($conn, $sql);
