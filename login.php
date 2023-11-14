@@ -1,23 +1,6 @@
 <?php
 require_once 'connection/getConnection.php';
-require __DIR__ . '/vendor/autoload.php';
-// Use the Configuration class 
-use Cloudinary\Configuration\Configuration;
-// Use the UploadApi class for uploading assets
-use Cloudinary\Api\Upload\UploadApi;
-//Get Detailed Photo
-use Cloudinary\Api\Admin\AdminApi;
-// Use the AdminApi class for managing assets
-use Cloudinary\Transformation\Resize;
-use Cloudinary\Transformation\Gravity;
-use Cloudinary\Transformation\FocusOn;
-use Cloudinary\Transformation\RoundCorners;
-use Cloudinary\Transformation\Delivery;
-use Cloudinary\Transformation\Format;
-use Cloudinary\Tag\ImageTag;
-// Configure an instance of your Cloudinary cloud
-Configuration::instance('cloudinary://687349936855341:YYl-ARmSPNM0vXhBOL3SeY-bQcg@drmtgjbht');
-
+require_once 'connection/cloudinary.php';
 
 if (isset($_COOKIE['loginStatus']) && isset($_SESSION['loginStatus'])) {
 	header('Location:index.php');
@@ -53,30 +36,7 @@ if (isset($_POST['login'])) {
 			} else {
 				//Saving profile photo into cookies
 				$decrypt = openssl_decrypt($photoUrl, 'AES-128-CTR', 'mediaKolab123', 0, '1234567891011121');
-				$admin = new AdminApi();
-				$assetData = $admin->asset($decrypt, [
-					'colors' => TRUE
-				]);
-				$assetWidth = $assetData['width'];
-				$assetHeight = $assetData['height'];
-				$cropSize = $assetHeight <= $assetWidth ? $assetHeight : $assetWidth;
-				//Get Photo
-
-				$imgtag = (new ImageTag($decrypt))
-					->resize(
-						Resize::crop()->width($cropSize)
-							->height($cropSize)
-							->gravity(
-								Gravity::focusOn(
-									FocusOn::face()
-								)
-							)
-					)
-					->roundCorners(RoundCorners::max())
-					->resize(Resize::scale()->width(60))
-					->delivery(Delivery::format(
-						Format::auto()
-					));
+				$imgtag = getImage($decrypt);
 			}
 
 			if ($remember) {

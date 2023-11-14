@@ -11,3 +11,6 @@ if (!isset($_COOKIE['loginStatus']) && !isset($_SESSION['loginStatus'])) {
 
 //Get Photo Profile
 $profilePhoto = $_COOKIE['profilePhoto'] ?? $_SESSION['profilePhoto'];
+
+//Get Admin ID
+$idAdmin = $_SESSION['idAdmin'] ?? $_COOKIE['idAdmin'];

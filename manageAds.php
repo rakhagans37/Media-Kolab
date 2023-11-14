@@ -4,7 +4,7 @@ require_once "connection/validateLogin.php";
 require_once "connection/getConnectionMsqli.php";
 $conn = getConnectionMysqli();
 
-//Script php untuk delete blog
+//Script php untuk delete ads
 if (isset($_GET['deleteButton'])) {
     $adsId = $_GET['adsId'];
 
@@ -19,7 +19,25 @@ if (isset($_GET['deleteButton'])) {
     header("Location:manageAds.php");
     exit;
 }
-//End script delete blog
+//End script delete ads
+//Script php untuk update ads
+if (isset($_GET['editButton'])) {
+    $adsId = $_GET['adsId'];
+    $dateReleased = $_GET['date-release'];
+    $dateExpired = $_GET['date-expired'];
+
+    $sqlDelete = "UPDATE tb_ad SET date_published = ?, date_expired = ? WHERE ad_id = ?";
+    $requestDelete = mysqli_prepare($conn, $sqlDelete);
+
+    mysqli_stmt_bind_param($requestDelete, "sss", $dateReleased, $dateExpired, $adsId);
+    mysqli_stmt_execute($requestDelete);
+    mysqli_stmt_close($requestDelete);
+    mysqli_close($conn);
+
+    header("Location:manageAds.php");
+    exit;
+}
+//End script delete ads
 
 //Script Php untuk membuat request yuang mengambil detail data blog dari database
 if (isset($_GET['search-ads'])) {
@@ -318,10 +336,10 @@ $request = mysqli_query($conn, $sql);
 																<td class="cell"><span>$datePublished</span><span class="note">2:16 PM</span></td> <td class="cell"><span>$dateExpired</span><span class="note">2:16 PM</span></td>
 																<td class="cell">
 																	<a class="btn-sm app-btn-secondary" href="#">View</a>
-																</td>
+																</td> <td class="cell"> <a class="btn-sm app-btn-danger" data-toggle="modal" href="#edit-ads" onclick="getAdsId('conEditAds','$adsId')">Edit</a></td>
 																<td class="cell">
-																	<a class="btn-sm app-btn-danger" data-toggle="modal" href="#delete-ads" onclick="getAdsId('$adsId')">Delete</a>
-																</td>
+																	<a class="btn-sm app-btn-danger" data-toggle="modal" href="#delete-ads" onclick="getAdsId('conDeleteAds','$adsId')">Delete</a>
+																</td>      
 															</tr>
 														TULIS;
                                                 }
@@ -374,6 +392,38 @@ $request = mysqli_query($conn, $sql);
                         </div>
                     </div>
                 </div>
+
+                <!-- Modal Edit -->
+                <div class="modal fade" id="edit-ads" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Konfirmasi</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Edit Iklan Ini?</p>
+                                <form action="manageAds.php" method="GET" id="conEditAds">
+                                    <label for="release">
+                                        Date Release :
+                                        <input type="date" name="date-release" required>
+                                    </label>
+                                    <label for="expired">
+                                        Date Expired :
+                                        <input type="date" name="date-expired" required>
+                                    </label>
+                                    <br>
+                                    <input type="submit" id="submit" name="editButton" class="btn app-btn-primary mt-2" value="Ya, saya yakin">
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn app-btn-secondary" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div><!--//container-fluid-->
         </div><!--//app-content-->
 
@@ -398,16 +448,16 @@ $request = mysqli_query($conn, $sql);
     <!-- Page Specific JS -->
     <script src="assets/js/app.js"></script>
     <script>
-        function getAdsId(adsId) {
+        function getAdsId(idForm, adsId) {
             console.log(adsId);
-            const formDelete = document.getElementById("conDeleteAds");
+            const formTarget = document.getElementById(idForm);
             const createInput = document.createElement("input");
 
             createInput.setAttribute("type", "hidden");
             createInput.setAttribute("name", "adsId");
             createInput.setAttribute("value", adsId);
 
-            formDelete.appendChild(createInput);
+            formTarget.appendChild(createInput);
         }
     </script>
 
