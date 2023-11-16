@@ -1,6 +1,7 @@
 <?php
 require_once "../connection/getConnection.php";
 require_once "../connection/getConnectionMsqli.php";
+require_once "../connection/hash.php";
 
 $conn = getConnection();
 
@@ -27,7 +28,7 @@ if (isset($_POST['signup-submit'])) {
 		if ($password != $confirmPassword) {
 			echo "Password tidak matching";
 		} else {
-			$id = random_int(10, 999999);
+			$id = generateIdEditor();
 			$passwordHashed = password_hash($confirmPassword, PASSWORD_DEFAULT);
 			$sqlInsert = "INSERT INTO tb_editor(editor_id, username, password, email, phone_number, role_id) values(?, ?, ?, ?, ?, ?)";
 			$requestInsert = $conn->prepare($sqlInsert);

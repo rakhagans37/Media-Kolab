@@ -1,5 +1,6 @@
 <?php
 require_once 'getConnection.php';
+require_once 'hash.php';
 require __DIR__ . '\../vendor/autoload.php';
 
 // Use the Configuration class 
@@ -19,6 +20,33 @@ use Cloudinary\Tag\ImageTag;
 
 // Configure an instance of your Cloudinary cloud
 Configuration::instance('cloudinary://687349936855341:YYl-ARmSPNM0vXhBOL3SeY-bQcg@drmtgjbht');
+
+function getAdminPhotoId($idAdmin)
+{
+    try {
+        $conn = getConnection();
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        $sql = "SELECT profile_photo FROM tb_admin WHERE admin_id = :adminId";
+        $request = $conn->prepare($sql);
+
+        $request->bindParam('adminId', $idAdmin);
+        $request->execute();
+
+        if ($result = $request->fetchAll()) {
+            $photoName = $result[0]['profile_photo'];
+            if (is_null($photoName)) {
+                $decryptPhotoName = null;
+            } else {
+                $decryptPhotoName = decryptPhotoProfile($photoName);
+            }
+        }
+        return $decryptPhotoName;
+    } catch (PDOException $errorMessage) {
+        $error = $errorMessage->getMessage();
+        echo $error;
+    }
+}
 
 function getImage($urlPhoto)
 {
@@ -49,46 +77,95 @@ function getImage($urlPhoto)
     return (string)$imgtag;
 }
 
-function uploadImage($idAdmin, $location)
+function uploadImageAdmin($idAdmin, $locationRedirect)
 {
     $newPhoto = $_FILES['new-photo']['tmp_name'];
-    $photoName = random_int(0, PHP_INT_MAX) . date("dmYHis") . $idAdmin;
-    $photoNameHashed = openssl_encrypt($photoName, 'AES-128-CTR', 'mediaKolab123', 0, '1234567891011121');
+    $newPhotoSize = filesize($newPhoto);
+    $newPhotoType = mime_content_type($newPhoto);
 
-    //Upload into cloudinary process
-    $upload = new UploadApi();
-    $upload->upload($newPhoto, [
-        'public_id' => $photoName,
-        'use_filename' => TRUE,
-        'overwrite' => TRUE
-    ]);
+    if ($newPhotoSize <= 6000000 && ($newPhotoType == 'image/jpg' || $newPhotoType == 'image/png' || $newPhotoType == 'image/jpeg')) {
+        $photoName = random_int(0, PHP_INT_MAX) . date("dmYHis") . $idAdmin;
+        $photoNameHashed = hashPhotoProfile($photoName);
 
-    try {
-        $conn = getConnection();
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        //Delete exPhoto
+        deleteImageAdmin($idAdmin, $locationRedirect);
 
-        $sql = "UPDATE tb_admin SET profile_photo = :newPhoto WHERE admin_id = :idAdmin";
-        $request = $conn->prepare($sql);
+        //Upload into cloudinary process
+        $upload = new UploadApi();
+        $upload->upload($newPhoto, [
+            'public_id' => $photoName,
+            'use_filename' => TRUE,
+            'overwrite' => TRUE
+        ]);
 
-        $request->bindParam('idAdmin', $idAdmin);
-        $request->bindParam('newPhoto', $photoNameHashed);
-        $request->execute();
+        try {
+            $conn = getConnection();
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        //Saving profile photo into cookies
-        $decrypt = openssl_decrypt($photoNameHashed, 'AES-128-CTR', 'mediaKolab123', 0, '1234567891011121');
+            $sql = "UPDATE tb_admin SET profile_photo = :newPhoto WHERE admin_id = :idAdmin";
+            $request = $conn->prepare($sql);
 
-        //Automatically getting the Photo
-        $imgtag = getImage($decrypt);
-        setcookie('profilePhoto', $imgtag, time() + (86400 * 7));
+            $request->bindParam('idAdmin', $idAdmin);
+            $request->bindParam('newPhoto', $photoNameHashed);
+            $request->execute();
 
-        $conn = null;
-        header("Location:$location");
-    } catch (PDOException $errorMessage) {
-        $error = $errorMessage->getMessage();
-        echo $error;
+            //Saving profile photo into cookies
+            $decrypt = decryptPhotoProfile($photoNameHashed);
+
+            //Automatically getting the Photo
+            $imgtag = getImage($decrypt);
+            if (isset($_COOKIE['loginStatus'])) {
+                setcookie('profilePhoto', $imgtag, time() + (86400 * 7));
+            } else {
+                $_SESSION['profilePhoto'] = $imgtag;
+            }
+
+            $conn = null;
+            header("Location:$locationRedirect");
+        } catch (PDOException $errorMessage) {
+            $error = $errorMessage->getMessage();
+            echo $error;
+        }
+    } else {
+        echo "Gabisa cuy";
     }
 }
 
-function deleteImage($idAdmin, $urlPhoto)
+function deleteImageAdmin($idAdmin, $locationRedirect)
 {
+    $api = new UploadApi();
+    $photoId = getAdminPhotoId($idAdmin);
+
+    if (!is_null($photoId)) {
+        $api->destroy($photoId);
+
+        //Update table
+        try {
+            $conn = getConnection();
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            $sql = "UPDATE tb_admin SET profile_photo = :setToNull WHERE admin_id = :idAdmin";
+            $request = $conn->prepare($sql);
+            $setToNull = null;
+
+            //Set into null
+            $request->bindParam('idAdmin', $idAdmin);
+            $request->bindParam('setToNull', $setToNull);
+            $request->execute();
+
+            //Set cookie or session into default image
+            $imgtag = "<img class='profile-image' src='assets/images/profiles/profile-1.png' alt='Profile Photo'>";
+            if (isset($_COOKIE['loginStatus'])) {
+                setcookie('profilePhoto', $imgtag, time() + (86400 * 7));
+            } else {
+                $_SESSION['profilePhoto'] = $imgtag;
+            }
+
+            $conn = null;
+            header("Location:$locationRedirect");
+        } catch (PDOException $errorMessage) {
+            $error = $errorMessage->getMessage();
+            echo $error;
+        }
+    }
 }

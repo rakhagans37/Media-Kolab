@@ -19,7 +19,6 @@ if (isset($_GET['ban-editor'])) {
     header("Location:manageuser.php");
     exit;
 }
-//End script ban editor
 
 //Script php untuk delete blog
 if (isset($_GET['activate-editor'])) {
@@ -36,17 +35,17 @@ if (isset($_GET['activate-editor'])) {
     header("Location:manageuser.php");
     exit;
 }
-//End script delete blog
+
 
 //Script untuk mengambil data publisher dari database
-if (isset($_GET['search-news'])) {
+if (isset($_GET['search-user'])) {
     $searchUser = $_GET['search-orders'];
     $sql = "SELECT tb_editor.editor_id, tb_editor.username, tb_editor.email, tb_editor.phone_number, COUNT(tb_blog.editor_id) + + COUNT(tb_media.editor_id) ,tb_role.role_name, tb_editor.banned FROM tb_media RIGHT JOIN tb_editor ON tb_media.editor_id = tb_editor.editor_id INNER JOIN tb_role ON tb_editor.role_id = tb_role.role_id LEFT JOIN tb_blog ON tb_blog.editor_id = tb_editor.editor_id GROUP BY tb_editor.editor_id HAVING tb_editor.username LIKE '%$searchUser%' and tb_editor.banned = 0";
 } else {
     $sql = "SELECT tb_editor.editor_id, tb_editor.username, tb_editor.email, tb_editor.phone_number, COUNT(tb_blog.editor_id) + + COUNT(tb_media.editor_id) ,tb_role.role_name, tb_editor.banned FROM tb_media RIGHT JOIN tb_editor ON tb_media.editor_id = tb_editor.editor_id INNER JOIN tb_role ON tb_editor.role_id = tb_role.role_id LEFT JOIN tb_blog ON tb_blog.editor_id = tb_editor.editor_id GROUP BY tb_editor.editor_id HAVING tb_editor.banned = 0";
 }
 
-if (isset($_GET['search-news'])) {
+if (isset($_GET['search-user'])) {
     $searchUser = $_GET['search-orders'];
     $sqlBannedUser = "SELECT tb_editor.editor_id, tb_editor.username, tb_editor.email, tb_editor.phone_number, COUNT(tb_blog.editor_id) + COUNT(tb_media.editor_id) ,tb_role.role_name, tb_editor.banned FROM tb_media RIGHT JOIN tb_editor ON tb_media.editor_id = tb_editor.editor_id INNER JOIN tb_role ON tb_editor.role_id = tb_role.role_id LEFT JOIN tb_blog ON tb_blog.editor_id = tb_editor.editor_id GROUP BY tb_editor.editor_id HAVING tb_editor.username LIKE '%$searchUser%' and tb_editor.banned = 1";
 } else {
@@ -277,7 +276,7 @@ $requestBannedUser = mysqli_query($conn, $sqlBannedUser);
                                             <input type="text" id="search-orders" name="search-orders" class="form-control search-orders" placeholder="Search">
                                         </div>
                                         <div class="col-auto">
-                                            <button type="submit" class="btn app-btn-secondary" name="search-news">Search</button>
+                                            <button type="submit" class="btn app-btn-secondary" name="search-user">Search</button>
                                         </div>
                                     </form>
 

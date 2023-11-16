@@ -2,10 +2,11 @@
 require_once "connection/getConnection.php";
 require_once "connection/validateLogin.php";
 require_once "connection/getConnectionMsqli.php";
+require_once "connection/hash.php";
 
 $conn = getConnectionMysqli();
 if (isset($_GET['add-roles'])) {
-    $id = random_int(1, 99999);
+    $id = generateIdRole();
     $rolesName = $_GET['new-roles'];
     $sqlAdd = "INSERT INTO tb_role VALUES(?,?)";
 

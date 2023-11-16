@@ -2,10 +2,11 @@
 require_once "connection/getConnection.php";
 require_once "connection/validateLogin.php";
 require_once "connection/getConnectionMsqli.php";
+require_once "connection/hash.php";
 
 $conn = getConnectionMysqli();
 if (isset($_GET['add-category'])) {
-    $id = random_int(1, 99999);
+    $id = generateIdCategory();
     $categoryName = $_GET['new-category'];
     $sqlAdd = "INSERT INTO tb_category VALUES(?,?)";
 

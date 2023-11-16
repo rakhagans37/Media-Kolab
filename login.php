@@ -1,6 +1,7 @@
 <?php
 require_once 'connection/getConnection.php';
 require_once 'connection/cloudinary.php';
+require_once 'connection/hash.php';
 
 if (isset($_COOKIE['loginStatus']) && isset($_SESSION['loginStatus'])) {
 	header('Location:index.php');
@@ -35,7 +36,7 @@ if (isset($_POST['login'])) {
 				$imgtag = "<img class='profile-image' src='assets/images/profiles/profile-1.png' alt='Profile Photo'>";
 			} else {
 				//Saving profile photo into cookies
-				$decrypt = openssl_decrypt($photoUrl, 'AES-128-CTR', 'mediaKolab123', 0, '1234567891011121');
+				$decrypt = decryptPhotoProfile($photoUrl);
 				$imgtag = getImage($decrypt);
 			}
 
@@ -88,6 +89,13 @@ if (isset($_POST['login'])) {
 <body class="app app-login p-0">
 	<div class="row g-0 app-auth-wrapper">
 		<div class="col-12 col-md-7 col-lg-6 auth-main-col text-center p-5">
+			<?php
+			if ($loginFail) {
+				echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">';
+				echo "<strong>Holy guacamole!</strong> You should check in on some of those fields below.";
+				echo '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+			}
+			?>
 			<div class="d-flex flex-column align-content-end">
 				<div class="app-auth-body mx-auto">
 					<div class="app-auth-branding mb-4"><a class="app-logo" href="index.php"><img class="logo-icon me-2" src="assets/images/app-logo.svg" alt="logo"></a></div>
@@ -168,12 +176,6 @@ if (isset($_POST['login'])) {
 
 	</div>
 	<!--//row-->
-
-	<?php
-	if ($loginFail) {
-		echo "<script> alert('Password Salah') </script>";
-	}
-	?>
 </body>
 
 </html>
