@@ -1,5 +1,5 @@
 <?php
-require_once "../connection/validateLoginPublisher.php";
+require_once "../connection/validateLoginEditor.php";
 ?>
 
 <!DOCTYPE html>

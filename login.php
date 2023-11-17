@@ -92,8 +92,7 @@ if (isset($_POST['login'])) {
 			<?php
 			if ($loginFail) {
 				echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">';
-				echo "<strong>Holy guacamole!</strong> You should check in on some of those fields below.";
-				echo '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+				echo "<strong>Oh tidak!</strong> sepertinya email atau password anda salah :)</div>";
 			}
 			?>
 			<div class="d-flex flex-column align-content-end">

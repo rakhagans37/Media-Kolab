@@ -1,7 +1,8 @@
 <?php
 require_once '../connection/getConnection.php';
+require_once '../connection/cloudinary.php';
 if (isset($_COOKIE['loginStatus']) && isset($_SESSION['loginStatus'])) {
-    header('Location:indexEditor.php');
+    header('Location:index.php');
     exit;
 }
 
@@ -18,23 +19,37 @@ if (isset($_POST['login'])) {
         $conn = getConnection();
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        $sql = "SELECT * FROM tb_editor where email = :email";
+        $sql = "SELECT * FROM tb_editor where email = :email and banned = :unBanned";
+        $unBanned = false;
         $request = $conn->prepare($sql);
 
         $request->bindParam('email', $email);
+        $request->bindParam('unBanned', $unBanned);
         $request->execute();
 
         if ($result = $request->fetchAll()) {
             $editorId = $result[0]['editor_id'];
             $passwordHashed = $result[0]['password'];
+            $photoUrl = $result[0]['profile_photo'];
             $loginStatus = true;
+
+            if (is_null($photoUrl)) {
+                $imgtag = "<img class='profile-image' src='../assets/images/profiles/profile-1.png' alt='Profile Photo'>";
+            } else {
+                //Saving profile photo into cookies
+                $decrypt = openssl_decrypt($photoUrl, 'AES-128-CTR', 'mediaKolab123', 0, '1234567891011121');
+                $imgtag = getImage($decrypt);
+            }
+
             if (password_verify($password, $passwordHashed)) {
                 if ($remember) {
                     setcookie('editorId', $editorId, time() + (86400 * 7));
-                    setcookie('loginStatus', $loginStatus, time() + (86400 * 7));
+                    setcookie('editorLoginStatus', $loginStatus, time() + (86400 * 7));
+                    setcookie('editorProfilePhoto', $imgtag);
                 } else {
-                    $_SESSION['loginStatus'] = $loginStatus;
+                    $_SESSION['editorLoginStatus'] = $loginStatus;
                     $_SESSION['editorId'] = $editorId;
+                    $_SESSION['editorProfilePhoto'] = $imgtag;
                 }
                 header('Location:indexEditor.php');
                 exit;
@@ -78,6 +93,12 @@ if (isset($_POST['login'])) {
 <body class="app app-login p-0">
     <div class="row g-0 app-auth-wrapper">
         <div class="col-12 col-md-7 col-lg-6 auth-main-col text-center p-5">
+            <?php
+            if ($loginFail) {
+                echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">';
+                echo "<strong>Oh tidak!</strong> sepertinya email tidak terdaftar atau akun terkena banned, silahkan hubungi kolab@gmail.com</div>";
+            }
+            ?>
             <div class="d-flex flex-column align-content-end">
                 <div class="app-auth-body mx-auto">
                     <div class="app-auth-branding mb-4"><a class="app-logo" href="index.php"><img class="logo-icon me-2" src="../assets/images/app-logo.svg" alt="logo"></a></div>
@@ -158,14 +179,6 @@ if (isset($_POST['login'])) {
 
     </div>
     <!--//row-->
-
-    <?php
-    if ($loginFail) {
-        echo "<script> alert('Akun tidak ditemukan') </script>";
-    } else if ($loginFailByPassword) {
-        echo "<script> alert('Password salah') </script>";
-    }
-    ?>
 </body>
 
 </html>
