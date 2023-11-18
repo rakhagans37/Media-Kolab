@@ -97,6 +97,9 @@ if (isset($_POST['login'])) {
             if ($loginFail) {
                 echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">';
                 echo "<strong>Oh tidak!</strong> sepertinya email tidak terdaftar atau akun terkena banned, silahkan hubungi kolab@gmail.com</div>";
+            } elseif ($loginFailByPassword) {
+                echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">';
+                echo "<strong>Oh tidak!</strong> sepertinya password yang anda masukkan salah :(</div>";
             }
             ?>
             <div class="d-flex flex-column align-content-end">

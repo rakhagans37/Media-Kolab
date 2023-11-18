@@ -13,4 +13,4 @@ if (!isset($_COOKIE['editorLoginStatus']) && !isset($_SESSION['editorLoginStatus
 $editorProfilePhoto = $_COOKIE['editorProfilePhoto'] ?? $_SESSION['editorProfilePhoto'];
 
 //Get Admin ID
-$editorId = $_SESSION['idAdmin'] ?? $_COOKIE['idAdmin'];
+$editorId = $_SESSION['editorId'] ?? $_COOKIE['editorId'];
