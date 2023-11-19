@@ -50,13 +50,12 @@ if (isset($_POST['login'])) {
 				$_SESSION['profilePhoto'] = $imgtag;
 			}
 
+			$conn = null;
 			header('Location:index.php');
 			exit;
 		} else {
 			$loginFail = true;
 		}
-
-		$conn = null;
 	} catch (PDOException $error) {
 		$error = "Terjadi Error " . $error->getMessage();
 	}

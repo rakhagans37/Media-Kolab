@@ -145,7 +145,7 @@ if ($result = mysqli_fetch_all($request)) {
 							<div id="submenu-1" class="collapse submenu submenu-1" data-bs-parent="#menu-accordion">
 								<ul class="submenu-list list-unstyled">
 									<li class="submenu-item"><a class="submenu-link" href="manageuser.php">Users Account</a></li>
-									<li class="submenu-item"><a class="submenu-link" href="roles.php">Users Roles</a></li>
+									<li class="submenu-item"><a class="submenu-link" href="manageRoles.php">Users Roles</a></li>
 								</ul>
 							</div>
 						</li>
@@ -178,7 +178,7 @@ if ($result = mysqli_fetch_all($request)) {
 									<li class="submenu-item"><a class="submenu-link" href="managemedia.php">Media</a></li>
 									<li class="submenu-item"><a class="submenu-link" href="manageCategory.php">News Category</a></li>
 									<li class="submenu-item"><a class="submenu-link" href="manageAds.php">Ads</a></li>
-									<li class="submenu-item"><a class="submenu-link" href="event.php">Event</a></li>
+									<li class="submenu-item"><a class="submenu-link" href="manageEvent.php">Event</a></li>
 								</ul>
 							</div>
 						</li>
