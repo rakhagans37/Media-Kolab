@@ -1,4 +1,5 @@
-<?php include('../connection/getConnectionMsqli.php');
+<?php
+include('../helper/getConnectionMsqli.php');
 
 $conn = getConnectionMysqli();
 

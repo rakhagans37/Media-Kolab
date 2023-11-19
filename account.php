@@ -1,7 +1,7 @@
 <?php
-require_once 'connection/validateLogin.php';
-require_once 'connection/getConnection.php';
-require_once 'connection/cloudinary.php';
+require_once __DIR__ . '/helper/validateLogin.php';
+require_once __DIR__ . '/helper/getConnection.php';
+require_once __DIR__ . '/helper/cloudinary.php';
 require __DIR__ . '/vendor/autoload.php';
 
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
@@ -192,7 +192,7 @@ try {
                             <!--//nav-link-->
                             <div id="submenu-2" class="collapse submenu submenu-2" data-bs-parent="#menu-accordion">
                                 <ul class="submenu-list list-unstyled">
-                                    <li class="submenu-item"><a class="submenu-link" href="news.php">News</a></li>
+                                    <li class="submenu-item"><a class="submenu-link" href="manageBlog.php">Blog</a></li>
                                     <li class="submenu-item"><a class="submenu-link" href="managemedia.php">Media</a></li>
                                     <li class="submenu-item"><a class="submenu-link" href="manageCategory.php">News Category</a></li>
                                     <li class="submenu-item"><a class="submenu-link" href="manageAds.php">Ads</a></li>
@@ -201,30 +201,6 @@ try {
                             </div>
                         </li>
                         <!--//nav-item-->
-                        <li class="nav-item has-submenu">
-                            <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-                            <a class="nav-link submenu-toggle active" href="#" data-bs-toggle="collapse" data-bs-target="#submenu-2" aria-expanded="true" aria-controls="submenu-2">
-                                <span class="nav-icon">
-                                    <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-                                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-files" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                        <path fill-rule="evenodd" d="M4 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4z" />
-                                        <path d="M6 0h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2v-1a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H6a1 1 0 0 0-1 1H4a2 2 0 0 1 2-2z" />
-                                    </svg>
-                                </span>
-                                <span class="nav-link-text">Pages</span>
-                                <span class="submenu-arrow">
-                                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-chevron-down" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                        <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
-                                    </svg>
-                                </span>
-                                <!--//submenu-arrow-->
-                            </a>
-                            <!--//nav-link-->
-                            <div id="submenu-2" class="collapse submenu submenu-2 show" data-bs-parent="#menu-accordion">
-                                <ul class="submenu-list list-unstyled">
-                                    <li class="submenu-item"><a class="submenu-link active" href="account.php">Account</a></li>
-                        </li>
-
                     </ul>
             </div>
             </li>
@@ -250,6 +226,17 @@ try {
             <div class="app-sidepanel-footer">
                 <nav class="app-nav app-nav-footer">
                     <ul class="app-menu footer-menu list-unstyled">
+                        <li class="nav-item">
+                            <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+                            <a class="nav-link" href="account.php">
+                                <span class="nav-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                                        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z" />
+                                    </svg>
+                                </span>
+                                <span class="nav-link-text">Account</span>
+                            </a><!--//nav-link-->
+                        </li><!--//nav-item-->
                         <li class="nav-item">
                             <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
                             <a class="nav-link" href="settings.php">

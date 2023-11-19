@@ -1,7 +1,7 @@
 <?php
-require_once 'connection/getConnection.php';
-require_once 'connection/cloudinary.php';
-require_once 'connection/hash.php';
+require_once __DIR__ . '/helper/getConnection.php';
+require_once __DIR__ . '/helper/cloudinary.php';
+require_once __DIR__ . '/helper/hash.php';
 
 if (isset($_COOKIE['loginStatus']) && isset($_SESSION['loginStatus'])) {
 	header('Location:index.php');
