@@ -1,7 +1,7 @@
 <?php
-require_once "../connection/getConnection.php";
-require_once "../connection/getConnectionMsqli.php";
-require_once "../connection/hash.php";
+require_once  __DIR__ .  "/../helper/getConnection.php";
+require_once  __DIR__ . "/../helper/getConnectionMsqli.php";
+require_once  __DIR__ . "/../helper/hash.php";
 
 $conn = getConnection();
 

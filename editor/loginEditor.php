@@ -1,6 +1,6 @@
 <?php
-require_once '../helper/getConnection.php';
-require_once '../helper/cloudinary.php';
+require_once __DIR__ . '/../helper/getConnection.php';
+require_once __DIR__ . '/../helper/cloudinary.php';
 if (isset($_COOKIE['loginStatus']) && isset($_SESSION['loginStatus'])) {
     header('Location:index.php');
     exit;

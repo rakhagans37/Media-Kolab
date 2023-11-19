@@ -16,7 +16,7 @@ if (isset($_GET['deleteButton'])) {
 	mysqli_stmt_close($requestDelete);
 	mysqli_close($conn);
 
-	header("Location:news.php");
+	header("Location:manageBlog.php");
 	exit;
 }
 //End script delete blog
@@ -24,9 +24,9 @@ if (isset($_GET['deleteButton'])) {
 //Script Php untuk membuat request yuang mengambil detail data blog dari database
 if (isset($_GET['search-news'])) {
 	$searchNews = $_GET['searchorders'];
-	$sql = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_category.category_name, tb_blog.date_release, tb_editor.username FROM ((tb_blog INNER JOIN tb_category ON tb_blog.category_id = tb_category.category_id) INNER JOIN tb_editor ON tb_blog.editor_id = tb_editor.editor_id) WHERE tb_blog.blog_title LIKE '%$searchNews%'";
+	$sql = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_category_blog.category_name, tb_blog.date_release, tb_editor.username, tb_blog.views FROM ((tb_blog INNER JOIN tb_category_blog ON tb_blog.category_id = tb_category_blog.category_id) INNER JOIN tb_editor ON tb_blog.editor_id = tb_editor.editor_id) WHERE tb_blog.blog_title LIKE '%$searchNews%'";
 } else {
-	$sql = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_category.category_name, tb_blog.date_release, tb_editor.username FROM ((tb_blog INNER JOIN tb_category ON tb_blog.category_id = tb_category.category_id) INNER JOIN tb_editor ON tb_blog.editor_id = tb_editor.editor_id)";
+	$sql = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_category_blog.category_name, tb_blog.date_release, tb_editor.username, tb_blog.views FROM ((tb_blog INNER JOIN tb_category_blog ON tb_blog.category_id = tb_category_blog.category_id) INNER JOIN tb_editor ON tb_blog.editor_id = tb_editor.editor_id)";
 }
 
 $request = mysqli_query($conn, $sql);
@@ -236,7 +236,7 @@ $request = mysqli_query($conn, $sql);
 						<div class="page-utilities">
 							<div class="row g-2 justify-content-start justify-content-md-end align-items-center">
 								<div class="col-auto">
-									<form class="table-search-form row gx-1 align-items-center" action="news.php" method="GET">
+									<form class="table-search-form row gx-1 align-items-center" action="manageBlog.php" method="GET">
 										<div class="col-auto">
 											<input type="text" id="search-orders" name="searchorders" class="form-control search-orders" placeholder="Search">
 										</div>
@@ -275,6 +275,7 @@ $request = mysqli_query($conn, $sql);
 												<th class="cell">Date Release</th>
 												<th class="cell">Tag</th>
 												<th class="cell">Publisher</th>
+												<th class="cell">Views</th>
 												<th class="cell"></th>
 												<th class="cell"></th>
 											</tr>
@@ -289,6 +290,7 @@ $request = mysqli_query($conn, $sql);
 													$category = $index[2];
 													$dateRelease = $index[3];
 													$publisher = $index[4];
+													$views = $index[5];
 													echo <<<TULIS
 															<tr>
 																<td class="cell">$blogId</td>
@@ -297,6 +299,7 @@ $request = mysqli_query($conn, $sql);
 																<td class="cell"><span>$dateRelease</span><span class="note">2:16 PM</span></td>
 																<td class="cell"><span class="badge bg-success">Paid</span></td>
 																<td class="cell">$publisher</td>
+																<td class="cell">$views Person</td>
 																<td class="cell">
 																	<a class="btn-sm app-btn-secondary" href="#">View</a>
 																</td>
@@ -348,7 +351,7 @@ $request = mysqli_query($conn, $sql);
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn app-btn-secondary" data-dismiss="modal">Close</button>
-								<form action="news.php" method="GET" id="conDeleteBlog">
+								<form action="manageBlog.php" method="GET" id="conDeleteBlog">
 									<input type="submit" id="submit" name="deleteButton" class="btn app-btn-confirmation" value="Ya, saya yakin">
 								</form>
 							</div>

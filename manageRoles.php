@@ -15,7 +15,7 @@ if (isset($_GET['add-roles'])) {
     mysqli_stmt_execute($requestAddCat);
     mysqli_stmt_close($requestAddCat);
 
-    header("Location:roles.php");
+    header("Location:manageRoles.php");
     exit;
 }
 ?>
@@ -223,7 +223,7 @@ if (isset($_GET['add-roles'])) {
                         <div class="page-utilities">
                             <div class="row g-2 justify-content-start justify-content-md-end align-items-center">
                                 <div class="col-auto">
-                                    <form class="table-search-form row gx-1 align-items-center" action="roles.php" method="GET">
+                                    <form class="table-search-form row gx-1 align-items-center" action="manageRoles.php" method="GET">
                                         <div class="col-auto">
                                             <input type="text" id="search-orders" name="searchorders" class="form-control search-orders" placeholder="Search">
                                         </div>
@@ -329,7 +329,30 @@ if (isset($_GET['add-roles'])) {
                     </div>
                     <div class="modal-body">
                         <p>Masukkan roles baru</p>
-                        <form class="row g-2 justify-content-start justify-content-md-end align-items-center" action="roles.php" method="GET">
+                        <form class="row g-2 justify-content-start justify-content-md-end align-items-center" action="manageRoles.php" method="GET">
+                            <input class="form-control app-btn-secondary" type="text" id="new-roles" name="new-roles">
+                            <input type="submit" id="submit" name="add-roles" class="btn app-btn-primary" value="Tambahkan">
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn app-btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="add-roles" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Tambah Role Baru</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Masukkan roles baru</p>
+                        <form class="row g-2 justify-content-start justify-content-md-end align-items-center" action="manageRoles.php" method="GET">
                             <input class="form-control app-btn-secondary" type="text" id="new-roles" name="new-roles">
                             <input type="submit" id="submit" name="add-roles" class="btn app-btn-primary" value="Tambahkan">
                         </form>

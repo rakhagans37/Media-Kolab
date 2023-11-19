@@ -16,7 +16,7 @@ if (isset($_GET['deleteButton'])) {
 	mysqli_stmt_close($requestDelete);
 	mysqli_close($conn);
 
-	header("Location:event.php");
+	header("Location:manageEvent.php");
 	exit;
 }
 ?>
@@ -277,9 +277,9 @@ if (isset($_GET['deleteButton'])) {
 											$conn = getConnectionMysqli();
 											if (isset($_GET['search-news'])) {
 												$searchNews = $_GET['searchorders'];
-												$sql = "SELECT tb_event.event_id, tb_event.event_title, tb_category.category_name, tb_event.date_release, tb_publisher.username FROM ((tb_event INNER JOIN tb_category ON tb_event.category_id = tb_category.category_id) INNER JOIN tb_editor ON tb_event.editor_id = tb_editor.editor_id) WHERE tb_event.event_title LIKE '%$searchNews%'";
+												$sql = "SELECT tb_event.event_id, tb_event.event_title, tb_category_event.category_name, tb_event.date_release, tb_publisher.username FROM ((tb_event INNER JOIN tb_category_event ON tb_event.category_id = tb_category_event.category_id) INNER JOIN tb_editor ON tb_event.editor_id = tb_editor.editor_id) WHERE tb_event.event_title LIKE '%$searchNews%'";
 											} else {
-												$sql = "SELECT tb_event.event_id, tb_event.event_title, tb_category.category_name, tb_event.date_release, tb_editor.username FROM ((tb_event INNER JOIN tb_category ON tb_event.category_id = tb_category.category_id) INNER JOIN tb_editor ON tb_event.editor_id = tb_editor.editor_id)";
+												$sql = "SELECT tb_event.event_id, tb_event.event_title, tb_category_event.category_name, tb_event.date_release, tb_editor.username FROM ((tb_event INNER JOIN tb_category_event ON tb_event.category_id = tb_category_event.category_id) INNER JOIN tb_editor ON tb_event.editor_id = tb_editor.editor_id)";
 											}
 
 											$request = mysqli_query($conn, $sql);
@@ -358,7 +358,7 @@ if (isset($_GET['deleteButton'])) {
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn app-btn-secondary" data-dismiss="modal">Close</button>
-								<form action="event.php" method="GET" id="conDeleteEvent">
+								<form action="manageEvent.php" method="GET" id="conDeleteEvent">
 									<input href="$hapus" id="submit" type="submit" name="deleteButton" class="btn app-btn-confirmation" value="Ya, Saya yakin"></input>
 								</form>
 							</div>

@@ -6,12 +6,29 @@ require_once __DIR__ . "/helper/hash.php";
 
 $conn = getConnectionMysqli();
 if (isset($_GET['add-category'])) {
+    $categoryType = $_GET['category-type'];
+    switch ($categoryType) {
+        case 'blogCategory':
+            $sqlAdd = "INSERT INTO tb_category_blog VALUES(?,?,?)";
+            break;
+        case 'mediaCategory':
+            $sqlAdd = "INSERT INTO tb_category_media VALUES(?,?,?)";
+            break;
+        case 'eventCategory':
+            $sqlAdd = "INSERT INTO tb_category_event VALUES(?,?,?)";
+            break;
+        case 'jobCategory':
+            $sqlAdd = "INSERT INTO tb_category_job_vacancy VALUES(?,?,?)";
+            break;
+    }
+    echo $categoryType;
     $id = generateIdCategory();
     $categoryName = $_GET['new-category'];
-    $sqlAdd = "INSERT INTO tb_category VALUES(?,?)";
+    $popularity = 0;
+
 
     $requestAddCat = mysqli_prepare($conn, $sqlAdd);
-    mysqli_stmt_bind_param($requestAddCat, "ss", $id, $categoryName);
+    mysqli_stmt_bind_param($requestAddCat, "sss", $id, $categoryName, $popularity);
     mysqli_stmt_execute($requestAddCat);
     mysqli_stmt_close($requestAddCat);
 
@@ -245,6 +262,13 @@ if (isset($_GET['add-category'])) {
                     </div><!--//col-auto-->
                 </div><!--//row-->
 
+                <nav id="orders-table-tab" class="orders-table-tab app-nav-tabs nav shadow-sm flex-column flex-sm-row mb-4">
+                    <a class="flex-sm-fill text-sm-center nav-link active" id="orders-all-tab" data-bs-toggle="tab" href="#orders-all" role="tab" aria-controls="orders-all" aria-selected="true">Active</a>
+                    <a class="flex-sm-fill text-sm-center nav-link" id="media-tab" data-bs-toggle="tab" href="#mediaCategory" role="tab" aria-controls="media" aria-selected="false">Media</a>
+                    <a class="flex-sm-fill text-sm-center nav-link" id="event-tab" data-bs-toggle="tab" href="#eventCategory" role="tab" aria-controls="event" aria-selected="false">Event</a>
+                    <a class="flex-sm-fill text-sm-center nav-link" id="job-tab" data-bs-toggle="tab" href="#jobCategory" role="tab" aria-controls="job" aria-selected="false">Job Vacancies</a>
+                </nav>
+
                 <div class="tab-content" id="orders-table-tab-content">
                     <div class="tab-pane fade show active" id="orders-all" role="tabpanel" aria-labelledby="orders-all-tab">
                         <div class="app-card app-card-orders-table shadow-sm mb-5">
@@ -263,9 +287,9 @@ if (isset($_GET['add-category'])) {
                                             <?php
                                             if (isset($_GET['search-news'])) {
                                                 $searchUser = $_GET['searchorders'];
-                                                $sql = "SELECT tb_category.category_id, tb_category.category_name, COUNT(tb_blog.category_id) + COUNT(tb_media.category_id) AS jumlah_member FROM tb_blog RIGHT JOIN tb_category ON tb_blog.category_id = tb_category.category_id LEFT JOIN tb_media ON tb_media.category_id = tb_category.category_id GROUP BY tb_category.category_id HAVING tb_category.category_name LIKE '%$searchUser%'";
+                                                $sql = "SELECT tb_category_blog.category_id, tb_category_blog.category_name, COUNT(tb_blog.category_id) AS jumlah_member FROM tb_blog RIGHT JOIN tb_category_blog ON tb_blog.category_id = tb_category_blog.category_id GROUP BY tb_category_blog.category_id HAVING tb_category_blog.category_name LIKE '%$searchUser%'";
                                             } else {
-                                                $sql = "SELECT tb_category.category_id, tb_category.category_name, COUNT(tb_blog.category_id) + COUNT(tb_media.category_id) AS jumlah_member FROM tb_blog RIGHT JOIN tb_category ON tb_blog.category_id = tb_category.category_id LEFT JOIN tb_media ON tb_media.category_id = tb_category.category_id GROUP BY tb_category.category_id";
+                                                $sql = "SELECT tb_category_blog.category_id, tb_category_blog.category_name, COUNT(tb_blog.category_id) AS jumlah_member FROM tb_blog RIGHT JOIN tb_category_blog ON tb_blog.category_id = tb_category_blog.category_id GROUP BY tb_category_blog.category_id";
                                             }
 
                                             $request1 = mysqli_query($conn, $sql);
@@ -275,20 +299,19 @@ if (isset($_GET['add-category'])) {
                                             // if (mysqli_num_rows($request) > 0) {
                                             if (mysqli_num_rows($request1) > 0) {
                                                 foreach ($result1 as $index) {
-                                                    $RolesId = $index[0];
-                                                    $RolesName = $index[1];
+                                                    $categoryId = $index[0];
+                                                    $categoryName = $index[1];
                                                     $Members = $index[2];
                                                     // foreach ($result1 as $total) {
 
                                                     echo <<<TULIS
 															<tr>
-																<td class="cell">$RolesId</td>
-																<td class="cell"><span class="truncate">$RolesName</span></td>
-																<td class="cell">$Members</td>
+																<td class="cell">$categoryId</td>
+																<td class="cell"><span class="truncate">$categoryName</span></td>
+																<td class="cell">$Members</td></tr>
 														TULIS;
                                                 }
                                             }
-                                            mysqli_close($conn);
                                             ?>
                                         </tbody>
                                     </table>
@@ -312,7 +335,7 @@ if (isset($_GET['add-category'])) {
 
                     </div><!--//tab-pane-->
 
-                    <div class="tab-pane fade" id="banned" role="tabpanel" aria-labelledby="banned-tab">
+                    <div class="tab-pane fade" id="mediaCategory" role="tabpanel" aria-labelledby="banned-tab">
                         <div class="app-card app-card-orders-table mb-5">
                             <div class="app-card-body">
                                 <div class="table-responsive">
@@ -320,57 +343,42 @@ if (isset($_GET['add-category'])) {
                                     <table class="table mb-0 text-left">
                                         <thead>
                                             <tr>
-                                                <th class="cell">Order</th>
-                                                <th class="cell">Product</th>
-                                                <th class="cell">Customer</th>
-                                                <th class="cell">Date</th>
-                                                <th class="cell">Status</th>
-                                                <th class="cell">Total</th>
+                                                <th class="cell">Category ID</th>
+                                                <th class="cell">Category Name</th>
+                                                <th class="cell">Members</th>
                                                 <th class="cell"></th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td class="cell">#15346</td>
-                                                <td class="cell"><span class="truncate">Lorem ipsum dolor sit amet eget volutpat erat</span></td>
-                                                <td class="cell">John Sanders</td>
-                                                <td class="cell"><span>17 Oct</span><span class="note">2:16 PM</span></td>
-                                                <td class="cell"><span class="badge bg-success">Paid</span></td>
-                                                <td class="cell">$259.35</td>
-                                                <td class="cell"><a class="btn-sm app-btn-secondary" href="#">View</a></td>
-                                            </tr>
+                                            <?php
+                                            if (isset($_GET['search-news'])) {
+                                                $searchUser = $_GET['searchorders'];
+                                                $sql = "SELECT tb_category_media.category_id, tb_category_media.category_name, COUNT(tb_media.category_id) AS jumlah_member FROM tb_category_media LEFT JOIN tb_media ON tb_media.category_id = tb_category_media.category_id GROUP BY tb_category_media.category_id HAVING tb_category_media.category_name LIKE '%$searchUser%'";
+                                            } else {
+                                                $sql = "SELECT tb_category_media.category_id, tb_category_media.category_name, COUNT(tb_media.category_id) AS jumlah_member FROM tb_category_media LEFT JOIN tb_media ON tb_media.category_id = tb_category_media.category_id GROUP BY tb_category_media.category_id";
+                                            }
 
-                                            <tr>
-                                                <td class="cell">#15344</td>
-                                                <td class="cell"><span class="truncate">Pellentesque diam imperdiet</span></td>
-                                                <td class="cell">Teresa Holland</td>
-                                                <td class="cell"><span class="cell-data">16 Oct</span><span class="note">01:16 AM</span></td>
-                                                <td class="cell"><span class="badge bg-success">Paid</span></td>
-                                                <td class="cell">$123.00</td>
-                                                <td class="cell"><a class="btn-sm app-btn-secondary" href="#">View</a></td>
-                                            </tr>
+                                            $request2 = mysqli_query($conn, $sql);
 
-                                            <tr>
-                                                <td class="cell">#15343</td>
-                                                <td class="cell"><span class="truncate">Vestibulum a accumsan lectus sed mollis ipsum</span></td>
-                                                <td class="cell">Jayden Massey</td>
-                                                <td class="cell"><span class="cell-data">15 Oct</span><span class="note">8:07 PM</span></td>
-                                                <td class="cell"><span class="badge bg-success">Paid</span></td>
-                                                <td class="cell">$199.00</td>
-                                                <td class="cell"><a class="btn-sm app-btn-secondary" href="#">View</a></td>
-                                            </tr>
+                                            $result2 = mysqli_fetch_all($request2);
 
+                                            // if (mysqli_num_rows($request) > 0) {
+                                            if (mysqli_num_rows($request2) > 0) {
+                                                foreach ($result2 as $index) {
+                                                    $categoryId = $index[0];
+                                                    $categoryName = $index[1];
+                                                    $Members = $index[2];
+                                                    // foreach ($result2 as $total) {
 
-                                            <tr>
-                                                <td class="cell">#15341</td>
-                                                <td class="cell"><span class="truncate">Morbi vulputate lacinia neque et sollicitudin</span></td>
-                                                <td class="cell">Raymond Atkins</td>
-                                                <td class="cell"><span class="cell-data">11 Oct</span><span class="note">11:18 AM</span></td>
-                                                <td class="cell"><span class="badge bg-success">Paid</span></td>
-                                                <td class="cell">$678.26</td>
-                                                <td class="cell"><a class="btn-sm app-btn-secondary" href="#">View</a></td>
-                                            </tr>
-
+                                                    echo <<<TULIS
+                                                    <tr>
+                                                    <td class="cell">$categoryId</td>
+                                                    <td class="cell"><span class="truncate">$categoryName</span></td>
+                                                    <td class="cell">$Members</td></tr>
+                                                    TULIS;
+                                                }
+                                            }
+                                            ?>
                                         </tbody>
                                     </table>
                                 </div><!--//table-responsive-->
@@ -378,72 +386,109 @@ if (isset($_GET['add-category'])) {
                         </div><!--//app-card-->
                     </div><!--//tab-pane-->
 
-                    <div class="tab-pane fade" id="orders-pending" role="tabpanel" aria-labelledby="orders-pending-tab">
+                    <div class="tab-pane fade" id="eventCategory" role="tabpanel" aria-labelledby="banned-tab">
                         <div class="app-card app-card-orders-table mb-5">
                             <div class="app-card-body">
                                 <div class="table-responsive">
+
                                     <table class="table mb-0 text-left">
                                         <thead>
                                             <tr>
-                                                <th class="cell">Order</th>
-                                                <th class="cell">Product</th>
-                                                <th class="cell">Customer</th>
-                                                <th class="cell">Date</th>
-                                                <th class="cell">Status</th>
-                                                <th class="cell">Total</th>
+                                                <th class="cell">Category ID</th>
+                                                <th class="cell">Category Name</th>
+                                                <th class="cell">Members</th>
                                                 <th class="cell"></th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td class="cell">#15345</td>
-                                                <td class="cell"><span class="truncate">Consectetur adipiscing elit</span></td>
-                                                <td class="cell">Dylan Ambrose</td>
-                                                <td class="cell"><span class="cell-data">16 Oct</span><span class="note">03:16 AM</span></td>
-                                                <td class="cell"><span class="badge bg-warning">Pending</span></td>
-                                                <td class="cell">$96.20</td>
-                                                <td class="cell"><a class="btn-sm app-btn-secondary" href="#">View</a></td>
-                                            </tr>
+                                            <?php
+                                            if (isset($_GET['search-news'])) {
+                                                $searchUser = $_GET['searchorders'];
+                                                $sql = "SELECT tb_category_event.category_id, tb_category_event.category_name, COUNT(tb_media.category_id) AS jumlah_member FROM tb_category_event LEFT JOIN tb_media ON tb_media.category_id = tb_category_event.category_id GROUP BY tb_category_event.category_id HAVING tb_category_event.category_name LIKE '%$searchUser%'";
+                                            } else {
+                                                $sql = "SELECT tb_category_event.category_id, tb_category_event.category_name, COUNT(tb_media.category_id) AS jumlah_member FROM tb_category_event LEFT JOIN tb_media ON tb_media.category_id = tb_category_event.category_id GROUP BY tb_category_event.category_id";
+                                            }
+
+                                            $request3 = mysqli_query($conn, $sql);
+
+                                            $result3 = mysqli_fetch_all($request3);
+
+                                            // if (mysqli_num_rows($request) > 0) {
+                                            if (mysqli_num_rows($request3) > 0) {
+                                                foreach ($result3 as $index) {
+                                                    $categoryId = $index[0];
+                                                    $categoryName = $index[1];
+                                                    $Members = $index[2];
+                                                    // foreach ($result2 as $total) {
+
+                                                    echo <<<TULIS
+                                                    <tr>
+                                                    <td class="cell">$categoryId</td>
+                                                    <td class="cell"><span class="truncate">$categoryName</span></td>
+                                                    <td class="cell">$Members</td></tr>
+                                                    TULIS;
+                                                }
+                                            }
+                                            ?>
                                         </tbody>
                                     </table>
                                 </div><!--//table-responsive-->
                             </div><!--//app-card-body-->
                         </div><!--//app-card-->
                     </div><!--//tab-pane-->
-                    <div class="tab-pane fade" id="orders-cancelled" role="tabpanel" aria-labelledby="orders-cancelled-tab">
+
+                    <div class="tab-pane fade" id="jobCategory" role="tabpanel" aria-labelledby="banned-tab">
                         <div class="app-card app-card-orders-table mb-5">
                             <div class="app-card-body">
                                 <div class="table-responsive">
+
                                     <table class="table mb-0 text-left">
                                         <thead>
                                             <tr>
-                                                <th class="cell">Order</th>
-                                                <th class="cell">Product</th>
-                                                <th class="cell">Customer</th>
-                                                <th class="cell">Date</th>
-                                                <th class="cell">Status</th>
-                                                <th class="cell">Total</th>
+                                                <th class="cell">Category ID</th>
+                                                <th class="cell">Category Name</th>
+                                                <th class="cell">Members</th>
                                                 <th class="cell"></th>
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            <?php
+                                            if (isset($_GET['search-news'])) {
+                                                $searchUser = $_GET['searchorders'];
+                                                $sql = "SELECT tb_category_job_vacancy.category_id, tb_category_job_vacancy.category_name, COUNT(tb_media.category_id) AS jumlah_member FROM tb_category_job_vacancy LEFT JOIN tb_media ON tb_media.category_id = tb_category_job_vacancy.category_id GROUP BY tb_category_job_vacancy.category_id HAVING tb_category_job_vacancy.category_name LIKE '%$searchUser%'";
+                                            } else {
+                                                $sql = "SELECT tb_category_job_vacancy.category_id, tb_category_job_vacancy.category_name, COUNT(tb_media.category_id) AS jumlah_member FROM tb_category_job_vacancy LEFT JOIN tb_media ON tb_media.category_id = tb_category_job_vacancy.category_id GROUP BY tb_category_job_vacancy.category_id";
+                                            }
 
-                                            <tr>
-                                                <td class="cell">#15342</td>
-                                                <td class="cell"><span class="truncate">Justo feugiat neque</span></td>
-                                                <td class="cell">Reina Brooks</td>
-                                                <td class="cell"><span class="cell-data">12 Oct</span><span class="note">04:23 PM</span></td>
-                                                <td class="cell"><span class="badge bg-danger">Cancelled</span></td>
-                                                <td class="cell">$59.00</td>
-                                                <td class="cell"><a class="btn-sm app-btn-secondary" href="#">View</a></td>
-                                            </tr>
+                                            $request4 = mysqli_query($conn, $sql);
+                                            $result4 = mysqli_fetch_all($request4);
 
+                                            // if (mysqli_num_rows($request) > 0) {
+                                            if (mysqli_num_rows($request4) > 0) {
+                                                foreach ($result4 as $index) {
+                                                    $categoryId = $index[0];
+                                                    $categoryName = $index[1];
+                                                    $Members = $index[2];
+                                                    // foreach ($result2 as $total) {
+
+                                                    echo <<<TULIS
+                                                    <tr>
+                                                    <td class="cell">$categoryId</td>
+                                                    <td class="cell"><span class="truncate">$categoryName</span></td>
+                                                    <td class="cell">$Members</td></tr>
+                                                    TULIS;
+                                                }
+                                            }
+                                            mysqli_close($conn);
+                                            ?>
                                         </tbody>
                                     </table>
                                 </div><!--//table-responsive-->
                             </div><!--//app-card-body-->
                         </div><!--//app-card-->
                     </div><!--//tab-pane-->
+
+
                 </div><!--//tab-content-->
 
                 <div class="modal fade" id="add-category" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -458,7 +503,14 @@ if (isset($_GET['add-category'])) {
                             <div class="modal-body">
                                 <p>Masukkan kategori baru</p>
                                 <form class="row g-2 justify-content-start justify-content-md-end align-items-center" action="manageCategory.php" method="GET">
-                                    <input class="form-control app-btn-secondary" type="text" id="new-category" name="new-category">
+                                    <select class="form-select" name="category-type" required>
+                                        <option value="" disabled selected hidden>Pilih Role Anda</option>
+                                        <option value='blogCategory'>Blog</option>
+                                        <option value='mediaCategory'>Media</option>
+                                        <option value='eventCategory'>Event</option>
+                                        <option value='jobCategory'>Job Vacancies</option>
+                                    </select>
+                                    <input class="form-control app-btn-secondary" type="text" id="new-category" name="new-category" required>
                                     <input type="submit" id="submit" name="add-category" class="btn app-btn-primary" value="Tambahkan">
                                 </form>
                             </div>

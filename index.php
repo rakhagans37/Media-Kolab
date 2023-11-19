@@ -548,7 +548,7 @@ if ($result = mysqli_fetch_all($request)) {
 											<?php
 											$conn = getConnectionMysqli();
 
-											$sql = "SELECT category_name FROM tb_category";
+											$sql = "SELECT category_name FROM tb_category_blog";
 
 											// Execute the query
 											$result = mysqli_query($conn, $sql);

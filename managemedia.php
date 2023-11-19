@@ -24,9 +24,9 @@ if (isset($_GET['deleteButton'])) {
 //Script Php untuk membuat request yuang mengambil detail data media dari database
 if (isset($_GET['search-media'])) {
 	$searchMedia = $_GET['searchorders'];
-	$sql = "SELECT tb_media.media_id, tb_media.media_title, tb_category.category_name, tb_media.date_release, tb_editor.username FROM ((tb_media INNER JOIN tb_category ON tb_media.category_id = tb_category.category_id) INNER JOIN tb_editor ON tb_media.editor_id = tb_editor.editor_id) WHERE tb_media.media_title LIKE '%$searchMedia%'";
+	$sql = "SELECT tb_media.media_id, tb_media.media_title, tb_category_media.category_name, tb_media.date_release, tb_editor.username, tb_media.views FROM ((tb_media INNER JOIN tb_category_media ON tb_media.category_id = tb_category_media.category_id) INNER JOIN tb_editor ON tb_media.editor_id = tb_editor.editor_id) WHERE tb_media.media_title LIKE '%$searchMedia%'";
 } else {
-	$sql = "SELECT tb_media.media_id, tb_media.media_title, tb_category.category_name, tb_media.date_release, tb_editor.username FROM ((tb_media INNER JOIN tb_category ON tb_media.category_id = tb_category.category_id) INNER JOIN tb_editor ON tb_media.editor_id = tb_editor.editor_id)";
+	$sql = "SELECT tb_media.media_id, tb_media.media_title, tb_category_media.category_name, tb_media.date_release, tb_editor.username, tb_media.views FROM ((tb_media INNER JOIN tb_category_media ON tb_media.category_id = tb_category_media.category_id) INNER JOIN tb_editor ON tb_media.editor_id = tb_editor.editor_id)";
 }
 
 $request = mysqli_query($conn, $sql);
@@ -275,6 +275,7 @@ $request = mysqli_query($conn, $sql);
 												<th class="cell">Date Release</th>
 												<th class="cell">Tag</th>
 												<th class="cell">Publisher</th>
+												<th class="cell">Views</th>
 												<th class="cell"></th>
 												<th class="cell"></th>
 											</tr>
@@ -289,6 +290,7 @@ $request = mysqli_query($conn, $sql);
 													$category = $index[2];
 													$dateRelease = $index[3];
 													$publisher = $index[4];
+													$views = $index[5];
 													echo <<<TULIS
 															<tr>
 																<td class="cell">$mediaId</td>
@@ -297,6 +299,7 @@ $request = mysqli_query($conn, $sql);
 																<td class="cell"><span>$dateRelease</span><span class="note">2:16 PM</span></td>
 																<td class="cell"><span class="badge bg-success">Paid</span></td>
 																<td class="cell">$publisher</td>
+																<td class="cell">$views Person</td>
 																<td class="cell">
 																	<a class="btn-sm app-btn-secondary" href="#">View</a>
 																</td>
