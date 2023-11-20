@@ -3,7 +3,7 @@ require_once __DIR__ . '/../helper/getConnection.php';
 require_once __DIR__ . '/../helper/cloudinary.php';
 require_once __DIR__ . '/../helper/hash.php';
 
-if (isset($_COOKIE['loginStatus']) && isset($_SESSION['loginStatus'])) {
+if (isset($_COOKIE['editorLoginStatus']) || isset($_SESSION['editorLoginStatus'])) {
     header('Location:index.php');
     exit;
 }

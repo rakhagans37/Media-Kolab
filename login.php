@@ -3,7 +3,7 @@ require_once __DIR__ . '/helper/getConnection.php';
 require_once __DIR__ . '/helper/cloudinary.php';
 require_once __DIR__ . '/helper/hash.php';
 
-if (isset($_COOKIE['loginStatus']) && isset($_SESSION['loginStatus'])) {
+if (isset($_COOKIE['loginStatus']) || isset($_SESSION['loginStatus'])) {
 	header('Location:index.php');
 	exit;
 }
@@ -132,8 +132,6 @@ if (isset($_POST['login'])) {
 								<button type="submit" name="login" class="btn app-btn-primary w-100 theme-btn mx-auto">Log In</button>
 							</div>
 						</form>
-
-						<div class="auth-option text-center pt-5">No Account? Sign up <a class="text-link" href="signup.php">here</a>.</div>
 					</div>
 					<!--//auth-form-container-->
 

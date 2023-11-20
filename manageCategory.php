@@ -280,6 +280,7 @@ if (isset($_GET['add-category'])) {
                                                 <th class="cell">Category ID</th>
                                                 <th class="cell">Category Name</th>
                                                 <th class="cell">Members</th>
+                                                <th class="cell">Popularity</th>
                                                 <th class="cell"></th>
                                             </tr>
                                         </thead>
@@ -287,9 +288,9 @@ if (isset($_GET['add-category'])) {
                                             <?php
                                             if (isset($_GET['search-news'])) {
                                                 $searchUser = $_GET['searchorders'];
-                                                $sql = "SELECT tb_category_blog.category_id, tb_category_blog.category_name, COUNT(tb_blog.category_id) AS jumlah_member FROM tb_blog RIGHT JOIN tb_category_blog ON tb_blog.category_id = tb_category_blog.category_id GROUP BY tb_category_blog.category_id HAVING tb_category_blog.category_name LIKE '%$searchUser%'";
+                                                $sql = "SELECT tb_category_blog.category_id, tb_category_blog.category_name, COUNT(tb_blog.category_id) AS jumlah_member, tb_category_blog.popularity FROM tb_blog RIGHT JOIN tb_category_blog ON tb_blog.category_id = tb_category_blog.category_id GROUP BY tb_category_blog.category_id HAVING tb_category_blog.category_name LIKE '%$searchUser%'";
                                             } else {
-                                                $sql = "SELECT tb_category_blog.category_id, tb_category_blog.category_name, COUNT(tb_blog.category_id) AS jumlah_member FROM tb_blog RIGHT JOIN tb_category_blog ON tb_blog.category_id = tb_category_blog.category_id GROUP BY tb_category_blog.category_id";
+                                                $sql = "SELECT tb_category_blog.category_id, tb_category_blog.category_name, COUNT(tb_blog.category_id) AS jumlah_member, tb_category_blog.popularity FROM tb_blog RIGHT JOIN tb_category_blog ON tb_blog.category_id = tb_category_blog.category_id GROUP BY tb_category_blog.category_id";
                                             }
 
                                             $request1 = mysqli_query($conn, $sql);
@@ -302,13 +303,14 @@ if (isset($_GET['add-category'])) {
                                                     $categoryId = $index[0];
                                                     $categoryName = $index[1];
                                                     $Members = $index[2];
+                                                    $popularity = $index[3];
                                                     // foreach ($result1 as $total) {
 
                                                     echo <<<TULIS
 															<tr>
 																<td class="cell">$categoryId</td>
 																<td class="cell"><span class="truncate">$categoryName</span></td>
-																<td class="cell">$Members</td></tr>
+																<td class="cell">$Members</td><td class="cell">$popularity Views</td></tr>
 														TULIS;
                                                 }
                                             }
@@ -346,6 +348,7 @@ if (isset($_GET['add-category'])) {
                                                 <th class="cell">Category ID</th>
                                                 <th class="cell">Category Name</th>
                                                 <th class="cell">Members</th>
+                                                <th class="cell">Popularity</th>
                                                 <th class="cell"></th>
                                             </tr>
                                         </thead>
@@ -353,9 +356,9 @@ if (isset($_GET['add-category'])) {
                                             <?php
                                             if (isset($_GET['search-news'])) {
                                                 $searchUser = $_GET['searchorders'];
-                                                $sql = "SELECT tb_category_media.category_id, tb_category_media.category_name, COUNT(tb_media.category_id) AS jumlah_member FROM tb_category_media LEFT JOIN tb_media ON tb_media.category_id = tb_category_media.category_id GROUP BY tb_category_media.category_id HAVING tb_category_media.category_name LIKE '%$searchUser%'";
+                                                $sql = "SELECT tb_category_media.category_id, tb_category_media.category_name, COUNT(tb_media.category_id) AS jumlah_member, tb_category_media.popularity FROM tb_category_media LEFT JOIN tb_media ON tb_media.category_id = tb_category_media.category_id GROUP BY tb_category_media.category_id HAVING tb_category_media.category_name LIKE '%$searchUser%'";
                                             } else {
-                                                $sql = "SELECT tb_category_media.category_id, tb_category_media.category_name, COUNT(tb_media.category_id) AS jumlah_member FROM tb_category_media LEFT JOIN tb_media ON tb_media.category_id = tb_category_media.category_id GROUP BY tb_category_media.category_id";
+                                                $sql = "SELECT tb_category_media.category_id, tb_category_media.category_name, COUNT(tb_media.category_id) AS jumlah_member, tb_category_media.popularity FROM tb_category_media LEFT JOIN tb_media ON tb_media.category_id = tb_category_media.category_id GROUP BY tb_category_media.category_id";
                                             }
 
                                             $request2 = mysqli_query($conn, $sql);
@@ -368,13 +371,15 @@ if (isset($_GET['add-category'])) {
                                                     $categoryId = $index[0];
                                                     $categoryName = $index[1];
                                                     $Members = $index[2];
+                                                    $popularity = $index[3];
                                                     // foreach ($result2 as $total) {
 
                                                     echo <<<TULIS
                                                     <tr>
                                                     <td class="cell">$categoryId</td>
                                                     <td class="cell"><span class="truncate">$categoryName</span></td>
-                                                    <td class="cell">$Members</td></tr>
+                                                    <td class="cell">$Members</td>
+                                                    <td class="cell">$popularity Views</td></tr>
                                                     TULIS;
                                                 }
                                             }
@@ -397,6 +402,7 @@ if (isset($_GET['add-category'])) {
                                                 <th class="cell">Category ID</th>
                                                 <th class="cell">Category Name</th>
                                                 <th class="cell">Members</th>
+                                                <th class="cell">Popularity</th>
                                                 <th class="cell"></th>
                                             </tr>
                                         </thead>
@@ -404,9 +410,9 @@ if (isset($_GET['add-category'])) {
                                             <?php
                                             if (isset($_GET['search-news'])) {
                                                 $searchUser = $_GET['searchorders'];
-                                                $sql = "SELECT tb_category_event.category_id, tb_category_event.category_name, COUNT(tb_media.category_id) AS jumlah_member FROM tb_category_event LEFT JOIN tb_media ON tb_media.category_id = tb_category_event.category_id GROUP BY tb_category_event.category_id HAVING tb_category_event.category_name LIKE '%$searchUser%'";
+                                                $sql = "SELECT tb_category_event.category_id, tb_category_event.category_name, COUNT(tb_media.category_id) AS jumlah_member, tb_category_event.popularity FROM tb_category_event LEFT JOIN tb_media ON tb_media.category_id = tb_category_event.category_id GROUP BY tb_category_event.category_id HAVING tb_category_event.category_name LIKE '%$searchUser%'";
                                             } else {
-                                                $sql = "SELECT tb_category_event.category_id, tb_category_event.category_name, COUNT(tb_media.category_id) AS jumlah_member FROM tb_category_event LEFT JOIN tb_media ON tb_media.category_id = tb_category_event.category_id GROUP BY tb_category_event.category_id";
+                                                $sql = "SELECT tb_category_event.category_id, tb_category_event.category_name, COUNT(tb_media.category_id) AS jumlah_member, tb_category_event.popularity FROM tb_category_event LEFT JOIN tb_media ON tb_media.category_id = tb_category_event.category_id GROUP BY tb_category_event.category_id";
                                             }
 
                                             $request3 = mysqli_query($conn, $sql);
@@ -419,13 +425,15 @@ if (isset($_GET['add-category'])) {
                                                     $categoryId = $index[0];
                                                     $categoryName = $index[1];
                                                     $Members = $index[2];
+                                                    $popularity = $index[3];
                                                     // foreach ($result2 as $total) {
 
                                                     echo <<<TULIS
                                                     <tr>
                                                     <td class="cell">$categoryId</td>
                                                     <td class="cell"><span class="truncate">$categoryName</span></td>
-                                                    <td class="cell">$Members</td></tr>
+                                                    <td class="cell">$Members</td>
+                                                    <td class="cell">$popularity Views</td></tr>
                                                     TULIS;
                                                 }
                                             }
@@ -448,6 +456,7 @@ if (isset($_GET['add-category'])) {
                                                 <th class="cell">Category ID</th>
                                                 <th class="cell">Category Name</th>
                                                 <th class="cell">Members</th>
+                                                <th class="cell">Popularity</th>
                                                 <th class="cell"></th>
                                             </tr>
                                         </thead>
@@ -455,9 +464,9 @@ if (isset($_GET['add-category'])) {
                                             <?php
                                             if (isset($_GET['search-news'])) {
                                                 $searchUser = $_GET['searchorders'];
-                                                $sql = "SELECT tb_category_job_vacancy.category_id, tb_category_job_vacancy.category_name, COUNT(tb_media.category_id) AS jumlah_member FROM tb_category_job_vacancy LEFT JOIN tb_media ON tb_media.category_id = tb_category_job_vacancy.category_id GROUP BY tb_category_job_vacancy.category_id HAVING tb_category_job_vacancy.category_name LIKE '%$searchUser%'";
+                                                $sql = "SELECT tb_category_job_vacancy.category_id, tb_category_job_vacancy.category_name, COUNT(tb_media.category_id) AS jumlah_member,tb_category_job_vacancy.popularity FROM tb_category_job_vacancy LEFT JOIN tb_media ON tb_media.category_id = tb_category_job_vacancy.category_id GROUP BY tb_category_job_vacancy.category_id HAVING tb_category_job_vacancy.category_name LIKE '%$searchUser%'";
                                             } else {
-                                                $sql = "SELECT tb_category_job_vacancy.category_id, tb_category_job_vacancy.category_name, COUNT(tb_media.category_id) AS jumlah_member FROM tb_category_job_vacancy LEFT JOIN tb_media ON tb_media.category_id = tb_category_job_vacancy.category_id GROUP BY tb_category_job_vacancy.category_id";
+                                                $sql = "SELECT tb_category_job_vacancy.category_id, tb_category_job_vacancy.category_name, COUNT(tb_media.category_id) AS jumlah_member,tb_category_job_vacancy.popularity FROM tb_category_job_vacancy LEFT JOIN tb_media ON tb_media.category_id = tb_category_job_vacancy.category_id GROUP BY tb_category_job_vacancy.category_id";
                                             }
 
                                             $request4 = mysqli_query($conn, $sql);
@@ -469,13 +478,15 @@ if (isset($_GET['add-category'])) {
                                                     $categoryId = $index[0];
                                                     $categoryName = $index[1];
                                                     $Members = $index[2];
+                                                    $popularity = $index[3];
                                                     // foreach ($result2 as $total) {
 
                                                     echo <<<TULIS
                                                     <tr>
                                                     <td class="cell">$categoryId</td>
                                                     <td class="cell"><span class="truncate">$categoryName</span></td>
-                                                    <td class="cell">$Members</td></tr>
+                                                    <td class="cell">$Members</td>
+                                                    <td class="cell">$popularity Views</td></tr>
                                                     TULIS;
                                                 }
                                             }
