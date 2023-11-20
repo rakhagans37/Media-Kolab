@@ -29,7 +29,7 @@ if (isset($_POST['signup-submit'])) {
 			echo "Password tidak matching";
 		} else {
 			$id = generateIdEditor();
-			$passwordHashed = password_hash($confirmPassword, PASSWORD_DEFAULT);
+			$passwordHashed = hashPassword($confirmPassword);
 			$sqlInsert = "INSERT INTO tb_editor(editor_id, username, password, email, phone_number, role_id) values(?, ?, ?, ?, ?, ?)";
 			$requestInsert = $conn->prepare($sqlInsert);
 			$requestInsert->bindParam(1, $id);

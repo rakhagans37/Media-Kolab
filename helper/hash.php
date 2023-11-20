@@ -10,6 +10,11 @@ function generateRandomString($length = 10)
     return $randomString;
 }
 
+function hashPassword($password)
+{
+    return password_hash($password, PASSWORD_DEFAULT);
+}
+
 function hashPhotoProfile($photoName)
 {
     $photoNameHashed = openssl_encrypt($photoName, 'AES-128-CTR', 'mediaKolab123', 0, '1234567891011121');

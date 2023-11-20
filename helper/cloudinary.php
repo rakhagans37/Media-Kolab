@@ -131,6 +131,61 @@ function uploadImageAdmin($idAdmin, $locationRedirect)
     }
 }
 
+function uploadImageEditor($editorId, $locationRedirect)
+{
+    $newPhoto = $_FILES['new-photo']['tmp_name'];
+    $newPhotoSize = filesize($newPhoto);
+    $newPhotoType = mime_content_type($newPhoto);
+
+    if ($newPhotoSize <= 6000000 && ($newPhotoType == 'image/jpg' || $newPhotoType == 'image/png' || $newPhotoType == 'image/jpeg')) {
+        $photoName = random_int(0, PHP_INT_MAX) . date("dmYHis") . $editorId;
+        $photoNameHashed = hashPhotoProfile($photoName);
+
+        //Delete exPhoto
+        deleteImageEditor($editorId, $locationRedirect);
+
+        //Upload into cloudinary process
+        $upload = new UploadApi();
+        $upload->upload($newPhoto, [
+            'public_id' => $photoName,
+            'use_filename' => TRUE,
+            'overwrite' => TRUE
+        ]);
+
+        try {
+            $conn = getConnection();
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            $sql = "UPDATE tb_editor SET profile_photo = :newPhoto WHERE editor_id = :editorId";
+            $request = $conn->prepare($sql);
+
+            $request->bindParam('editorId', $editorId);
+            $request->bindParam('newPhoto', $photoNameHashed);
+            $request->execute();
+
+            //Saving profile photo into cookies
+            $decrypt = decryptPhotoProfile($photoNameHashed);
+
+            //Automatically getting the Photo
+            $imgtag = getImage($decrypt);
+            if (isset($_COOKIE['loginStatus'])) {
+                setcookie('profilePhoto', $imgtag, time() + (86400 * 7));
+            } else {
+                $_SESSION['profilePhoto'] = $imgtag;
+            }
+
+            $conn = null;
+            header("Location:$locationRedirect");
+            exit;
+        } catch (PDOException $errorMessage) {
+            $error = $errorMessage->getMessage();
+            echo $error;
+        }
+    } else {
+        echo "Gabisa cuy";
+    }
+}
+
 function deleteImageAdmin($idAdmin, $locationRedirect)
 {
     $api = new UploadApi();
@@ -154,7 +209,46 @@ function deleteImageAdmin($idAdmin, $locationRedirect)
             $request->execute();
 
             //Set cookie or session into default image
-            $imgtag = "<img class='profile-image' src='assets/images/profiles/profile-1.png' alt='Profile Photo'>";
+            $imgtag = "<img class='profile-image' src='../assets/images/profiles/profile-1.png' alt='Profile Photo'>";
+            if (isset($_COOKIE['loginStatus'])) {
+                setcookie('profilePhoto', $imgtag, time() + (86400 * 7));
+            } else {
+                $_SESSION['profilePhoto'] = $imgtag;
+            }
+
+            $conn = null;
+            header("Location:$locationRedirect");
+        } catch (PDOException $errorMessage) {
+            $error = $errorMessage->getMessage();
+            echo $error;
+        }
+    }
+}
+
+function deleteImageEditor($editorId, $locationRedirect)
+{
+    $api = new UploadApi();
+    $photoId = getAdminPhotoId($editorId);
+
+    if (!is_null($photoId)) {
+        $api->destroy($photoId);
+
+        //Update table
+        try {
+            $conn = getConnection();
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            $sql = "UPDATE tb_editor SET profile_photo = :setToNull WHERE editor_id = :editorId";
+            $request = $conn->prepare($sql);
+            $setToNull = null;
+
+            //Set into null
+            $request->bindParam('editorId', $editorId);
+            $request->bindParam('setToNull', $setToNull);
+            $request->execute();
+
+            //Set cookie or session into default image
+            $imgtag = "<img class='profile-image' src='../assets/images/profiles/profile-1.png' alt='Profile Photo'>";
             if (isset($_COOKIE['loginStatus'])) {
                 setcookie('profilePhoto', $imgtag, time() + (86400 * 7));
             } else {

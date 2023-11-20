@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/../helper/getConnection.php';
 require_once __DIR__ . '/../helper/cloudinary.php';
+require_once __DIR__ . '/../helper/hash.php';
+
 if (isset($_COOKIE['loginStatus']) && isset($_SESSION['loginStatus'])) {
     header('Location:index.php');
     exit;
@@ -37,7 +39,7 @@ if (isset($_POST['login'])) {
                 $imgtag = "<img class='profile-image' src='../assets/images/profiles/profile-1.png' alt='Profile Photo'>";
             } else {
                 //Saving profile photo into cookies
-                $decrypt = openssl_decrypt($photoUrl, 'AES-128-CTR', 'mediaKolab123', 0, '1234567891011121');
+                $decrypt = decryptPhotoProfile($photoUrl);
                 $imgtag = getImage($decrypt);
             }
 
