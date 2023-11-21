@@ -4,6 +4,7 @@ require_once  __DIR__ . "/../helper/getConnectionMsqli.php";
 require_once  __DIR__ . "/../helper/hash.php";
 
 $conn = getConnection();
+$signupSuccess = null;
 
 if (isset($_POST['signup-submit'])) {
 	$username = $_POST['signup-username'];
@@ -23,7 +24,7 @@ if (isset($_POST['signup-submit'])) {
 	$request->execute();
 
 	if ($result = $request->fetchAll()) {
-		echo "Username/Email/Nomor HP telah digunakan";
+		$signupSuccess = False;
 	} else {
 		if ($password != $confirmPassword) {
 			echo "Password tidak matching";
@@ -40,6 +41,7 @@ if (isset($_POST['signup-submit'])) {
 			$requestInsert->bindParam(6, $roleId);
 
 			$requestInsert->execute();
+			$signupSuccess = True;
 		}
 	}
 }
@@ -70,6 +72,23 @@ if (isset($_POST['signup-submit'])) {
 <body class="app app-signup p-0">
 	<div class="row g-0 app-auth-wrapper">
 		<div class="col-12 col-md-7 col-lg-6 auth-main-col text-center p-5">
+			<?php
+			if ($signupSuccess === True) {
+				echo '<div class="alert alert-success alert-dismissible fade show" role="alert">';
+				echo "<strong>Selamat, </strong>akun telah berhasil ditambahkan. buatlah konten dengan bijak :)</div>";
+				echo <<<Javascript
+				<script>
+					function redirect(){
+						window.location.href='loginEditor.php'
+					};
+					setTimeout(redirect, 3000);
+				</script>;
+				Javascript;
+			} else if ($signupSuccess === False) {
+				echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">';
+				echo "<strong>Mohon maaf, </strong>sepertinya username/nomor hp/email yang anda masukkan telah digunakan.</div>";
+			}
+			?>
 			<div class="d-flex flex-column align-content-end">
 				<div class="app-auth-body mx-auto">
 					<div class="app-auth-branding mb-4"><a class="app-logo" href="index.html"><img class="logo-icon me-2" src="../assets/images/app-logo.svg" alt="logo"></a></div>
