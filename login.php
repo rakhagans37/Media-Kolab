@@ -37,7 +37,7 @@ if (isset($_POST['login'])) {
 			} else {
 				//Saving profile photo into cookies
 				$decrypt = decryptPhotoProfile($photoUrl);
-				$imgtag = getImage($decrypt);
+				$imgtag = getImageProfile($decrypt);
 			}
 
 			if ($remember) {

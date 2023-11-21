@@ -515,7 +515,7 @@ if (isset($_GET['add-category'])) {
                                 <p>Masukkan kategori baru</p>
                                 <form class="row g-2 justify-content-start justify-content-md-end align-items-center" action="manageCategory.php" method="GET">
                                     <select class="form-select" name="category-type" required>
-                                        <option value="" disabled selected hidden>Pilih Role Anda</option>
+                                        <option value="" disabled selected hidden>Pilih Golongan Kategori</option>
                                         <option value='blogCategory'>Blog</option>
                                         <option value='mediaCategory'>Media</option>
                                         <option value='eventCategory'>Event</option>

@@ -277,7 +277,7 @@ if (isset($_GET['deleteButton'])) {
 											$conn = getConnectionMysqli();
 											if (isset($_GET['search-news'])) {
 												$searchNews = $_GET['searchorders'];
-												$sql = "SELECT tb_event.event_id, tb_event.event_title, tb_category_event.category_name, tb_event.date_release, tb_publisher.username FROM ((tb_event INNER JOIN tb_category_event ON tb_event.category_id = tb_category_event.category_id) INNER JOIN tb_editor ON tb_event.editor_id = tb_editor.editor_id) WHERE tb_event.event_title LIKE '%$searchNews%'";
+												$sql = "SELECT tb_event.event_id, tb_event.event_title, tb_category_event.category_name, tb_event.date_release, tb_editor.username FROM ((tb_event INNER JOIN tb_category_event ON tb_event.category_id = tb_category_event.category_id) INNER JOIN tb_editor ON tb_event.editor_id = tb_editor.editor_id) WHERE tb_event.event_title LIKE '%$searchNews%'";
 											} else {
 												$sql = "SELECT tb_event.event_id, tb_event.event_title, tb_category_event.category_name, tb_event.date_release, tb_editor.username FROM ((tb_event INNER JOIN tb_category_event ON tb_event.category_id = tb_category_event.category_id) INNER JOIN tb_editor ON tb_event.editor_id = tb_editor.editor_id)";
 											}

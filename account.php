@@ -6,7 +6,8 @@ require __DIR__ . '/vendor/autoload.php';
 
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     if (isset($_POST['changePhotoButton'])) {
-        uploadImageAdmin($idAdmin, "account.php");
+        $photoTemp = $_FILES['new-photo']['tmp_name'];
+        uploadImageAdmin($idAdmin, $photoTemp, "account.php");
     }
 }
 

@@ -1,7 +1,7 @@
 <?php
 require_once 'getConnection.php';
 require_once 'hash.php';
-require __DIR__ . '\../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 // Use the Configuration class 
 use Cloudinary\Configuration\Configuration;
@@ -48,7 +48,34 @@ function getAdminPhotoId($idAdmin)
     }
 }
 
-function getImage($urlPhoto)
+function getEditorPhotoId($editorId)
+{
+    try {
+        $conn = getConnection();
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        $sql = "SELECT profile_photo FROM tb_editor WHERE editor_id = :editorId";
+        $request = $conn->prepare($sql);
+
+        $request->bindParam('editorId', $editorId);
+        $request->execute();
+
+        if ($result = $request->fetchAll()) {
+            $photoName = $result[0]['profile_photo'];
+            if (is_null($photoName)) {
+                $decryptPhotoName = null;
+            } else {
+                $decryptPhotoName = decryptPhotoProfile($photoName);
+            }
+        }
+        return $decryptPhotoName;
+    } catch (PDOException $errorMessage) {
+        $error = $errorMessage->getMessage();
+        echo $error;
+    }
+}
+
+function getImageProfile($urlPhoto)
 {
     $admin = new AdminApi();
     $assetData = $admin->asset($urlPhoto, [
@@ -77,11 +104,39 @@ function getImage($urlPhoto)
     return (string)$imgtag;
 }
 
-function uploadImageAdmin($idAdmin, $locationRedirect)
+function getImageDefault($urlPhoto)
 {
-    $newPhoto = $_FILES['new-photo']['tmp_name'];
-    $newPhotoSize = filesize($newPhoto);
-    $newPhotoType = mime_content_type($newPhoto);
+    $admin = new AdminApi();
+    $assetData = $admin->asset($urlPhoto, [
+        'colors' => TRUE
+    ]);
+    $assetWidth = $assetData['width'];
+    $assetHeight = $assetData['height'];
+    $cropSize = $assetHeight <= $assetWidth ? $assetHeight : $assetWidth;
+    //Get Photo
+    $imgtag = (new ImageTag($urlPhoto))
+        ->resize(
+            Resize::crop()->width($cropSize)
+                ->height($cropSize)
+                ->gravity(
+                    Gravity::focusOn(
+                        FocusOn::face()
+                    )
+                )
+        )
+        ->roundCorners(RoundCorners::max())
+        ->resize(Resize::scale()->width(60))
+        ->delivery(Delivery::format(
+            Format::auto()
+        ));
+
+    return (string)$imgtag;
+}
+
+function uploadImageAdmin($idAdmin, $photoTemp, $locationRedirect)
+{
+    $newPhotoSize = filesize($photoTemp);
+    $newPhotoType = mime_content_type($photoTemp);
 
     if ($newPhotoSize <= 6000000 && ($newPhotoType == 'image/jpg' || $newPhotoType == 'image/png' || $newPhotoType == 'image/jpeg')) {
         $photoName = random_int(0, PHP_INT_MAX) . date("dmYHis") . $idAdmin;
@@ -92,7 +147,7 @@ function uploadImageAdmin($idAdmin, $locationRedirect)
 
         //Upload into cloudinary process
         $upload = new UploadApi();
-        $upload->upload($newPhoto, [
+        $upload->upload($photoTemp, [
             'public_id' => $photoName,
             'use_filename' => TRUE,
             'overwrite' => TRUE
@@ -113,7 +168,7 @@ function uploadImageAdmin($idAdmin, $locationRedirect)
             $decrypt = decryptPhotoProfile($photoNameHashed);
 
             //Automatically getting the Photo
-            $imgtag = getImage($decrypt);
+            $imgtag = getImageProfile($decrypt);
             if (isset($_COOKIE['loginStatus'])) {
                 setcookie('profilePhoto', $imgtag, time() + (86400 * 7));
             } else {
@@ -131,11 +186,10 @@ function uploadImageAdmin($idAdmin, $locationRedirect)
     }
 }
 
-function uploadImageEditor($editorId, $locationRedirect)
+function uploadImageEditor($editorId, $photoTemp, $locationRedirect)
 {
-    $newPhoto = $_FILES['new-photo']['tmp_name'];
-    $newPhotoSize = filesize($newPhoto);
-    $newPhotoType = mime_content_type($newPhoto);
+    $newPhotoSize = filesize($photoTemp);
+    $newPhotoType = mime_content_type($photoTemp);
 
     if ($newPhotoSize <= 6000000 && ($newPhotoType == 'image/jpg' || $newPhotoType == 'image/png' || $newPhotoType == 'image/jpeg')) {
         $photoName = random_int(0, PHP_INT_MAX) . date("dmYHis") . $editorId;
@@ -146,7 +200,7 @@ function uploadImageEditor($editorId, $locationRedirect)
 
         //Upload into cloudinary process
         $upload = new UploadApi();
-        $upload->upload($newPhoto, [
+        $upload->upload($photoTemp, [
             'public_id' => $photoName,
             'use_filename' => TRUE,
             'overwrite' => TRUE
@@ -167,11 +221,11 @@ function uploadImageEditor($editorId, $locationRedirect)
             $decrypt = decryptPhotoProfile($photoNameHashed);
 
             //Automatically getting the Photo
-            $imgtag = getImage($decrypt);
+            $imgtag = getImageProfile($decrypt);
             if (isset($_COOKIE['loginStatus'])) {
-                setcookie('profilePhoto', $imgtag, time() + (86400 * 7));
+                setcookie('editorProfilePhoto', $imgtag, time() + (86400 * 7));
             } else {
-                $_SESSION['profilePhoto'] = $imgtag;
+                $_SESSION['editorProfilePhoto'] = $imgtag;
             }
 
             $conn = null;
@@ -228,7 +282,7 @@ function deleteImageAdmin($idAdmin, $locationRedirect)
 function deleteImageEditor($editorId, $locationRedirect)
 {
     $api = new UploadApi();
-    $photoId = getAdminPhotoId($editorId);
+    $photoId = getEditorPhotoId($editorId);
 
     if (!is_null($photoId)) {
         $api->destroy($photoId);
@@ -250,9 +304,9 @@ function deleteImageEditor($editorId, $locationRedirect)
             //Set cookie or session into default image
             $imgtag = "<img class='profile-image' src='../assets/images/profiles/profile-1.png' alt='Profile Photo'>";
             if (isset($_COOKIE['loginStatus'])) {
-                setcookie('profilePhoto', $imgtag, time() + (86400 * 7));
+                setcookie('editorProfilePhoto', $imgtag, time() + (86400 * 7));
             } else {
-                $_SESSION['profilePhoto'] = $imgtag;
+                $_SESSION['editorProfilePhoto'] = $imgtag;
             }
 
             $conn = null;
@@ -261,5 +315,30 @@ function deleteImageEditor($editorId, $locationRedirect)
             $error = $errorMessage->getMessage();
             echo $error;
         }
+    }
+}
+
+
+//Function for uploading image for blog
+function uploadImageNews($newImageTemp)
+{
+    $newPhotoSize = filesize($newImageTemp);
+    $newPhotoType = mime_content_type($newImageTemp);
+
+    if ($newPhotoSize <= 10000000 && ($newPhotoType == 'image/jpg' || $newPhotoType == 'image/png' || $newPhotoType == 'image/jpeg')) {
+        $photoName = random_int(0, PHP_INT_MAX) . date("dmYHis");
+        $photoNameHashed = hashPhotoProfile($photoName);
+
+        //Upload into cloudinary process
+        $upload = new UploadApi();
+        $upload->upload($newImageTemp, [
+            'public_id' => $photoName,
+            'use_filename' => TRUE,
+            'overwrite' => TRUE
+        ]);
+
+        return $photoNameHashed;
+    } else {
+        echo "Gabisa cuy";
     }
 }
