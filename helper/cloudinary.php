@@ -106,31 +106,14 @@ function getImageProfile($urlPhoto)
 
 function getImageDefault($urlPhoto)
 {
+    // Get the asset details
     $admin = new AdminApi();
-    $assetData = $admin->asset($urlPhoto, [
+    $imageData = $admin->asset($urlPhoto, [
         'colors' => TRUE
     ]);
-    $assetWidth = $assetData['width'];
-    $assetHeight = $assetData['height'];
-    $cropSize = $assetHeight <= $assetWidth ? $assetHeight : $assetWidth;
-    //Get Photo
-    $imgtag = (new ImageTag($urlPhoto))
-        ->resize(
-            Resize::crop()->width($cropSize)
-                ->height($cropSize)
-                ->gravity(
-                    Gravity::focusOn(
-                        FocusOn::face()
-                    )
-                )
-        )
-        ->roundCorners(RoundCorners::max())
-        ->resize(Resize::scale()->width(60))
-        ->delivery(Delivery::format(
-            Format::auto()
-        ));
 
-    return (string)$imgtag;
+    // Return url of the image
+    return $imageData['url'];
 }
 
 function uploadImageAdmin($idAdmin, $photoTemp, $locationRedirect)
@@ -143,7 +126,7 @@ function uploadImageAdmin($idAdmin, $photoTemp, $locationRedirect)
         $photoNameHashed = hashPhotoProfile($photoName);
 
         //Delete exPhoto
-        deleteImageAdmin($idAdmin, $locationRedirect);
+        deleteImageAdmin($idAdmin);
 
         //Upload into cloudinary process
         $upload = new UploadApi();
@@ -196,7 +179,7 @@ function uploadImageEditor($editorId, $photoTemp, $locationRedirect)
         $photoNameHashed = hashPhotoProfile($photoName);
 
         //Delete exPhoto
-        deleteImageEditor($editorId, $locationRedirect);
+        deleteImageEditor($editorId);
 
         //Upload into cloudinary process
         $upload = new UploadApi();
@@ -240,7 +223,7 @@ function uploadImageEditor($editorId, $photoTemp, $locationRedirect)
     }
 }
 
-function deleteImageAdmin($idAdmin, $locationRedirect)
+function deleteImageAdmin($idAdmin)
 {
     $api = new UploadApi();
     $photoId = getAdminPhotoId($idAdmin);
@@ -271,7 +254,6 @@ function deleteImageAdmin($idAdmin, $locationRedirect)
             }
 
             $conn = null;
-            header("Location:$locationRedirect");
         } catch (PDOException $errorMessage) {
             $error = $errorMessage->getMessage();
             echo $error;
@@ -279,7 +261,7 @@ function deleteImageAdmin($idAdmin, $locationRedirect)
     }
 }
 
-function deleteImageEditor($editorId, $locationRedirect)
+function deleteImageEditor($editorId)
 {
     $api = new UploadApi();
     $photoId = getEditorPhotoId($editorId);
@@ -310,7 +292,6 @@ function deleteImageEditor($editorId, $locationRedirect)
             }
 
             $conn = null;
-            header("Location:$locationRedirect");
         } catch (PDOException $errorMessage) {
             $error = $errorMessage->getMessage();
             echo $error;
