@@ -303,7 +303,7 @@ function deleteImageEditor($editorId, $locationRedirect)
 
             //Set cookie or session into default image
             $imgtag = "<img class='profile-image' src='../assets/images/profiles/profile-1.png' alt='Profile Photo'>";
-            if (isset($_COOKIE['loginStatus'])) {
+            if (isset($_COOKIE['editorLoginStatus'])) {
                 setcookie('editorProfilePhoto', $imgtag, time() + (86400 * 7));
             } else {
                 $_SESSION['editorProfilePhoto'] = $imgtag;
@@ -319,13 +319,13 @@ function deleteImageEditor($editorId, $locationRedirect)
 }
 
 
-//Function for uploading image for blog
+//Function for uploading image for blog, event, job-vacancies, and media
 function uploadImageNews($newImageTemp)
 {
     $newPhotoSize = filesize($newImageTemp);
     $newPhotoType = mime_content_type($newImageTemp);
 
-    if ($newPhotoSize <= 10000000 && ($newPhotoType == 'image/jpg' || $newPhotoType == 'image/png' || $newPhotoType == 'image/jpeg')) {
+    if ($newPhotoSize <= 15000000 && ($newPhotoType == 'image/jpg' || $newPhotoType == 'image/png' || $newPhotoType == 'image/jpeg')) {
         $photoName = random_int(0, PHP_INT_MAX) . date("dmYHis");
         $photoNameHashed = hashPhotoProfile($photoName);
 
