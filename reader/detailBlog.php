@@ -373,14 +373,14 @@ $result4 = mysqli_fetch_all($data3);
 											<div class="post post-list-sm circle">
 											<div class="thumb circle">
 												<span class="number">$number</span>
-												<a href="detailJobVacancies.php?jobId=$popularBlogId">
+												<a href="detailBlog.php?blogId=$popularBlogId">
 													<div class="inner">
 														<img src="images/posts/tabs-1.jpg" alt="post-title" />
 													</div>
 												</a>
 											</div>
 											<div class="details clearfix">
-												<h6 class="post-title my-0"><a href="detailJobVacancies.php?jobId=$popularBlogId">$popularBlogTitle</a></h6>
+												<h6 class="post-title my-0"><a href="detailBlog.php?blogId=$popularBlogId">$popularBlogTitle</a></h6>
 												<ul class="meta list-inline mt-1 mb-0">
 													<li class="list-inline-item">$popularBlogDate</li>
 												</ul>

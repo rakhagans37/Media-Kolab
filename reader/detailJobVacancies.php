@@ -7,7 +7,7 @@ increaseJobVacancies($jobId);
 
 $conn = getConnectionMysqli();
 
-$query = "SELECT tb_job_vacancies.vacancy_id, tb_job_vacancies.vacancy_title, tb_job_vacancies.date_release,tb_job_vacancies.image_url, tb_job_vacancies.company_name, tb_editor.username, tb_job_vacancies.vacancy_content FROM tb_job_vacancies INNER JOIN tb_editor ON tb_job_vacancies.editor_id=tb_editor.editor_id WHERE tb_job_vacancies.vacancy_id='$jobId'";
+$query = "SELECT tb_job_vacancies.vacancy_id, tb_job_vacancies.vacancy_title, tb_job_vacancies.date_release, tb_job_vacancies.image_url, tb_job_vacancies.company_name, tb_editor.username, tb_job_vacancies.vacancy_content FROM tb_job_vacancies INNER JOIN tb_editor ON tb_job_vacancies.editor_id=tb_editor.editor_id WHERE tb_job_vacancies.vacancy_id='$jobId'";
 $result = mysqli_query($conn, $query);
 $request = mysqli_fetch_array($result);
 

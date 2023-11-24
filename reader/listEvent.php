@@ -190,7 +190,7 @@ $result4 = mysqli_fetch_all($data4);
 											<div class="post post-grid rounded bordered">
 												<div class="thumb top-rounded">
 													<a href="category.html" class="category-badge position-absolute">$categoryName</a>
-													<a href="blog-single.html">
+													<a href="detailEvent.php?eventId=$eventId">
 														<div class="inner">
 															<img src="$image" alt="post-title" />
 														</div>
@@ -216,7 +216,7 @@ $result4 = mysqli_fetch_all($data4);
 														</ul>
 													</div>
 													<div class="more-button float-end">
-														<a href="blog-single.html"><span class="icon-options"></span></a>
+														<a href="detailEvent.php?eventId=$eventId"><span class="icon-options"></span></a>
 													</div>
 												</div>
 											</div>

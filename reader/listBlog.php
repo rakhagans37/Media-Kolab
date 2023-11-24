@@ -1,5 +1,7 @@
 <?php
 include('../helper/getConnectionMsqli.php');
+require_once __DIR__ . '/../helper/cloudinary.php';
+require_once __DIR__ . '/../helper/hash.php';
 
 $conn = getConnectionMysqli();
 
@@ -178,7 +180,7 @@ $result4 = mysqli_fetch_all($data4);
 									$blogId = $isi[0];
 									$blogTitle = $isi[1];
 									$dateRelease = $isi[2];
-									$image = $isi[3];
+									$image = getImageDefault(decryptPhotoProfile($isi[3]));
 									$editorUsername = $isi[4];
 									$categoryName = $isi[5];
 
@@ -188,9 +190,9 @@ $result4 = mysqli_fetch_all($data4);
 											<div class="post post-grid rounded bordered">
 												<div class="thumb top-rounded">
 													<a href="category.html" class="category-badge position-absolute">$categoryName</a>
-													<a href="blog-single.html">
+													<a href="detailBlog.php?blogId=$blogId">
 														<div class="inner">
-															<img src="images/posts/post-md-2.jpg" alt="post-title" />
+															<img src="$image" alt="post-title" />
 														</div>
 													</a>
 												</div>
@@ -214,7 +216,7 @@ $result4 = mysqli_fetch_all($data4);
 														</ul>
 													</div>
 													<div class="more-button float-end">
-														<a href="blog-single.html"><span class="icon-options"></span></a>
+														<a href="detailBlog.php?blogId=$blogId"><span class="icon-options"></span></a>
 													</div>
 												</div>
 											</div>
@@ -260,14 +262,14 @@ $result4 = mysqli_fetch_all($data4);
 											<div class="post post-list-sm circle">
 											<div class="thumb circle">
 												<span class="number">$number</span>
-												<a href="detailJobVacancies.php?jobId=$popularBlogId">
+												<a href="detailBlog.php?blogId=$popularBlogId">
 													<div class="inner">
 														<img src="images/posts/tabs-1.jpg" alt="post-title" />
 													</div>
 												</a>
 											</div>
 											<div class="details clearfix">
-												<h6 class="post-title my-0"><a href="detailJobVacancies.php?jobId=$popularBlogId">$popularBlogTitle</a></h6>
+												<h6 class="post-title my-0"><a href="detailBlog.php?blogId=$popularBlogId">$popularBlogTitle</a></h6>
 												<ul class="meta list-inline mt-1 mb-0">
 													<li class="list-inline-item">$popularBlogDate</li>
 												</ul>

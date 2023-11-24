@@ -116,6 +116,7 @@ function getImageDefault($urlPhoto)
     return $imageData['url'];
 }
 
+
 function uploadImageAdmin($idAdmin, $photoTemp, $locationRedirect)
 {
     $newPhotoSize = filesize($photoTemp);
