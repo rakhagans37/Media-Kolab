@@ -5,18 +5,25 @@ require_once __DIR__ . "/helper/getConnectionMsqli.php";
 require_once __DIR__ . "/helper/hash.php";
 
 $conn = getConnectionMysqli();
+$duplicationData = false;
 if (isset($_GET['add-roles'])) {
     $id = generateIdRole();
     $rolesName = $_GET['new-roles'];
-    $sqlAdd = "INSERT INTO tb_role VALUES(?,?)";
+    $sqlCheck = "SELECT * FROM tb_role WHERE role_name LIKE '$rolesName'";
+    $requestCheck = mysqli_query($conn, $sqlCheck);
+    if (mysqli_num_rows($requestCheck) < 1) {
+        $sqlAdd = "INSERT INTO tb_role VALUES(?,?)";
 
-    $requestAddCat = mysqli_prepare($conn, $sqlAdd);
-    mysqli_stmt_bind_param($requestAddCat, "ss", $id, $rolesName);
-    mysqli_stmt_execute($requestAddCat);
-    mysqli_stmt_close($requestAddCat);
+        $requestAddCat = mysqli_prepare($conn, $sqlAdd);
+        mysqli_stmt_bind_param($requestAddCat, "ss", $id, $rolesName);
+        mysqli_stmt_execute($requestAddCat);
+        mysqli_stmt_close($requestAddCat);
 
-    header("Location:manageRoles.php");
-    exit;
+        header("Location:manageRoles.php");
+        exit;
+    } else {
+        $duplicationData = true;
+    }
 }
 ?>
 
@@ -214,7 +221,12 @@ if (isset($_GET['add-roles'])) {
 
         <div class="app-content pt-3 p-md-3 p-lg-4">
             <div class="container-xl">
-
+                <?php
+                if ($duplicationData) {
+                    echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">';
+                    echo "<strong>Oh tidak!</strong> role yang baru anda masukkan sudah tersedia</div>";
+                }
+                ?>
                 <div class="row g-3 mb-4 align-items-center justify-content-between">
                     <div class="col-auto">
                         <h1 class="app-page-title mb-0">Roles</h1>
@@ -353,6 +365,7 @@ if (isset($_GET['add-roles'])) {
                     <div class="modal-body">
                         <p>Masukkan roles baru</p>
                         <form class="row g-2 justify-content-start justify-content-md-end align-items-center" action="manageRoles.php" method="GET">
+                            <option value=""></option>
                             <input class="form-control app-btn-secondary" type="text" id="new-roles" name="new-roles">
                             <input type="submit" id="submit" name="add-roles" class="btn app-btn-primary" value="Tambahkan">
                         </form>

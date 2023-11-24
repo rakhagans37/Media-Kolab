@@ -5,35 +5,49 @@ require_once __DIR__ . "/helper/getConnectionMsqli.php";
 require_once __DIR__ . "/helper/hash.php";
 
 $conn = getConnectionMysqli();
+$duplicationData = False;
 if (isset($_GET['add-category'])) {
     $categoryType = $_GET['category-type'];
-    switch ($categoryType) {
-        case 'blogCategory':
-            $sqlAdd = "INSERT INTO tb_category_blog VALUES(?,?,?)";
-            break;
-        case 'mediaCategory':
-            $sqlAdd = "INSERT INTO tb_category_media VALUES(?,?,?)";
-            break;
-        case 'eventCategory':
-            $sqlAdd = "INSERT INTO tb_category_event VALUES(?,?,?)";
-            break;
-        case 'jobCategory':
-            $sqlAdd = "INSERT INTO tb_category_job_vacancy VALUES(?,?,?)";
-            break;
-    }
-    echo $categoryType;
     $id = generateIdCategory();
     $categoryName = $_GET['new-category'];
     $popularity = 0;
+    switch ($categoryType) {
+        case 'blogCategory':
+            $sqlCheck = "SELECT * FROM tb_category_blog WHERE category_name LIKE ?";
+            $sqlAdd = "INSERT INTO tb_category_blog VALUES(?,?,?)";
+            break;
+        case 'mediaCategory':
+            $sqlCheck = "SELECT * FROM tb_category_media WHERE category_name LIKE ?";
+            $sqlAdd = "INSERT INTO tb_category_media VALUES(?,?,?)";
+            break;
+        case 'eventCategory':
+            $sqlCheck = "SELECT * FROM tb_category_event WHERE category_name LIKE ?";
+            $sqlAdd = "INSERT INTO tb_category_event VALUES(?,?,?)";
+            break;
+        case 'jobCategory':
+            $sqlCheck = "SELECT * FROM tb_category_event WHERE category_name LIKE ?";
+            $sqlAdd = "INSERT INTO tb_category_job_vacancy VALUES(?,?,?)";
+            break;
+    }
+    $sqlCheck = $sqlCheck;
+    $reqCheck = mysqli_prepare($conn, $sqlCheck);
+    mysqli_stmt_bind_param($reqCheck, "s", $categoryName);
+    mysqli_stmt_execute($reqCheck);
 
+    if (mysqli_stmt_fetch($reqCheck)) {
+        $duplicationData = True;
+        mysqli_stmt_close($reqCheck);
+    } else {
+        mysqli_stmt_close($reqCheck);
 
-    $requestAddCat = mysqli_prepare($conn, $sqlAdd);
-    mysqli_stmt_bind_param($requestAddCat, "sss", $id, $categoryName, $popularity);
-    mysqli_stmt_execute($requestAddCat);
-    mysqli_stmt_close($requestAddCat);
+        $requestAddCat = mysqli_prepare($conn, $sqlAdd);
+        mysqli_stmt_bind_param($requestAddCat, "sss", $id, $categoryName, $popularity);
+        mysqli_stmt_execute($requestAddCat);
+        mysqli_stmt_close($requestAddCat);
 
-    header("Location:manageCategory.php");
-    exit;
+        header("Location:manageCategory.php");
+        exit;
+    }
 }
 ?>
 
@@ -232,7 +246,12 @@ if (isset($_GET['add-category'])) {
 
         <div class="app-content pt-3 p-md-3 p-lg-4">
             <div class="container-xl">
-
+                <?php
+                if ($duplicationData) {
+                    echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">';
+                    echo "<strong>Oh tidak!</strong> role yang baru anda masukkan sudah tersedia</div>";
+                }
+                ?>
                 <div class="row g-3 mb-4 align-items-center justify-content-between">
                     <div class="col-auto">
                         <h1 class="app-page-title mb-0">News Category</h1>
