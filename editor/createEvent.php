@@ -253,7 +253,7 @@ if (isset($_POST['event-submit'])) {
 									<li>
 										<hr class="dropdown-divider">
 									</li>
-									<li><a class="dropdown-item" href="logout.php">Log Out</a></li>
+									<li><a class="dropdown-item" href="logoutEditor.php">Log Out</a></li>
 								</ul>
 							</div><!--//app-user-dropdown-->
 						</div><!--//app-utilities-->

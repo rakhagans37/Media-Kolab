@@ -1,13 +1,14 @@
 <?php
 require_once __DIR__ . "/../helper/getConnectionMsqli.php";
 require_once __DIR__ . "/../helper/increasePopularity.php";
+require_once __DIR__ . "/../helper/cloudinary.php";
 
 $eventId = $_GET["eventId"];
 increaseEvent($eventId);
 
 $conn = getConnectionMysqli();
 
-$query = "SELECT tb_event.event_id, tb_event.event_title, tb_event.date_release, tb_event.image_url, tb_editor.username, tb_event.event_content, tb_event.date_event, tb_event.link_google_map FROM tb_event INNER JOIN tb_editor ON tb_event.editor_id=tb_editor.editor_id WHERE tb_event.event_id = '$eventId'";
+$query = "SELECT tb_event.event_id, tb_event.event_title, tb_event.date_release, tb_event.image_url, tb_editor.username, tb_event.event_content, tb_event.date_event, tb_event.link_google_map, tb_editor.profile_photo FROM tb_event INNER JOIN tb_editor ON tb_event.editor_id=tb_editor.editor_id WHERE tb_event.event_id = '$eventId'";
 $result = mysqli_query($conn, $query);
 $request = mysqli_fetch_array($result);
 
@@ -23,6 +24,12 @@ $result3 = mysqli_fetch_all($data2);
 $data3 = mysqli_query($conn, $query4);
 $result4 = mysqli_fetch_all($data3);
 
+//Get Editor Profile Photo
+if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
+	$editorProfilePhoto = getImageProfile($editorPhotoUrl);
+} else {
+	$editorProfilePhoto = "../assets/images/profiles/profile-1.png";
+}
 ?>
 <!DOCTYPE html>
 <html lang="en-US">
@@ -96,34 +103,20 @@ $result4 = mysqli_fetch_all($data3);
 					<div class="collapse navbar-collapse">
 						<!-- menus -->
 						<ul class="navbar-nav mr-auto">
-							<li class="nav-item dropdown active">
-								<a class="nav-link dropdown-toggle" href="index.html">Home</a>
-								<ul class="dropdown-menu">
-									<li><a class="dropdown-item" href="index.html">Magazine</a></li>
-									<li><a class="dropdown-item" href="personal.html">Personal</a></li>
-									<li><a class="dropdown-item" href="personal-alt.html">Personal Alt</a></li>
-									<li><a class="dropdown-item" href="minimal.html">Minimal</a></li>
-									<li><a class="dropdown-item" href="classic.html">Classic</a></li>
-								</ul>
+							<li class="nav-item">
+								<a class="nav-link" href="index.php">Home</a>
+							</li>
+							<li class="nav-item active">
+								<a class="nav-link" href="listEvent.php">Event</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" href="category.html">Lifestyle</a>
+								<a class="nav-link" href="listBlog.php">Blog</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" href="category.html">Inspiration</a>
-							</li>
-							<li class="nav-item dropdown">
-								<a class="nav-link dropdown-toggle" href="#">Pages</a>
-								<ul class="dropdown-menu">
-									<li><a class="dropdown-item" href="category.html">Category</a></li>
-									<li><a class="dropdown-item" href="blog-single.html">Blog Single</a></li>
-									<li><a class="dropdown-item" href="blog-single-alt.html">Blog Single Alt</a></li>
-									<li><a class="dropdown-item" href="about.html">About</a></li>
-									<li><a class="dropdown-item" href="contact.html">Contact</a></li>
-								</ul>
+								<a class="nav-link" href="listMedia.php">Media</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" href="contact.html">Contact</a>
+								<a class="nav-link" href="listJobVacancies.php">Loker/Magang</a>
 							</li>
 						</ul>
 					</div>
@@ -160,7 +153,7 @@ $result4 = mysqli_fetch_all($data3);
 				<nav aria-label="breadcrumb">
 					<ol class="breadcrumb">
 						<li class="breadcrumb-item"><a href="#">Home</a></li>
-						<li class="breadcrumb-item"><a href="#">Inspiration</a></li>
+						<li class="breadcrumb-item"><a href="#">Event</a></li>
 						<li class="breadcrumb-item active" aria-current="page"><?php echo $request["event_title"] ?></li>
 					</ol>
 				</nav>
@@ -174,7 +167,7 @@ $result4 = mysqli_fetch_all($data3);
 							<div class="post-header">
 								<h1 class="title mt-0 mb-3"><?php echo $request["event_title"] ?></h1>
 								<ul class="meta list-inline mb-0">
-									<li class="list-inline-item"><a href="#"><img src="images/other/author-sm.png" class="author" alt="author" /><?php echo $request["username"] ?></a></li>
+									<li class="list-inline-item"><a href="#"><img src="<?php echo $editorProfilePhoto ?>" class="author" width="35" height="35" alt="author" /><?php echo $request["username"] ?></a></li>
 									<li class="list-inline-item"><?php echo $request["date_release"] ?></li>
 								</ul>
 							</div>
@@ -340,22 +333,6 @@ $result4 = mysqli_fetch_all($data3);
 
 						<!-- sidebar -->
 						<div class="sidebar">
-							<!-- widget about -->
-							<div class="widget rounded">
-								<div class="widget-about data-bg-image text-center" data-bg-image="images/map-bg.png">
-									<img src="images/logo.svg" alt="logo" class="mb-4" />
-									<p class="mb-4">Hello, We’re content writer who is fascinated by content fashion, celebrity and lifestyle. We helps clients bring the right content to the right people.</p>
-									<ul class="social-icons list-unstyled list-inline mb-0">
-										<li class="list-inline-item"><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-										<li class="list-inline-item"><a href="#"><i class="fab fa-twitter"></i></a></li>
-										<li class="list-inline-item"><a href="#"><i class="fab fa-instagram"></i></a></li>
-										<li class="list-inline-item"><a href="#"><i class="fab fa-pinterest"></i></a></li>
-										<li class="list-inline-item"><a href="#"><i class="fab fa-medium"></i></a></li>
-										<li class="list-inline-item"><a href="#"><i class="fab fa-youtube"></i></a></li>
-									</ul>
-								</div>
-							</div>
-
 							<!-- widget popular posts -->
 							<div class="widget rounded">
 								<div class="widget-header text-center">
@@ -551,29 +528,21 @@ $result4 = mysqli_fetch_all($data3);
 		<!-- menu -->
 		<nav>
 			<ul class="vertical-menu">
-				<li class="active">
-					<a href="index.html">Home</a>
-					<ul class="submenu">
-						<li><a href="index.html">Magazine</a></li>
-						<li><a href="personal.html">Personal</a></li>
-						<li><a href="personal-alt.html">Personal Alt</a></li>
-						<li><a href="minimal.html">Minimal</a></li>
-						<li><a href="classic.html">Classic</a></li>
-					</ul>
-				</li>
-				<li><a href="category.html">Lifestyle</a></li>
-				<li><a href="category.html">Inspiration</a></li>
 				<li>
-					<a href="#">Pages</a>
-					<ul class="submenu">
-						<li><a href="category.html">Category</a></li>
-						<li><a href="blog-single.html">Blog Single</a></li>
-						<li><a href="blog-single-alt.html">Blog Single Alt</a></li>
-						<li><a href="about.html">About</a></li>
-						<li><a href="contact.html">Contact</a></li>
-					</ul>
+					<a href="index.php">Home</a>
 				</li>
-				<li><a href="contact.html">Contact</a></li>
+				<li class="active">
+					<a href="listEvent.php">Event</a>
+				</li>
+				<li>
+					<a href="listBlog.php">Blog</a>
+				</li>
+				<li>
+					<a href="listMedia.php">Media</a>
+				</li>
+				<li>
+					<a href="listJobVacancies.php">Loker/Magang</a>
+				</li>
 			</ul>
 		</nav>
 

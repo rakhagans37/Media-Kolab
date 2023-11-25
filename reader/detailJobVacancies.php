@@ -7,7 +7,7 @@ increaseJobVacancies($jobId);
 
 $conn = getConnectionMysqli();
 
-$query = "SELECT tb_job_vacancies.vacancy_id, tb_job_vacancies.vacancy_title, tb_job_vacancies.date_release, tb_job_vacancies.image_url, tb_job_vacancies.company_name, tb_editor.username, tb_job_vacancies.vacancy_content FROM tb_job_vacancies INNER JOIN tb_editor ON tb_job_vacancies.editor_id=tb_editor.editor_id WHERE tb_job_vacancies.vacancy_id='$jobId'";
+$query = "SELECT tb_job_vacancies.vacancy_id, tb_job_vacancies.vacancy_title, tb_job_vacancies.date_release, tb_job_vacancies.image_url, tb_job_vacancies.company_name, tb_editor.username, tb_job_vacancies.vacancy_content, tb_editor.profile_photo FROM tb_job_vacancies INNER JOIN tb_editor ON tb_job_vacancies.editor_id=tb_editor.editor_id WHERE tb_job_vacancies.vacancy_id='$jobId'";
 $result = mysqli_query($conn, $query);
 $request = mysqli_fetch_array($result);
 
@@ -23,6 +23,12 @@ $result3 = mysqli_fetch_all($data2);
 $data3 = mysqli_query($conn, $query4);
 $result4 = mysqli_fetch_all($data3);
 
+//Get Editor Profile Photo
+if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
+	$editorProfilePhoto = getImageProfile($editorPhotoUrl);
+} else {
+	$editorProfilePhoto = "../assets/images/profiles/profile-1.png";
+}
 ?>
 <!DOCTYPE html>
 <html lang="en-US">
@@ -96,34 +102,20 @@ $result4 = mysqli_fetch_all($data3);
 					<div class="collapse navbar-collapse">
 						<!-- menus -->
 						<ul class="navbar-nav mr-auto">
-							<li class="nav-item dropdown active">
-								<a class="nav-link dropdown-toggle" href="index.html">Home</a>
-								<ul class="dropdown-menu">
-									<li><a class="dropdown-item" href="index.html">Magazine</a></li>
-									<li><a class="dropdown-item" href="personal.html">Personal</a></li>
-									<li><a class="dropdown-item" href="personal-alt.html">Personal Alt</a></li>
-									<li><a class="dropdown-item" href="minimal.html">Minimal</a></li>
-									<li><a class="dropdown-item" href="classic.html">Classic</a></li>
-								</ul>
+							<li class="nav-item">
+								<a class="nav-link" href="index.php">Home</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" href="category.html">Lifestyle</a>
+								<a class="nav-link" href="listEvent.php">Event</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" href="category.html">Inspiration</a>
-							</li>
-							<li class="nav-item dropdown">
-								<a class="nav-link dropdown-toggle" href="#">Pages</a>
-								<ul class="dropdown-menu">
-									<li><a class="dropdown-item" href="category.html">Category</a></li>
-									<li><a class="dropdown-item" href="blog-single.html">Blog Single</a></li>
-									<li><a class="dropdown-item" href="blog-single-alt.html">Blog Single Alt</a></li>
-									<li><a class="dropdown-item" href="about.html">About</a></li>
-									<li><a class="dropdown-item" href="contact.html">Contact</a></li>
-								</ul>
+								<a class="nav-link" href="listBlog.php">Blog</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" href="contact.html">Contact</a>
+								<a class="nav-link" href="listMedia.php">Media</a>
+							</li>
+							<li class="nav-item active">
+								<a class="nav-link" href="listJobVacancies.php">Loker/Magang</a>
 							</li>
 						</ul>
 					</div>
@@ -174,7 +166,7 @@ $result4 = mysqli_fetch_all($data3);
 							<div class="post-header">
 								<h1 class="title mt-0 mb-3"><?php echo $request["vacancy_title"] ?></h1>
 								<ul class="meta list-inline mb-0">
-									<li class="list-inline-item"><a href="#"><img src="images/other/author-sm.png" class="author" alt="author" /><?php echo $request["username"] ?></a></li>
+									<li class="list-inline-item"><a href="#"><img src="<?php echo $editorProfilePhoto ?>" class="author" width="35" height="35" alt="author" /><?php echo $request["username"] ?></a></li>
 									<li class="list-inline-item"><a href="#"><?php echo $request["company_name"] ?></a></li>
 									<li class="list-inline-item"><?php echo $request["date_release"] ?></li>
 								</ul>
@@ -578,29 +570,21 @@ $result4 = mysqli_fetch_all($data3);
 		<!-- menu -->
 		<nav>
 			<ul class="vertical-menu">
-				<li class="active">
-					<a href="index.html">Home</a>
-					<ul class="submenu">
-						<li><a href="index.html">Magazine</a></li>
-						<li><a href="personal.html">Personal</a></li>
-						<li><a href="personal-alt.html">Personal Alt</a></li>
-						<li><a href="minimal.html">Minimal</a></li>
-						<li><a href="classic.html">Classic</a></li>
-					</ul>
-				</li>
-				<li><a href="category.html">Lifestyle</a></li>
-				<li><a href="category.html">Inspiration</a></li>
 				<li>
-					<a href="#">Pages</a>
-					<ul class="submenu">
-						<li><a href="category.html">Category</a></li>
-						<li><a href="blog-single.html">Blog Single</a></li>
-						<li><a href="blog-single-alt.html">Blog Single Alt</a></li>
-						<li><a href="about.html">About</a></li>
-						<li><a href="contact.html">Contact</a></li>
-					</ul>
+					<a href="index.php">Home</a>
 				</li>
-				<li><a href="contact.html">Contact</a></li>
+				<li>
+					<a href="listEvent.php">Event</a>
+				</li>
+				<li>
+					<a href="listBlog.php">Blog</a>
+				</li>
+				<li>
+					<a href="listMedia.php">Media</a>
+				</li>
+				<li class="active">
+					<a href="listJobVacancies.php">Loker/Magang</a>
+				</li>
 			</ul>
 		</nav>
 

@@ -53,7 +53,7 @@ $result4 = mysqli_fetch_all($data4);
 
 <body>
 
-	<!-- preloader
+	<!-- preloader -->
 	<div id="preloader">
 		<div class="book">
 			<div class="inner">
@@ -82,7 +82,7 @@ $result4 = mysqli_fetch_all($data4);
 				<li></li>
 			</ul>
 		</div>
-	</div> -->
+	</div>
 
 	<!-- site wrapper -->
 	<div class="site-wrapper">
