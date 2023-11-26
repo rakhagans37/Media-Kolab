@@ -204,6 +204,7 @@ if (isset($_GET['add-category'])) {
                                     <li class="submenu-item"><a class="submenu-link active" href="manageCategory.php">News Category</a></li>
                                     <li class="submenu-item"><a class="submenu-link" href="manageAds.php">Ads</a></li>
                                     <li class="submenu-item"><a class="submenu-link" href="manageEvent.php">Event</a></li>
+                                    <li class="submenu-item"><a class="submenu-link" href="manageJobVacancies.php">Job Vacancies</a></li>
                                 </ul>
                             </div>
                         </li>

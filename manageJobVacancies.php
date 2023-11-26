@@ -2,57 +2,35 @@
 require_once __DIR__ . "/helper/getConnection.php";
 require_once __DIR__ . "/helper/validateLogin.php";
 require_once __DIR__ . "/helper/getConnectionMsqli.php";
-
 $conn = getConnectionMysqli();
-//Script php untuk ban editor
-if (isset($_GET['ban-editor'])) {
-    $editorId = $_GET['editorId'];
-
-    $sqlDelete = "UPDATE tb_editor SET banned = 1 WHERE editor_id = ?";
-    $requestBanEditor = mysqli_prepare($conn, $sqlDelete);
-
-    mysqli_stmt_bind_param($requestBanEditor, "s", $editorId);
-    mysqli_stmt_execute($requestBanEditor);
-    mysqli_stmt_close($requestBanEditor);
-    mysqli_close($conn);
-
-    header("Location:manageuser.php");
-    exit;
-}
 
 //Script php untuk delete blog
-if (isset($_GET['activate-editor'])) {
-    $editorId = $_GET['editorId'];
+if (isset($_GET['deleteButton'])) {
+    $jobId = $_GET['jobId'];
 
-    $sqlDelete = "UPDATE tb_editor SET banned = 0 WHERE editor_id = ?";
-    $requestActivateEditor = mysqli_prepare($conn, $sqlDelete);
+    $sqlDelete = "DELETE FROM tb_job_vacancies WHERE vacancy_id = ?";
+    $requestDelete = mysqli_prepare($conn, $sqlDelete);
 
-    mysqli_stmt_bind_param($requestActivateEditor, "s", $editorId);
-    mysqli_stmt_execute($requestActivateEditor);
-    mysqli_stmt_close($requestActivateEditor);
+    mysqli_stmt_bind_param($requestDelete, "s", $jobId);
+    mysqli_stmt_execute($requestDelete);
+    mysqli_stmt_close($requestDelete);
     mysqli_close($conn);
 
-    header("Location:manageuser.php");
+    header("Location:manageJobVacancies.php");
     exit;
 }
+//End script delete blog
 
-
-//Script untuk mengambil data publisher dari database
-if (isset($_GET['search-user'])) {
-    $searchUser = $_GET['search-orders'];
-    $sql = "SELECT tb_editor.editor_id, tb_editor.username, tb_editor.email, tb_editor.phone_number, COUNT(tb_blog.editor_id) + + COUNT(tb_media.editor_id) ,tb_role.role_name, tb_editor.banned FROM tb_media RIGHT JOIN tb_editor ON tb_media.editor_id = tb_editor.editor_id INNER JOIN tb_role ON tb_editor.role_id = tb_role.role_id LEFT JOIN tb_blog ON tb_blog.editor_id = tb_editor.editor_id GROUP BY tb_editor.editor_id HAVING tb_editor.username LIKE '%$searchUser%' and tb_editor.banned = 0";
+//Script Php untuk membuat request yuang mengambil detail data blog dari database
+if (isset($_GET['search-news'])) {
+    $searchNews = $_GET['searchorders'];
+    $sql = "SELECT tb_job_vacancies.vacancy_id, tb_job_vacancies.vacancy_title, tb_category_job_vacancy.category_name, tb_job_vacancies.date_release, tb_editor.username, tb_job_vacancies.views, tb_job_vacancies.company_name FROM ((tb_job_vacancies INNER JOIN tb_category_job_vacancy ON tb_job_vacancies.category_id = tb_category_job_vacancy.category_id) INNER JOIN tb_editor ON tb_job_vacancies.editor_id = tb_editor.editor_id) WHERE tb_job_vacancies.vacancy_title LIKE '%$searchNews%'";
 } else {
-    $sql = "SELECT tb_editor.editor_id, tb_editor.username, tb_editor.email, tb_editor.phone_number, COUNT(tb_blog.editor_id) + + COUNT(tb_media.editor_id) ,tb_role.role_name, tb_editor.banned FROM tb_media RIGHT JOIN tb_editor ON tb_media.editor_id = tb_editor.editor_id INNER JOIN tb_role ON tb_editor.role_id = tb_role.role_id LEFT JOIN tb_blog ON tb_blog.editor_id = tb_editor.editor_id GROUP BY tb_editor.editor_id HAVING tb_editor.banned = 0";
+    $sql = "SELECT tb_job_vacancies.vacancy_id, tb_job_vacancies.vacancy_title, tb_category_job_vacancy.category_name, tb_job_vacancies.date_release, tb_editor.username, tb_job_vacancies.views, tb_job_vacancies.company_name FROM ((tb_job_vacancies INNER JOIN tb_category_job_vacancy ON tb_job_vacancies.category_id = tb_category_job_vacancy.category_id) INNER JOIN tb_editor ON tb_job_vacancies.editor_id = tb_editor.editor_id)";
 }
 
-if (isset($_GET['search-user'])) {
-    $searchUser = $_GET['search-orders'];
-    $sqlBannedUser = "SELECT tb_editor.editor_id, tb_editor.username, tb_editor.email, tb_editor.phone_number, COUNT(tb_blog.editor_id) + COUNT(tb_media.editor_id) ,tb_role.role_name, tb_editor.banned FROM tb_media RIGHT JOIN tb_editor ON tb_media.editor_id = tb_editor.editor_id INNER JOIN tb_role ON tb_editor.role_id = tb_role.role_id LEFT JOIN tb_blog ON tb_blog.editor_id = tb_editor.editor_id GROUP BY tb_editor.editor_id HAVING tb_editor.username LIKE '%$searchUser%' and tb_editor.banned = 1";
-} else {
-    $sqlBannedUser = "SELECT tb_editor.editor_id, tb_editor.username, tb_editor.email, tb_editor.phone_number, COUNT(tb_blog.editor_id) + COUNT(tb_media.editor_id) ,tb_role.role_name, tb_editor.banned FROM tb_media RIGHT JOIN tb_editor ON tb_media.editor_id = tb_editor.editor_id INNER JOIN tb_role ON tb_editor.role_id = tb_role.role_id LEFT JOIN tb_blog ON tb_blog.editor_id = tb_editor.editor_id GROUP BY tb_editor.editor_id HAVING tb_editor.banned = 1";
-}
 $request = mysqli_query($conn, $sql);
-$requestBannedUser = mysqli_query($conn, $sqlBannedUser);
+//End script mengambil data blog
 ?>
 
 <!DOCTYPE html>
@@ -76,7 +54,6 @@ $requestBannedUser = mysqli_query($conn, $sqlBannedUser);
     <!-- App CSS -->
     <!-- <link id="theme-style" rel="stylesheet" href="assets/css/portal.css"> -->
     <link id="theme-style" rel="stylesheet" href="assets\scss\portal.css">
-
 </head>
 
 <body class="app">
@@ -172,9 +149,9 @@ $requestBannedUser = mysqli_query($conn, $sqlBannedUser);
                                 <!--//submenu-arrow-->
                             </a>
                             <!--//nav-link-->
-                            <div id="submenu-1" class="collapse submenu submenu-1 show" data-bs-parent="#menu-accordion">
+                            <div id="submenu-1" class="collapse submenu submenu-1" data-bs-parent="#menu-accordion">
                                 <ul class="submenu-list list-unstyled">
-                                    <li class="submenu-item"><a class="submenu-link active" href="manageuser.php">Users Account</a></li>
+                                    <li class="submenu-item"><a class="submenu-link" href="manageuser.php">Users Account</a></li>
                                     <li class="submenu-item"><a class="submenu-link" href="manageRoles.php">Users Roles</a></li>
                                 </ul>
                             </div>
@@ -201,15 +178,14 @@ $requestBannedUser = mysqli_query($conn, $sqlBannedUser);
                                 <!--//submenu-arrow-->
                             </a>
                             <!--//nav-link-->
-                            <div id="submenu-2" class="collapse submenu submenu-2" data-bs-parent="#menu-accordion">
+                            <div id="submenu-2" class="collapse submenu submenu-2 show" data-bs-parent="#menu-accordion">
                                 <ul class="submenu-list list-unstyled">
                                     <li class="submenu-item"><a class="submenu-link" href="manageBlog.php">Blog</a></li>
                                     <li class="submenu-item"><a class="submenu-link" href="managemedia.php">Media</a></li>
                                     <li class="submenu-item"><a class="submenu-link" href="manageCategory.php">News Category</a></li>
                                     <li class="submenu-item"><a class="submenu-link" href="manageAds.php">Ads</a></li>
                                     <li class="submenu-item"><a class="submenu-link" href="manageEvent.php">Event</a></li>
-                                    <li class="submenu-item"><a class="submenu-link" href="manageJobVacancies.php">Job Vacancies</a></li>
-
+                                    <li class="submenu-item"><a class="submenu-link active" href="manageJobVacancies.php">Job Vacancies</a></li>
                                 </ul>
                             </div>
                         </li>
@@ -255,31 +231,36 @@ $requestBannedUser = mysqli_query($conn, $sqlBannedUser);
 
                 <div class="row g-3 mb-4 align-items-center justify-content-between">
                     <div class="col-auto">
-                        <h1 class="app-page-title mb-0">Manage User</h1>
+                        <h1 class="app-page-title mb-0">News</h1>
                     </div>
                     <div class="col-auto">
                         <div class="page-utilities">
                             <div class="row g-2 justify-content-start justify-content-md-end align-items-center">
                                 <div class="col-auto">
-                                    <form class="table-search-form row gx-1 align-items-center" action="manageuser.php" method="GET">
+                                    <form class="table-search-form row gx-1 align-items-center" action="manageBlog.php" method="GET">
                                         <div class="col-auto">
-                                            <input type="text" id="search-orders" name="search-orders" class="form-control search-orders" placeholder="Search">
+                                            <input type="text" id="search-orders" name="searchorders" class="form-control search-orders" placeholder="Search">
                                         </div>
                                         <div class="col-auto">
-                                            <button type="submit" class="btn app-btn-secondary" name="search-user">Search</button>
+                                            <button type="submit" class="btn app-btn-secondary" name="search-news">Search</button>
                                         </div>
                                     </form>
 
                                 </div><!--//col-->
+                                <div class="col-auto">
+
+                                    <select class="form-select w-auto">
+                                        <option selected value="option-1">All</option>
+                                        <option value="option-2">This week</option>
+                                        <option value="option-3">This month</option>
+                                        <option value="option-4">Last 3 months</option>
+
+                                    </select>
+                                </div>
                             </div><!--//row-->
                         </div><!--//table-utilities-->
                     </div><!--//col-auto-->
                 </div><!--//row-->
-
-                <nav id="orders-table-tab" class="orders-table-tab app-nav-tabs nav shadow-sm flex-column flex-sm-row mb-4">
-                    <a class="flex-sm-fill text-sm-center nav-link active" id="orders-all-tab" data-bs-toggle="tab" href="#orders-all" role="tab" aria-controls="orders-all" aria-selected="true">Active</a>
-                    <a class="flex-sm-fill text-sm-center nav-link-danger" id="banned-tab" data-bs-toggle="tab" href="#banned" role="tab" aria-controls="banned" aria-selected="false">Banned</a>
-                </nav>
 
                 <div class="tab-content" id="orders-table-tab-content">
                     <div class="tab-pane fade show active" id="orders-all" role="tabpanel" aria-labelledby="orders-all-tab">
@@ -289,37 +270,51 @@ $requestBannedUser = mysqli_query($conn, $sqlBannedUser);
                                     <table class="table app-table-hover mb-0 text-left">
                                         <thead>
                                             <tr>
-                                                <th class="cell">User ID</th>
-                                                <th class="cell">Username</th>
-                                                <th class="cell">Email</th>
-                                                <th class="cell">Phone Number</th>
-                                                <th class="cell">Partisipasi</th>
-                                                <th class="cell">Role</th>
+                                                <th class="cell">News ID</th>
+                                                <th class="cell">Title</th>
+                                                <th class="cell">Category</th>
+                                                <th class="cell">Date Release</th>
+                                                <th class="cell">Tag</th>
+                                                <th class="cell">Publisher</th>
+                                                <th class="cell">Company</th>
+                                                <th class="cell">Views</th>
+                                                <th class="cell"></th>
                                                 <th class="cell"></th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php
+                                            // Print data detail blog dari request yang telah dibuat sebelumnya
                                             if (mysqli_num_rows($request) > 0) {
                                                 foreach ($result = mysqli_fetch_all($request) as $index) {
-                                                    $editorId = $index[0];
-                                                    $username = $index[1];
-                                                    $email = $index[2];
-                                                    $phoneNumber = $index[3];
-                                                    $participation = $index[4];
-                                                    $role = $index[5];
+                                                    $jobId = $index[0];
+                                                    $blogTitle = $index[1];
+                                                    $category = $index[2];
+                                                    $dateRelease = $index[3];
+                                                    $publisher = $index[4];
+                                                    $views = $index[5];
+                                                    $companyName = $index[6];
                                                     echo <<<TULIS
 															<tr>
-																<td class="cell">$editorId</td>
-																<td class="cell"><span class="truncate">$username</span></td>
-																<td class="cell">$email</td>
-																<td class="cell"><span>$phoneNumber</span><span class="note">2:16 PM</span></td> <td class="cell">$participation Blog/Media</td>
-																<td class="cell"><span class="badge bg-success">$role</span></td>
-																<td class="cell"><a class="btn-sm app-btn-danger" data-toggle="modal" href="#ban-editor-account" onclick="getEditorId($editorId)">Ban User</a></td>
+																<td class="cell">$jobId</td>
+																<td class="cell"><span class="truncate">$blogTitle</span></td>
+																<td class="cell">$category</td>
+																<td class="cell"><span>$dateRelease</span><span class="note">2:16 PM</span></td>
+																<td class="cell"><span class="badge bg-success">Paid</span></td>
+																<td class="cell">$publisher</td><td class="cell">$companyName</td>
+																<td class="cell">$views Person</td>
+																<td class="cell">
+																	<a class="btn-sm app-btn-secondary" href="#">View</a>
+																</td>
+																<td class="cell">
+																	<a class="btn-sm app-btn-danger" data-toggle="modal" href="#delete-blog" onclick="getJobId('$jobId')">Delete</a>
+																</td>
 															</tr>
 														TULIS;
                                                 }
                                             }
+
+                                            mysqli_close($conn);
                                             ?>
                                         </tbody>
                                     </table>
@@ -327,6 +322,7 @@ $requestBannedUser = mysqli_query($conn, $sqlBannedUser);
 
                             </div><!--//app-card-body-->
                         </div><!--//app-card-->
+
                         <nav class="app-pagination">
                             <ul class="pagination justify-content-center">
                                 <li class="page-item disabled">
@@ -340,174 +336,33 @@ $requestBannedUser = mysqli_query($conn, $sqlBannedUser);
                                 </li>
                             </ul>
                         </nav><!--//app-pagination-->
-
-                    </div><!--//tab-pane-->
-
-                    <div class="tab-pane fade" id="banned" role="tabpanel" aria-labelledby="banned-tab">
-                        <div class="app-card app-card-orders-table mb-5">
-                            <div class="app-card-body">
-                                <div class="table-responsive">
-
-                                    <table class="table mb-0 text-left">
-                                        <thead>
-                                            <tr>
-                                                <th class="cell">User ID</th>
-                                                <th class="cell">Username</th>
-                                                <th class="cell">Email</th>
-                                                <th class="cell">Phone Number</th>
-                                                <th class="cell">Partisipasi</th>
-                                                <th class="cell">Role</th>
-                                                <th class="cell"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php
-                                            if (mysqli_num_rows($requestBannedUser) > 0) {
-                                                foreach ($result = mysqli_fetch_all($requestBannedUser) as $index) {
-                                                    $editorId = $index[0];
-                                                    $username = $index[1];
-                                                    $email = $index[2];
-                                                    $phoneNumber = $index[3];
-                                                    $participation = $index[4];
-                                                    $role = $index[5];
-                                                    echo <<<TULIS
-															<tr>
-																<td class="cell">$editorId</td>
-																<td class="cell"><span class="truncate">$username</span></td>
-																<td class="cell">$email</td>
-																<td class="cell"><span>$phoneNumber</span><span class="note">2:16 PM</span></td> <td class="cell">$participation Blog/Media</td>
-																<td class="cell"><span class="badge bg-success">$role</span></td>
-																<td class="cell"><a class="btn-sm app-btn-secondary" data-toggle="modal" href="#activate-editor-account" onclick="getEditorIdForActivate($editorId)">Activate User</a></td>
-															</tr>
-														TULIS;
-                                                }
-                                            }
-
-                                            mysqli_close($conn);
-                                            ?>
-                                        </tbody>
-                                    </table>
-                                </div><!--//table-responsive-->
-                            </div><!--//app-card-body-->
-                        </div><!--//app-card-->
-                    </div><!--//tab-pane-->
-
-                    <div class="tab-pane fade" id="orders-pending" role="tabpanel" aria-labelledby="orders-pending-tab">
-                        <div class="app-card app-card-orders-table mb-5">
-                            <div class="app-card-body">
-                                <div class="table-responsive">
-                                    <table class="table mb-0 text-left">
-                                        <thead>
-                                            <tr>
-                                                <th class="cell">Order</th>
-                                                <th class="cell">Product</th>
-                                                <th class="cell">Customer</th>
-                                                <th class="cell">Date</th>
-                                                <th class="cell">Status</th>
-                                                <th class="cell">Total</th>
-                                                <th class="cell"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td class="cell">#15345</td>
-                                                <td class="cell"><span class="truncate">Consectetur adipiscing elit</span></td>
-                                                <td class="cell">Dylan Ambrose</td>
-                                                <td class="cell"><span class="cell-data">16 Oct</span><span class="note">03:16 AM</span></td>
-                                                <td class="cell"><span class="badge bg-warning">Pending</span></td>
-                                                <td class="cell">$96.20</td>
-                                                <td class="cell"><a class="btn-sm app-btn-secondary" href="#">View</a></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div><!--//table-responsive-->
-                            </div><!--//app-card-body-->
-                        </div><!--//app-card-->
-                    </div><!--//tab-pane-->
-                    <div class="tab-pane fade" id="orders-cancelled" role="tabpanel" aria-labelledby="orders-cancelled-tab">
-                        <div class="app-card app-card-orders-table mb-5">
-                            <div class="app-card-body">
-                                <div class="table-responsive">
-                                    <table class="table mb-0 text-left">
-                                        <thead>
-                                            <tr>
-                                                <th class="cell">Order</th>
-                                                <th class="cell">Product</th>
-                                                <th class="cell">Customer</th>
-                                                <th class="cell">Date</th>
-                                                <th class="cell">Status</th>
-                                                <th class="cell">Total</th>
-                                                <th class="cell"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-
-                                            <tr>
-                                                <td class="cell">#15342</td>
-                                                <td class="cell"><span class="truncate">Justo feugiat neque</span></td>
-                                                <td class="cell">Reina Brooks</td>
-                                                <td class="cell"><span class="cell-data">12 Oct</span><span class="note">04:23 PM</span></td>
-                                                <td class="cell"><span class="badge bg-danger">Cancelled</span></td>
-                                                <td class="cell">$59.00</td>
-                                                <td class="cell"><a class="btn-sm app-btn-secondary" href="#">View</a></td>
-                                            </tr>
-
-                                        </tbody>
-                                    </table>
-                                </div><!--//table-responsive-->
-                            </div><!--//app-card-body-->
-                        </div><!--//app-card-->
                     </div><!--//tab-pane-->
                 </div><!--//tab-content-->
 
-
-
+                <!-- Modal -->
+                <div class="modal fade" id="delete-blog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Konfirmasi</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Apakah anda yakin ingin menghapus berita ini?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn app-btn-secondary" data-dismiss="modal">Close</button>
+                                <form action="manageJobVacancies.php" method="GET" id="conDeleteBlog">
+                                    <input type="submit" id="submit" name="deleteButton" class="btn app-btn-confirmation" value="Ya, saya yakin">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div><!--//container-fluid-->
         </div><!--//app-content-->
-        <!-- Modal -->
-        <div class="modal fade" id="ban-editor-account" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Konfirmasi</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Apakah anda yakin ingin banned editor ini?</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn app-btn-secondary" data-dismiss="modal">Close</button>
-                        <form action="manageuser.php" method="GET" id="conBanEditor">
-                            <input type="submit" id="submit" name="ban-editor" class="btn app-btn-confirmation" value="Ya, saya yakin">
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal fade" id="activate-editor-account" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Konfirmasi</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Apakah anda yakin ingin aktifkan editor ini?</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn app-btn-secondary" data-dismiss="modal">Close</button>
-                        <form action="manageuser.php" method="GET" id="conActEditor">
-                            <input type="submit" id="submit" name="activate-editor" class="btn app-btn-secondary" value="Ya, saya yakin">
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <footer class="app-footer">
             <div class="container text-center py-3">
@@ -530,26 +385,14 @@ $requestBannedUser = mysqli_query($conn, $sqlBannedUser);
     <!-- Page Specific JS -->
     <script src="assets/js/app.js"></script>
     <script>
-        function getEditorId(editorId) {
-            console.log(editorId);
-            const formDelete = document.getElementById("conBanEditor");
+        function getJobId(jobId) {
+            console.log(jobId);
+            const formDelete = document.getElementById("conDeleteBlog");
             const createInput = document.createElement("input");
 
             createInput.setAttribute("type", "hidden");
-            createInput.setAttribute("name", "editorId");
-            createInput.setAttribute("value", editorId);
-
-            formDelete.appendChild(createInput);
-        }
-
-        function getEditorIdForActivate(editorId) {
-            console.log(editorId);
-            const formDelete = document.getElementById("conActEditor");
-            const createInput = document.createElement("input");
-
-            createInput.setAttribute("type", "hidden");
-            createInput.setAttribute("name", "editorId");
-            createInput.setAttribute("value", editorId);
+            createInput.setAttribute("name", "jobId");
+            createInput.setAttribute("value", jobId);
 
             formDelete.appendChild(createInput);
         }

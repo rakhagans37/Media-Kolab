@@ -116,6 +116,28 @@ function getImageDefault($urlPhoto)
     return $imageData['url'];
 }
 
+function getImageNews($urlPhoto)
+{
+    $admin = new AdminApi();
+    $assetData = $admin->asset($urlPhoto, [
+        'colors' => TRUE
+    ]);
+    $assetWidth = $assetData['width'];
+    $assetHeight = $assetData['height'];
+    $cropSize = $assetHeight <= $assetWidth ? $assetHeight : $assetWidth;
+    //Get Photo
+    $imgtag = (new ImageTag($urlPhoto))
+        ->resize(
+            Resize::crop()->width($cropSize)
+                ->height($cropSize)
+        )
+        ->resize(Resize::scale()->width(1000)->height(670))
+        ->delivery(Delivery::format(
+            Format::auto()
+        ));
+
+    return (string)$imgtag;
+}
 
 function uploadImageAdmin($idAdmin, $photoTemp, $locationRedirect)
 {

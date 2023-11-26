@@ -180,7 +180,7 @@ $result4 = mysqli_fetch_all($data4);
 									$eventId = $isi[0];
 									$eventTitle = $isi[1];
 									$dateRelease = $isi[2];
-									$image = getImageDefault(decryptPhotoProfile($isi[3]));
+									$image = getImageNews(decryptPhotoProfile($isi[3]));
 									$editorUsername = $isi[4];
 									$categoryName = $isi[5];
 
@@ -192,7 +192,7 @@ $result4 = mysqli_fetch_all($data4);
 													<a href="category.html" class="category-badge position-absolute">$categoryName</a>
 													<a href="detailEvent.php?eventId=$eventId">
 														<div class="inner">
-															<img src="$image" alt="post-title" />
+															$image
 														</div>
 													</a>
 												</div>

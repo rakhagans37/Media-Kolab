@@ -175,6 +175,7 @@ if (isset($_GET['deleteButton'])) {
 											<li class="submenu-item"><a class="submenu-link" href="manageCategory.php">News Category</a></li>
 											<li class="submenu-item"><a class="submenu-link" href="manageAds.php">Ads</a></li>
 											<li class="submenu-item"><a class="submenu-link active" href="manageEvent.php">Event</a></li>
+											<li class="submenu-item"><a class="submenu-link" href="manageJobVacancies.php">Job Vacancies</a></li>
 										</ul>
 									</div>
 								</li>

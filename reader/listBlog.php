@@ -35,7 +35,7 @@ $result4 = mysqli_fetch_all($data4);
 	<title>Katen - Minimal Blog & Magazine HTML Theme</title>
 	<meta name="description" content="Katen - Minimal Blog & Magazine HTML Theme">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-	<link rel="shortcut icon" type="image/x-icon" href="images/favicon.png">
+	<link rel="shortcut icon" type="image/x-icon" href="images/logoNgampus2.png">
 
 	<!-- STYLES -->
 	<link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" media="all">
@@ -180,7 +180,7 @@ $result4 = mysqli_fetch_all($data4);
 									$blogId = $isi[0];
 									$blogTitle = $isi[1];
 									$dateRelease = $isi[2];
-									$image = getImageDefault(decryptPhotoProfile($isi[3]));
+									$image = getImageNews(decryptPhotoProfile($isi[3]));
 									$editorUsername = $isi[4];
 									$categoryName = $isi[5];
 
@@ -192,7 +192,7 @@ $result4 = mysqli_fetch_all($data4);
 													<a href="category.html" class="category-badge position-absolute">$categoryName</a>
 													<a href="detailBlog.php?blogId=$blogId">
 														<div class="inner">
-															<img src="$image" alt="post-title" />
+															$image
 														</div>
 													</a>
 												</div>
