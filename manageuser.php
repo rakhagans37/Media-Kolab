@@ -136,7 +136,7 @@ $requestBannedUser = mysqli_query($conn, $sqlBannedUser);
             <div class="sidepanel-inner d-flex flex-column">
                 <a href="#" id="sidepanel-close" class="sidepanel-close d-xl-none">&times;</a>
                 <div class="app-branding">
-                    <a class="app-logo" href="index.php"><img class="logo-icon me-2" src="assets/images/app-logo.svg" alt="logo"><span class="logo-text">PORTAL</span></a>
+                    <a class="app-logo" href="index.php"><img class="logo-icon me-2" src="assets/images/app-logo.png" alt="logo"><span class="logo-text">Ngampus.id</span></a>
 
                 </div><!--//app-branding-->
                 <nav id="app-nav-main" class="app-nav app-nav-main flex-grow-1">
@@ -209,7 +209,6 @@ $requestBannedUser = mysqli_query($conn, $sqlBannedUser);
                                     <li class="submenu-item"><a class="submenu-link" href="manageAds.php">Ads</a></li>
                                     <li class="submenu-item"><a class="submenu-link" href="manageEvent.php">Event</a></li>
                                     <li class="submenu-item"><a class="submenu-link" href="manageJobVacancies.php">Job Vacancies</a></li>
-
                                 </ul>
                             </div>
                         </li>
