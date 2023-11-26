@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . "/../helper/getConnectionMsqli.php";
 require_once __DIR__ . "/../helper/increasePopularity.php";
+require_once __DIR__ . "/../helper/cloudinary.php";
+require_once __DIR__ . "/../helper/hash.php";
 
 $jobId = $_GET["jobId"];
 increaseJobVacancies($jobId);
@@ -25,9 +27,10 @@ $result4 = mysqli_fetch_all($data3);
 
 //Get Editor Profile Photo
 if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
-	$editorProfilePhoto = getImageProfile($editorPhotoUrl);
+	$editorProfilePhoto = getImageProfile(decryptPhotoProfile($editorPhotoUrl), 35);
+	$editorProfilePhoto =  substr_replace($editorProfilePhoto, " class='author'", 4, 0);
 } else {
-	$editorProfilePhoto = "../assets/images/profiles/profile-1.png";
+	$editorProfilePhoto = "<img src='../assets/images/profiles/profile-1.png' class='author' width='35' height='35' alt='author' />";
 }
 ?>
 <!DOCTYPE html>
@@ -166,7 +169,14 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 							<div class="post-header">
 								<h1 class="title mt-0 mb-3"><?php echo $request["vacancy_title"] ?></h1>
 								<ul class="meta list-inline mb-0">
-									<li class="list-inline-item"><a href="#"><img src="<?php echo $editorProfilePhoto ?>" class="author" width="35" height="35" alt="author" /><?php echo $request["username"] ?></a></li>
+									<li class="list-inline-item">
+										<a href="#">
+											<?php
+											echo $editorProfilePhoto;
+											echo $request["username"];
+											?>
+										</a>
+									</li>
 									<li class="list-inline-item"><a href="#"><?php echo $request["company_name"] ?></a></li>
 									<li class="list-inline-item"><?php echo $request["date_release"] ?></li>
 								</ul>

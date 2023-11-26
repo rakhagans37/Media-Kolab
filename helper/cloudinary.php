@@ -4,6 +4,7 @@ require_once 'hash.php';
 require __DIR__ . '/../vendor/autoload.php';
 
 // Use the Configuration class 
+use Cloudinary\Cloudinary;
 use Cloudinary\Configuration\Configuration;
 // Use the UploadApi class for uploading assets
 use Cloudinary\Api\Upload\UploadApi;
@@ -18,8 +19,12 @@ use Cloudinary\Transformation\Delivery;
 use Cloudinary\Transformation\Format;
 use Cloudinary\Tag\ImageTag;
 
+
 // Configure an instance of your Cloudinary cloud
 Configuration::instance('cloudinary://687349936855341:YYl-ARmSPNM0vXhBOL3SeY-bQcg@drmtgjbht');
+
+
+
 
 function getAdminPhotoId($idAdmin)
 {
@@ -75,7 +80,7 @@ function getEditorPhotoId($editorId)
     }
 }
 
-function getImageProfile($urlPhoto)
+function getImageProfile($urlPhoto, $width = 60)
 {
     $admin = new AdminApi();
     $assetData = $admin->asset($urlPhoto, [
@@ -96,11 +101,39 @@ function getImageProfile($urlPhoto)
                 )
         )
         ->roundCorners(RoundCorners::max())
-        ->resize(Resize::scale()->width(60))
+        ->resize(Resize::scale()->width($width))
         ->delivery(Delivery::format(
             Format::auto()
         ));
 
+    return (string)$imgtag;
+}
+
+function getUrlImageProfile($urlPhoto, $width = 60)
+{
+    $admin = new AdminApi();
+    $assetData = $admin->asset($urlPhoto, [
+        'colors' => TRUE
+    ]);
+    $assetWidth = $assetData['width'];
+    $assetHeight = $assetData['height'];
+    $cropSize = $assetHeight <= $assetWidth ? $assetHeight : $assetWidth;
+    //Get Photo
+    $imgtag = (new ImageTag($urlPhoto))
+        ->resize(
+            Resize::crop()->width($cropSize)
+                ->height($cropSize)
+                ->gravity(
+                    Gravity::focusOn(
+                        FocusOn::face()
+                    )
+                )
+        )
+        ->roundCorners(RoundCorners::max())
+        ->resize(Resize::scale()->width($width))
+        ->delivery(Delivery::format(
+            Format::auto()
+        ));
     return (string)$imgtag;
 }
 

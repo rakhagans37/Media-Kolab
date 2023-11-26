@@ -32,13 +32,13 @@
   --bs-gray-700: #495057;
   --bs-gray-800: #343a40;
   --bs-gray-900: #212529;
-  --bs-primary: #15a362;
+  --bs-primary: #0076b2;
   --bs-secondary: #5d6778;
   --bs-success: #5cb377;
   --bs-danger: #d26d69;
   --bs-warning: #EEBF41;
   --bs-info: #5b99ea;
-  --bs-primary-rgb: 21, 163, 98;
+  --bs-primary-rgb: 0, 118, 178;
   --bs-secondary-rgb: 93, 103, 120;
   --bs-success-rgb: 92, 179, 119;
   --bs-danger-rgb: 210, 109, 105;
@@ -2999,20 +2999,20 @@ textarea.form-control-lg {
 }
 
 .btn-primary {
-  --bs-btn-color: #000;
-  --bs-btn-bg: #15a362;
-  --bs-btn-border-color: #15a362;
-  --bs-btn-hover-color: #000;
-  --bs-btn-hover-bg: #38b17a;
-  --bs-btn-hover-border-color: #2cac72;
-  --bs-btn-focus-shadow-rgb: 18, 139, 83;
-  --bs-btn-active-color: #000;
-  --bs-btn-active-bg: #44b581;
-  --bs-btn-active-border-color: #2cac72;
+  --bs-btn-color: #fff;
+  --bs-btn-bg: #0076b2;
+  --bs-btn-border-color: #0076b2;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #006497;
+  --bs-btn-hover-border-color: #005e8e;
+  --bs-btn-focus-shadow-rgb: 38, 139, 190;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #005e8e;
+  --bs-btn-active-border-color: #005986;
   --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-  --bs-btn-disabled-color: #000;
-  --bs-btn-disabled-bg: #15a362;
-  --bs-btn-disabled-border-color: #15a362;
+  --bs-btn-disabled-color: #fff;
+  --bs-btn-disabled-bg: #0076b2;
+  --bs-btn-disabled-border-color: #0076b2;
 }
 
 .btn-secondary {
@@ -3101,19 +3101,19 @@ textarea.form-control-lg {
 }
 
 .btn-outline-primary {
-  --bs-btn-color: #15a362;
-  --bs-btn-border-color: #15a362;
-  --bs-btn-hover-color: #000;
-  --bs-btn-hover-bg: #15a362;
-  --bs-btn-hover-border-color: #15a362;
-  --bs-btn-focus-shadow-rgb: 21, 163, 98;
-  --bs-btn-active-color: #000;
-  --bs-btn-active-bg: #15a362;
-  --bs-btn-active-border-color: #15a362;
+  --bs-btn-color: #0076b2;
+  --bs-btn-border-color: #0076b2;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #0076b2;
+  --bs-btn-hover-border-color: #0076b2;
+  --bs-btn-focus-shadow-rgb: 0, 118, 178;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #0076b2;
+  --bs-btn-active-border-color: #0076b2;
   --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-  --bs-btn-disabled-color: #15a362;
+  --bs-btn-disabled-color: #0076b2;
   --bs-btn-disabled-bg: transparent;
-  --bs-btn-disabled-border-color: #15a362;
+  --bs-btn-disabled-border-color: #0076b2;
   --bs-gradient: none;
 }
 
@@ -6730,8 +6730,8 @@ textarea.form-control-lg {
 }
 
 .text-bg-primary {
-  color: #000 !important;
-  background-color: RGBA(21, 163, 98, var(--bs-bg-opacity, 1)) !important;
+  color: #fff !important;
+  background-color: RGBA(0, 118, 178, var(--bs-bg-opacity, 1)) !important;
 }
 
 .text-bg-secondary {
@@ -6764,8 +6764,8 @@ textarea.form-control-lg {
   text-decoration-color: RGBA(var(--bs-primary-rgb), var(--bs-link-underline-opacity, 1)) !important;
 }
 .link-primary:hover, .link-primary:focus {
-  color: RGBA(68, 181, 129, var(--bs-link-opacity, 1)) !important;
-  text-decoration-color: RGBA(68, 181, 129, var(--bs-link-underline-opacity, 1)) !important;
+  color: RGBA(0, 94, 142, var(--bs-link-opacity, 1)) !important;
+  text-decoration-color: RGBA(0, 94, 142, var(--bs-link-underline-opacity, 1)) !important;
 }
 
 .link-secondary {
@@ -11846,11 +11846,11 @@ h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
 }
 
 a {
-  color: #15a362;
+  color: #0076b2;
   text-decoration: none;
 }
 a:hover {
-  color: #128c54;
+  color: #006599;
 }
 
 hr {
@@ -11916,8 +11916,8 @@ a.app-link {
   text-decoration-color: rgba(37, 41, 48, 0.3);
 }
 a.app-link:hover {
-  color: #15a362;
-  text-decoration-color: rgba(21, 163, 98, 0.8);
+  color: #0076b2;
+  text-decoration-color: rgba(0, 118, 178, 0.8);
 }
 
 button.close:focus {
@@ -11944,14 +11944,14 @@ button.close:focus {
 }
 
 .app-btn-primary {
-  background: #15a362;
+  background: #0076b2;
   color: #fff;
-  border-color: #15a362;
+  border-color: #0076b2;
 }
 .app-btn-primary:hover, .app-btn-primary:active {
   color: #fff;
-  background: #18ba70;
-  border-color: #18ba70;
+  background: #0087cc;
+  border-color: #0087cc;
 }
 
 .app-btn-secondary {
@@ -11960,8 +11960,8 @@ button.close:focus {
   border: 1px solid #bcc1cb;
 }
 .app-btn-secondary:hover {
-  color: #15a362;
-  border: 1px solid #15a362;
+  color: #0076b2;
+  border: 1px solid #0076b2;
   background: white;
 }
 
@@ -11989,11 +11989,11 @@ button.close:focus {
 
 .btn-light {
   background: #f5f6fe;
-  color: #15a362;
+  color: #0076b2;
 }
 .btn-light:hover {
   background: #f5f6fe;
-  color: #15a362;
+  color: #0076b2;
 }
 
 .form-control {
@@ -12010,8 +12010,8 @@ button.close:focus {
 }
 
 .form-check-input:checked {
-  background-color: #15a362;
-  border-color: #15a362;
+  background-color: #0076b2;
+  border-color: #0076b2;
 }
 
 .dropdown-menu {
@@ -12078,7 +12078,7 @@ button.close:focus {
 }
 .app-search-form .search-btn:active, .app-search-form .search-btn:focus, .app-search-form .search-btn:hover {
   outline: none !important;
-  color: #15a362;
+  color: #0076b2;
   box-shadow: none;
 }
 
@@ -12177,8 +12177,8 @@ button.close:focus {
 }
 .app-notifications-dropdown .app-icon-holder {
   display: inline-block;
-  background: #edfdf6;
-  color: #15a362;
+  background: #e5f6ff;
+  color: #0076b2;
   width: 36px;
   height: 36px;
   padding-top: 4px;
@@ -12221,7 +12221,7 @@ button.close:focus {
     opacity: 0.8;
   }
   .search-mobile-trigger:hover {
-    color: #15a362;
+    color: #0076b2;
     -webkit-opacity: 1;
     -moz-opacity: 1;
     opacity: 1;
@@ -12347,9 +12347,9 @@ button.close:focus {
   border-left: 3px solid transparent;
 }
 .app-nav .nav-link.active {
-  color: #15a362;
-  background: #edfdf6;
-  border-left: 3px solid #15a362;
+  color: #0076b2;
+  background: #e5f6ff;
+  border-left: 3px solid #0076b2;
   font-weight: 500;
 }
 .app-nav .nav-link.submenu-toggle.active {
@@ -12357,7 +12357,7 @@ button.close:focus {
   border-color: transparent;
 }
 .app-nav .nav-link:hover {
-  color: #15a362;
+  color: #0076b2;
 }
 .app-nav .nav-icon {
   position: absolute;
@@ -12422,10 +12422,10 @@ button.close:focus {
   color: #252930;
 }
 .app-nav .submenu-link.active {
-  color: #15a362;
+  color: #0076b2;
 }
 .app-nav .submenu-link.active:before {
-  background-color: #15a362;
+  background-color: #0076b2;
 }
 
 .app-sidepanel-footer {
@@ -12508,7 +12508,7 @@ button.close:focus {
   border-radius: 0.25rem;
 }
 .app-card.border-left-decoration {
-  border-left: 3px solid #15a362;
+  border-left: 3px solid #0076b2;
 }
 .app-card .app-card-link-mask {
   position: absolute;
@@ -12609,8 +12609,8 @@ button.close:focus {
 
 .app-card .app-icon-holder {
   display: inline-block;
-  background: #edfdf6;
-  color: #15a362;
+  background: #e5f6ff;
+  color: #0076b2;
   width: 50px;
   height: 50px;
   padding-top: 10px;
@@ -12778,15 +12778,15 @@ button.close:focus {
   font-weight: bold;
 }
 .app-nav-tabs .nav-link.active {
-  color: #15a362;
-  border-bottom: 2px solid #15a362;
+  color: #0076b2;
+  border-bottom: 2px solid #0076b2;
 }
 .app-nav-tabs .nav-link.active:hover {
   background: none;
 }
 .app-nav-tabs .nav-link:hover {
-  background: #edfdf6;
-  color: #15a362;
+  background: #e5f6ff;
+  color: #0076b2;
 }
 .app-nav-tabs .nav-link-danger {
   color: #5d6778;
@@ -12844,7 +12844,7 @@ button.close:focus {
   padding-left: 0;
   font-size: 1rem;
   text-decoration: none;
-  color: #15a362;
+  color: #0076b2;
 }
 .app-card-accordion .faq-accordion .accordion-button:after {
   display: none;

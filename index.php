@@ -31,7 +31,7 @@ if ($result = mysqli_fetch_all($request)) {
 	<script defer src="assets/plugins/fontawesome/js/all.min.js"></script>
 
 	<!-- App CSS -->
-	<link id="theme-style" rel="stylesheet" href="assets/css/portal.css">
+	<link id="theme-style" rel="stylesheet" href="assets/scss/portal.css">
 
 </head>
 
