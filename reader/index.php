@@ -99,7 +99,7 @@ $result4 = mysqli_fetch_all($req4);
 							<li class="nav-item">
 								<a class="nav-link" href="listMedia.php">Media</a>
 							</li>
-							<li class="nav-item"><a class="nav-link" href="listJobVacancies">Loker/Magang</a></li>
+							<li class="nav-item"><a class="nav-link" href="listJobVacancies.php">Loker/Magang</a></li>
 						</ul>
 					</div>
 
@@ -107,11 +107,7 @@ $result4 = mysqli_fetch_all($req4);
 					<div class="header-right">
 						<!-- social icons -->
 						<ul class="social-icons list-unstyled list-inline mb-0">
-							<li class="list-inline-item"><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-							<li class="list-inline-item"><a href="#"><i class="fab fa-twitter"></i></a></li>
 							<li class="list-inline-item"><a href="#"><i class="fab fa-instagram"></i></a></li>
-							<li class="list-inline-item"><a href="#"><i class="fab fa-pinterest"></i></a></li>
-							<li class="list-inline-item"><a href="#"><i class="fab fa-medium"></i></a></li>
 							<li class="list-inline-item"><a href="#"><i class="fab fa-youtube"></i></a></li>
 						</ul>
 						<!-- header buttons -->
@@ -370,7 +366,7 @@ $result4 = mysqli_fetch_all($req4);
 											echo <<<Buat
 											<div class="post">
 												<div class="thumb rounded">
-													<a href="category.html" class="category-badge position-absolute">$kunci[3]</a>
+													<a href="detailEvent.php?eventId=$kunci[5]" class="category-badge position-absolute">$kunci[3]</a>
 													<span class="post-format">
 														<i class="icon-picture"></i>
 													</span>
@@ -420,15 +416,15 @@ $result4 = mysqli_fetch_all($req4);
 
 									foreach ($result4 as $kode) {
 										if ($number == 3) {
-											$image = getImageNews(decryptPhotoProfile($kunci[4]));
+											$image = getImageNews(decryptPhotoProfile($kode[4]));
 											echo <<<Buat
 											<div class="post">
 												<div class="thumb rounded">
-													<a href="category.html" class="category-badge position-absolute">$kode[3]</a>
+													<a href="detailEvent.php?eventId=$kode[5]" class="category-badge position-absolute">$kode[3]</a>
 													<span class="post-format">
 														<i class="icon-earphones"></i>
 													</span>
-													<a href="blog-single.html">
+													<a href="detailEvent.php?eventId=$kode[5]">
 														<div class="inner">
 															$image
 														</div>
@@ -438,23 +434,23 @@ $result4 = mysqli_fetch_all($req4);
 													<li class="list-inline-item"><a href="#">$kode[2]</a></li>
 													<li class="list-inline-item">$kode[1]</li>
 												</ul>
-												<h5 class="post-title mb-3 mt-3"><a href="blog-single.html">$kode[0]</a></h5>
+												<h5 class="post-title mb-3 mt-3"><a href="detailEvent.php?eventId=$kode[5]">$kode[0]</a></h5>
 											</div>
 											Buat;
 										}
 										if ($number > 3 and $number <= 5) {
-											$image = getImageNews(decryptPhotoProfile($kunci[4]));
+											$image = getImageNews(decryptPhotoProfile($kode[4]));
 											echo <<<Buat
 											<div class="post post-list-sm square before-seperator">
 											<div class="thumb rounded">
-												<a href="blog-single.html">
+												<a href="detailEvent.php?eventId=$kode[5]">
 													<div class="inner">
 														$image
 													</div>
 												</a>
 											</div>
 											<div class="details clearfix">
-												<h6 class="post-title my-0"><a href="blog-single.html">$kode[0]</a></h6>
+												<h6 class="post-title my-0"><a href="detailEvent.php?eventId=$kode[5]">$kode[0]</a></h6>
 												<ul class="meta list-inline mt-1 mb-0">
 													<li class="list-inline-item">$kode[1]</li>
 												</ul>

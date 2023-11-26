@@ -53,9 +53,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
         $connMyqli = getConnectionMysqli();
         $newPassworUser = hashPassword($password);
-        $sqlUpdatePassword = "UPDATE tb_editor SET password = ' $newPassworUser' WHERE editor_id = $editorId ";
+        $sqlUpdatePassword = "UPDATE tb_editor SET password = $newPassworUser WHERE editor_id = $editorId ";
         mysqli_query($connMyqli,   $sqlUpdatePassword);
         mysqli_close($connMyqli);
+        header('accountEditor.php');
+        exit;
     }
 }
 
@@ -65,7 +67,7 @@ try {
     $conn = getConnection();
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    $sql = "SELECT * FROM tb_editor WHERE editor_id = :idEditor";
+    $sql = "SELECT tb_editor.username, tb_editor.email, tb_editor.phone_number, tb_role.role_name FROM tb_editor INNER JOIN tb_role ON tb_editor.role_id = tb_role.role_id WHERE editor_id = :idEditor";
     $request = $conn->prepare($sql);
     $request->bindParam(':idEditor', $editorId);
     $request->execute();
@@ -73,7 +75,7 @@ try {
         $name = $result['username'];
         $email = $result['email'];
         $NumberPhone = $result['phone_number'];
-        $Role = $result['role_id'];
+        $Role = $result['role_name'];
     }
 
     $conn = null;
@@ -102,7 +104,7 @@ try {
     <script defer src="../assets/plugins/fontawesome/js/all.min.js"></script>
 
     <!-- App CSS -->
-    <link id="theme-style" rel="stylesheet" href="../assets/css/portal.css">
+    <link id="theme-style" rel="stylesheet" href="../assets/scss/portal.css">
 
 </head>
 
@@ -174,7 +176,7 @@ try {
             <div class="sidepanel-inner d-flex flex-column">
                 <a href="#" id="sidepanel-close" class="sidepanel-close d-xl-none">&times;</a>
                 <div class="app-branding">
-                    <a class="app-logo" href="index.php"><img class="logo-icon me-2" src="../assets/images/app-logo.svg" alt="logo"><span class="logo-text">PORTAL</span></a>
+                    <a class="app-logo" href="index.php"><img class="logo-icon me-2" src="../assets/images/app-logo.png" alt="logo"><span class="logo-text">Ngampus.id</span></a>
 
                 </div>
                 <!--//app-branding-->
@@ -472,7 +474,7 @@ try {
                                 <p>Choose your password </p>
                                 <form action="accountEditor.php" method="POST" id="" class="d-flex flex-row align-items-center justify-content-between" enctype="multipart/form-data">
                                     <div class="form-group">
-                                        <input type="text" class="form-control" name="NewPasswoard" placeholder="change your password" required>
+                                        <input type="password" class="form-control" name="NewPasswoard" placeholder="change your password" required>
                                     </div>
                                     <div class="form-group">
                                         <input type="submit" id="submit" name="changePasswoard" class="btn app-btn-primary" value="Change">

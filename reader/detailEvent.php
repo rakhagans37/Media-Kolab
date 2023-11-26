@@ -182,7 +182,10 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 							</div>
 							<!-- featured image -->
 							<div class="featured-image">
-								<img src="images/posts/featured-lg.jpg" alt="post-title" />
+								<?php
+								$image = getImageNews(decryptPhotoProfile($request['image_url']));
+								echo $image;
+								?>
 							</div>
 							<!-- post content -->
 							<div class="post-content clearfix">
