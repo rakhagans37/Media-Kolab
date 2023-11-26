@@ -104,8 +104,7 @@ $result4 = mysqli_fetch_all($data4);
 
 					<div class="col-md-4 col-sm-12 col-xs-12 text-center">
 						<!-- site logo -->
-						<a class="navbar-brand" href="personal.html"><img src="images/other/avatar-lg.png" alt="logo" /></a>
-						<a href="personal.html" class="d-block text-logo">Ko+Lab<span class="dot">.</span></a>
+						<a class="navbar-brand" href="personal.html"><img src="images/logo-text.png" height="30" alt="logo" /></a>
 					</div>
 
 					<div class="col-md-4 col-sm-12 col-xs-12">

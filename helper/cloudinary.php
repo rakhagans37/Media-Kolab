@@ -109,34 +109,6 @@ function getImageProfile($urlPhoto, $width = 60)
     return (string)$imgtag;
 }
 
-function getUrlImageProfile($urlPhoto, $width = 60)
-{
-    $admin = new AdminApi();
-    $assetData = $admin->asset($urlPhoto, [
-        'colors' => TRUE
-    ]);
-    $assetWidth = $assetData['width'];
-    $assetHeight = $assetData['height'];
-    $cropSize = $assetHeight <= $assetWidth ? $assetHeight : $assetWidth;
-    //Get Photo
-    $imgtag = (new ImageTag($urlPhoto))
-        ->resize(
-            Resize::crop()->width($cropSize)
-                ->height($cropSize)
-                ->gravity(
-                    Gravity::focusOn(
-                        FocusOn::face()
-                    )
-                )
-        )
-        ->roundCorners(RoundCorners::max())
-        ->resize(Resize::scale()->width($width))
-        ->delivery(Delivery::format(
-            Format::auto()
-        ));
-    return (string)$imgtag;
-}
-
 function getImageDefault($urlPhoto)
 {
     // Get the asset details
