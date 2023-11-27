@@ -10,12 +10,18 @@ $result = mysqli_fetch_all($req);
 $sql2 = "SELECT tb_blog.blog_title,tb_blog.date_release,tb_editor.username,tb_category_blog.category_name, tb_blog.blog_id  FROM tb_blog inner join tb_editor on tb_blog.editor_id = tb_editor.editor_id inner join tb_category_blog on tb_blog.category_id = tb_category_blog.category_id ORDER BY tb_blog.views desc limit 4";
 $req2 = mysqli_query($conn, $sql2);
 $result2 = mysqli_fetch_all($req2);
-$sql3 = "SELECT tb_media.media_title,tb_media.date_release,tb_editor.username,tb_category_media.category_name, tb_media.media_id FROM tb_media inner join tb_editor on tb_media.editor_id = tb_editor.editor_id inner join tb_category_media on tb_media.category_id = tb_category_media.category_id limit 4";
+$sql3 = "SELECT tb_media.media_title,tb_media.date_release,tb_editor.username,tb_category_media.category_name, tb_media.media_id FROM tb_media inner join tb_editor on tb_media.editor_id = tb_editor.editor_id inner join tb_category_media on tb_media.category_id = tb_category_media.category_id ORDER BY tb_media.date_release desc limit 6";
 $req3 = mysqli_query($conn, $sql3);
 $result3 = mysqli_fetch_all($req3);
-$sql4 = "SELECT tb_event.event_title,tb_event.date_release,tb_editor.username,tb_category_event.category_name, tb_event.image_url, tb_event.event_id FROM tb_event inner join tb_editor on tb_event.editor_id = tb_editor.editor_id inner join tb_category_event on tb_event.category_id = tb_category_event.category_id ORDER BY tb_event.views desc limit 6";
+$sqlPopular = "SELECT tb_media.media_title,tb_media.date_release,tb_editor.username,tb_category_media.category_name, tb_media.media_id FROM tb_media inner join tb_editor on tb_media.editor_id = tb_editor.editor_id inner join tb_category_media on tb_media.category_id = tb_category_media.category_id ORDER BY tb_media.views desc limit 3";
+$reqPopular = mysqli_query($conn, $sqlPopular);
+$resultPopular = mysqli_fetch_all($reqPopular);
+$sql4 = "SELECT tb_event.event_title,tb_event.date_release,tb_editor.username,tb_category_event.category_name, tb_event.image_url, tb_event.event_id FROM tb_event inner join tb_editor on tb_event.editor_id = tb_editor.editor_id inner join tb_category_event on tb_event.category_id = tb_category_event.category_id ORDER BY tb_event.date_release desc limit 6";
 $req4 = mysqli_query($conn, $sql4);
 $result4 = mysqli_fetch_all($req4);
+$sql5 = "SELECT tb_job_vacancies.vacancy_title,tb_job_vacancies.date_release,tb_editor.username,tb_category_job_vacancy.category_name, tb_job_vacancies.image_url, tb_job_vacancies.vacancy_id FROM tb_job_vacancies inner join tb_editor on tb_job_vacancies.editor_id = tb_editor.editor_id inner join tb_category_job_vacancy on tb_job_vacancies.category_id = tb_category_job_vacancy.category_id ORDER BY tb_job_vacancies.date_release desc limit 5";
+$req5 = mysqli_query($conn, $sql5);
+$result5 = mysqli_fetch_all($req5);
 ?>
 
 
@@ -291,45 +297,61 @@ $result4 = mysqli_fetch_all($req4);
 							<div class="row gy-5">
 								<div class="col-sm-6">
 									<!-- post -->
-									<div class="post">
-										<div class="thumb rounded">
-											<a href="category.html" class="category-badge position-absolute"><?php echo $result3[0][3] ?></a>
-											<span class="post-format">
-												<i class="icon-picture"></i>
-											</span>
-											<a href="blog-single.html">
-												<div class="inner">
-													<img src="images/posts/editor-lg.jpg" alt="post-title" />
-												</div>
-											</a>
-										</div>
-										<ul class="meta list-inline mt-4 mb-0">
-											<li class="list-inline-item"><a href="#"><img src="images/other/author-sm.png" class="author" alt="author" /><?php echo $result3[0][2] ?></a></li>
-											<li class="list-inline-item"><?php echo $result3[0][1] ?></li>
-										</ul>
-										<h5 class="post-title mb-3 mt-3"><a href="blog-single.html"><?php echo $result3[0][0] ?></a></h5>
-									</div>
+									<?php
+									$index = 0;
+									foreach ($result3 as $file) {
+										if ($index == 0) {
+											echo <<<Buat
+											<div class="post">
+											<div class="thumb rounded">
+												<a href="category.html" class="category-badge position-absolute">$file[3]</a>
+												<span class="post-format">
+													<i class="icon-picture"></i>
+												</span>
+												<a href="detailMedia.php?mediaId=$file[4]">
+													<div class="inner">
+														<img src="images/posts/editor-lg.jpg" alt="post-title" />
+													</div>
+												</a>
+											</div>
+											<ul class="meta list-inline mt-4 mb-0">
+												<li class="list-inline-item"><a href="#">$file[2]</a></li>
+												<li class="list-inline-item">$file[1]</li>
+											</ul>
+											<h5 class="post-title mb-3 mt-3"><a href="detailMedia.php?mediaId=$file[4]">$file[0]</a></h5>
+											</div>
+											Buat;
+										} else {
+											break;
+										}
+										$index++;
+									}
+									?>
 								</div>
 								<div class="col-sm-6">
 									<?php
+									$index = 0;
 									foreach ($result3 as $file) {
-										echo <<<Buat
+										if ($index > 0) {
+											echo <<<Buat
 											<div class="post post-list-sm square">
 											<div class="thumb rounded">
-												<a href="blog-single.html">
+												<a href="detailMedia.php?mediaId=$file[4]">
 													<div class="inner">
 														<img src="images/posts/editor-sm-1.jpg" alt="post-title" />
 													</div>
 												</a>
 											</div>
 											<div class="details clearfix">
-												<h6 class="post-title my-0"><a href="blog-single.html">$file[0]</a></h6>
+												<h6 class="post-title my-0"><a href="detailMedia.php?mediaId=$file[4]">$file[0]</a></h6>
 												<ul class="meta list-inline mt-1 mb-0">
 													<li class="list-inline-item">$file[1]</li>
 												</ul>
 											</div>
 											</div>
 										Buat;
+										}
+										$index++;
 									}
 									?>
 								</div>
@@ -359,52 +381,60 @@ $result4 = mysqli_fetch_all($req4);
 								<div class="col-sm-6">
 									<!-- post -->
 									<?php
-									$index = 0;
-									foreach ($result4 as $kunci) {
+									for ($index = 0; $index < count($result4); $index++) {
+										$eventTitle = $result4[$index][0];
+										$eventDateRelease = $result4[$index][1];
+										$usernameEditor = $result4[$index][2];
+										$eventCategory = $result4[$index][3];
+										$eventUrlImage = $result4[$index][4];
+										$eventId = $result4[$index][5];
+
 										if ($index == 0) {
-											$image = getImageNews(decryptPhotoProfile($kunci[4]));
+											$image = getImageNews(decryptPhotoProfile($eventUrlImage));
 											echo <<<Buat
 											<div class="post">
 												<div class="thumb rounded">
-													<a href="detailEvent.php?eventId=$kunci[5]" class="category-badge position-absolute">$kunci[3]</a>
+													<a href="detailEvent.php?eventId=$eventId" class="category-badge position-absolute">$eventCategory</a>
 													<span class="post-format">
 														<i class="icon-picture"></i>
 													</span>
-													<a href="detailEvent.php?eventId=$kunci[5]">
+													<a href="detailEvent.php?eventId=$eventId">
 														<div class="inner">
 															$image
 														</div>
 													</a>
 												</div>
 												<ul class="meta list-inline mt-4 mb-0">
-													<li class="list-inline-item"><a href="#">$kunci[2]</a></li>
-													<li class="list-inline-item">$kunci[1]</li>
+													<li class="list-inline-item"><a href="#">$usernameEditor</a></li>
+													<li class="list-inline-item">$eventDateRelease</li>
 												</ul>
-												<h5 class="post-title mb-3 mt-3"><a href="detailEvent.php?eventId=$kunci[5]">$kunci[0]</a></h5>
+												<h5 class="post-title mb-3 mt-3"><a href="detailEvent.php?eventId=$eventId">$eventTitle</a></h5>
 											</div>
 											Buat;
-										}
-										if ($index > 0 and $index <= 2) {
-											$image = getImageNews(decryptPhotoProfile($kunci[4]));
+										} else if ($index <= 2) {
+											$image = getImageNews(decryptPhotoProfile($eventUrlImage));
 											echo <<<Buat
 											<div class="post post-list-sm square before-seperator">
-											<div class="thumb rounded">
-												<a href="detailEvent.php?eventId=$kunci[5]">
-													<div class="inner">
-														$image
-													</div>
-												</a>
-											</div>
-											<div class="details clearfix">
-												<h6 class="post-title my-0"><a href="detailEvent.php?eventId=$kunci[5]">$kunci[0]</a></h6>
-												<ul class="meta list-inline mt-1 mb-0">
-													<li class="list-inline-item">$kunci[1]</li>
-												</ul>
-											</div>
+												<div class="thumb rounded">
+													<a href="detailEvent.php?eventId=$eventId">
+														<div class="inner">
+															$image
+														</div>
+													</a>
+												</div>
+												<div class="details clearfix">
+													<h6 class="post-title my-0">
+														<a href="detailEvent.php?eventId=$eventId">$eventTitle</a>
+													</h6>
+													<ul class="meta list-inline mt-1 mb-0">
+														<li class="list-inline-item">$eventDateRelease</li>
+													</ul>
+												</div>
 											</div>
 											Buat;
+										} else {
+											break;
 										}
-										$index = $index + 1;
 									}
 									?>
 									<!-- post -->
@@ -412,57 +442,62 @@ $result4 = mysqli_fetch_all($req4);
 								<div class="col-sm-6">
 									<!-- post -->
 									<?php
-									$number = 0;
+									for ($index = 3; $index < count($result4); $index++) {
+										$eventTitle = $result4[$index][0];
+										$eventDateRelease = $result4[$index][1];
+										$usernameEditor = $result4[$index][2];
+										$eventCategory = $result4[$index][3];
+										$eventUrlImage = $result4[$index][4];
+										$eventId = $result4[$index][5];
 
-									foreach ($result4 as $kode) {
-										if ($number == 3) {
-											$image = getImageNews(decryptPhotoProfile($kode[4]));
+										if ($index == 3) {
+											$image = getImageNews(decryptPhotoProfile($eventUrlImage));
 											echo <<<Buat
 											<div class="post">
 												<div class="thumb rounded">
-													<a href="detailEvent.php?eventId=$kode[5]" class="category-badge position-absolute">$kode[3]</a>
+													<a href="detailEvent.php?eventId=$eventId" class="category-badge position-absolute">$eventCategory</a>
 													<span class="post-format">
-														<i class="icon-earphones"></i>
+														<i class="icon-picture"></i>
 													</span>
-													<a href="detailEvent.php?eventId=$kode[5]">
+													<a href="detailEvent.php?eventId=$eventId">
 														<div class="inner">
 															$image
 														</div>
 													</a>
 												</div>
 												<ul class="meta list-inline mt-4 mb-0">
-													<li class="list-inline-item"><a href="#">$kode[2]</a></li>
-													<li class="list-inline-item">$kode[1]</li>
+													<li class="list-inline-item"><a href="#">$usernameEditor</a></li>
+													<li class="list-inline-item">$eventDateRelease</li>
 												</ul>
-												<h5 class="post-title mb-3 mt-3"><a href="detailEvent.php?eventId=$kode[5]">$kode[0]</a></h5>
+												<h5 class="post-title mb-3 mt-3"><a href="detailEvent.php?eventId=$eventId">$eventTitle</a></h5>
 											</div>
 											Buat;
-										}
-										if ($number > 3 and $number <= 5) {
-											$image = getImageNews(decryptPhotoProfile($kode[4]));
+										} else if ($index <= 5) {
+											$image = getImageNews(decryptPhotoProfile($eventUrlImage));
 											echo <<<Buat
 											<div class="post post-list-sm square before-seperator">
-											<div class="thumb rounded">
-												<a href="detailEvent.php?eventId=$kode[5]">
-													<div class="inner">
-														$image
-													</div>
-												</a>
+												<div class="thumb rounded">
+													<a href="detailEvent.php?eventId=$eventId">
+														<div class="inner">
+															$image
+														</div>
+													</a>
+												</div>
+												<div class="details clearfix">
+													<h6 class="post-title my-0">
+														<a href="detailEvent.php?eventId=$eventId">$eventTitle</a>
+													</h6>
+													<ul class="meta list-inline mt-1 mb-0">
+														<li class="list-inline-item">$eventDateRelease</li>
+													</ul>
+												</div>
 											</div>
-											<div class="details clearfix">
-												<h6 class="post-title my-0"><a href="detailEvent.php?eventId=$kode[5]">$kode[0]</a></h6>
-												<ul class="meta list-inline mt-1 mb-0">
-													<li class="list-inline-item">$kode[1]</li>
-												</ul>
-											</div>
-										</div>
-										Buat;
+											Buat;
+										} else {
+											break;
 										}
-										$number++;
 									}
 									?>
-
-
 								</div>
 							</div>
 
@@ -470,7 +505,7 @@ $result4 = mysqli_fetch_all($req4);
 
 							<!-- section header -->
 							<div class="section-header">
-								<h3 class="section-title">Inspiration</h3>
+								<h3 class="section-title">Loker/Magang</h3>
 								<img src="images/wave.svg" class="wave" alt="wave" />
 								<div class="slick-arrows-top">
 									<button type="button" data-role="none" class="carousel-topNav-prev slick-custom-buttons" aria-label="Previous"><i class="icon-arrow-left"></i></button>
@@ -479,60 +514,30 @@ $result4 = mysqli_fetch_all($req4);
 							</div>
 
 							<div class="row post-carousel-twoCol post-carousel">
-								<!-- post -->
-								<div class="post post-over-content col-md-6">
-									<div class="details clearfix">
-										<a href="category.html" class="category-badge">Inspiration</a>
-										<h4 class="post-title"><a href="blog-single.html">Want To Have A More Appealing Tattoo?</a></h4>
-										<ul class="meta list-inline mb-0">
-											<li class="list-inline-item"><a href="#">Katen Doe</a></li>
-											<li class="list-inline-item">29 March 2021</li>
-										</ul>
-									</div>
-									<a href="blog-single.html">
-										<div class="thumb rounded">
-											<div class="inner">
-												<img src="images/posts/inspiration-1.jpg" alt="thumb" />
-											</div>
+								<!-- Post -->
+								<?php
+								foreach ($result5 as $data) {
+									echo <<<Buat
+									<div class="post post-over-content col-md-6">
+										<div class="details clearfix">
+											<a href="detailJobVacancies.php?jobId=$data[5]" class="category-badge">$data[3]</a>
+											<h4 class="post-title"><a href="detailJobVacancies.php?jobId=$data[5]">$data[0]</a></h4>
+											<ul class="meta list-inline mb-0">
+												<li class="list-inline-item"><a href="detailJobVacancies.php?jobId=$data[5]">$data[2]</a></li>
+												<li class="list-inline-item">$data[1]</li>
+											</ul>
 										</div>
-									</a>
-								</div>
-								<!-- post -->
-								<div class="post post-over-content col-md-6">
-									<div class="details clearfix">
-										<a href="category.html" class="category-badge">Inspiration</a>
-										<h4 class="post-title"><a href="blog-single.html">Feel Like A Pro With The Help Of These 7 Tips</a></h4>
-										<ul class="meta list-inline mb-0">
-											<li class="list-inline-item"><a href="#">Katen Doe</a></li>
-											<li class="list-inline-item">29 March 2021</li>
-										</ul>
-									</div>
-									<a href="blog-single.html">
-										<div class="thumb rounded">
-											<div class="inner">
-												<img src="images/posts/inspiration-2.jpg" alt="thumb" />
+										<a href="detailJobVacancies.php?jobId=$data[5]">
+											<div class="thumb rounded">
+												<div class="inner">
+													<img src="images/posts/inspiration-1.jpg" alt="thumb" />
+												</div>
 											</div>
-										</div>
-									</a>
-								</div>
-								<!-- post -->
-								<div class="post post-over-content col-md-6">
-									<div class="details clearfix">
-										<a href="category.html" class="category-badge">Inspiration</a>
-										<h4 class="post-title"><a href="blog-single.html">Your Light Is About To Stop Being Relevant</a></h4>
-										<ul class="meta list-inline mb-0">
-											<li class="list-inline-item"><a href="#">Katen Doe</a></li>
-											<li class="list-inline-item">29 March 2021</li>
-										</ul>
+										</a>
 									</div>
-									<a href="blog-single.html">
-										<div class="thumb rounded">
-											<div class="inner">
-												<img src="images/posts/inspiration-3.jpg" alt="thumb" />
-											</div>
-										</div>
-									</a>
-								</div>
+									Buat;
+								}
+								?>
 							</div>
 
 							<div class="spacer" data-height="50"></div>
@@ -721,61 +726,37 @@ $result4 = mysqli_fetch_all($req4);
 							<!-- widget popular posts -->
 							<div class="widget rounded">
 								<div class="widget-header text-center">
-									<h3 class="widget-title">Popular Posts</h3>
+									<h3 class="widget-title">Popular Media</h3>
 									<img src="images/wave.svg" class="wave" alt="wave" />
 								</div>
 								<div class="widget-content">
-									<!-- post -->
-									<div class="post post-list-sm circle">
-										<div class="thumb circle">
-											<span class="number">1</span>
-											<a href="blog-single.html">
-												<div class="inner">
-													<img src="images/posts/tabs-1.jpg" alt="post-title" />
-												</div>
-											</a>
+									<?php
+									$number = 1;
+									foreach ($resultPopular as $data) {
+										$popularMediaId = $data[4];
+										$popularMediaTitle = $data[0];
+										$popularMediaDate = $data[1];
+										echo <<<Buat
+											<div class="post post-list-sm circle">
+											<div class="thumb circle">
+												<span class="number">$number</span>
+												<a href="detailMedia?mediaId=$popularMediaId">
+													<div class="inner">
+														<img src="images/posts/tabs-1.jpg" alt="post-title" />
+													</div>
+												</a>
+											</div>
+											<div class="details clearfix">
+												<h6 class="post-title my-0"><a href="detailMedia?mediaId=$popularMediaId">$popularMediaTitle</a></h6>
+												<ul class="meta list-inline mt-1 mb-0">
+													<li class="list-inline-item">$popularMediaDate</li>
+												</ul>
+											</div>
 										</div>
-										<div class="details clearfix">
-											<h6 class="post-title my-0"><a href="blog-single.html">3 Easy Ways To Make Your iPhone Faster</a></h6>
-											<ul class="meta list-inline mt-1 mb-0">
-												<li class="list-inline-item">29 March 2021</li>
-											</ul>
-										</div>
-									</div>
-									<!-- post -->
-									<div class="post post-list-sm circle">
-										<div class="thumb circle">
-											<span class="number">2</span>
-											<a href="blog-single.html">
-												<div class="inner">
-													<img src="images/posts/tabs-2.jpg" alt="post-title" />
-												</div>
-											</a>
-										</div>
-										<div class="details clearfix">
-											<h6 class="post-title my-0"><a href="blog-single.html">An Incredibly Easy Method That Works For All</a></h6>
-											<ul class="meta list-inline mt-1 mb-0">
-												<li class="list-inline-item">29 March 2021</li>
-											</ul>
-										</div>
-									</div>
-									<!-- post -->
-									<div class="post post-list-sm circle">
-										<div class="thumb circle">
-											<span class="number">3</span>
-											<a href="blog-single.html">
-												<div class="inner">
-													<img src="images/posts/tabs-3.jpg" alt="post-title" />
-												</div>
-											</a>
-										</div>
-										<div class="details clearfix">
-											<h6 class="post-title my-0"><a href="blog-single.html">10 Ways To Immediately Start Selling Furniture</a></h6>
-											<ul class="meta list-inline mt-1 mb-0">
-												<li class="list-inline-item">29 March 2021</li>
-											</ul>
-										</div>
-									</div>
+										Buat;
+										$number++;
+									}
+									?>
 								</div>
 							</div>
 

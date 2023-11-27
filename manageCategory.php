@@ -25,7 +25,7 @@ if (isset($_GET['add-category'])) {
             $sqlAdd = "INSERT INTO tb_category_event VALUES(?,?,?)";
             break;
         case 'jobCategory':
-            $sqlCheck = "SELECT * FROM tb_category_event WHERE category_name LIKE ?";
+            $sqlCheck = "SELECT * FROM tb_category_job_vacancy WHERE category_name LIKE ?";
             $sqlAdd = "INSERT INTO tb_category_job_vacancy VALUES(?,?,?)";
             break;
     }
