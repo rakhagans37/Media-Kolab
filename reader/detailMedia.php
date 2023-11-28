@@ -4,21 +4,21 @@ require_once __DIR__ . "/../helper/increasePopularity.php";
 require_once __DIR__ . "/../helper/cloudinary.php";
 require_once __DIR__ . "/../helper/hash.php";
 
-$jobId = $_GET["jobId"];
-increaseJobVacancies($jobId);
+$mediaId = $_GET["mediaId"];
+increasemedia($mediaId);
 
 $conn = getConnectionMysqli();
 
-$query = "SELECT tb_job_vacancies.vacancy_id, tb_job_vacancies.vacancy_title, tb_job_vacancies.date_release, tb_job_vacancies.image_url, tb_job_vacancies.company_name, tb_editor.username, tb_job_vacancies.vacancy_content, tb_editor.profile_photo, tb_editor.description FROM tb_job_vacancies INNER JOIN tb_editor ON tb_job_vacancies.editor_id=tb_editor.editor_id WHERE tb_job_vacancies.vacancy_id='$jobId'";
+$query = "SELECT tb_media.media_id, tb_media.media_title, tb_media.date_release, tb_media.image_url, tb_editor.username, tb_media.media_content, tb_editor.profile_photo, tb_editor.description FROM tb_media INNER JOIN tb_editor ON tb_media.editor_id = tb_editor.editor_id WHERE tb_media.media_id = '$mediaId'";
 $result = mysqli_query($conn, $query);
 $request = mysqli_fetch_array($result);
 
-$query2 = "SELECT vacancy_id, vacancy_title, date_release, views, logo FROM tb_job_vacancies ORDER BY views desc limit 3";
+$query2 = "SELECT media_id, media_title, date_release, views, image_url FROM tb_media ORDER BY views desc limit 3";
 $data = mysqli_query($conn, $query2);
 $result2 = mysqli_fetch_all($data);
 
-$query3 = "SELECT tb_job_vacancies.category_id, tb_category_job_vacancy.category_name, COUNT(tb_job_vacancies.category_id) AS jumlah_kategori FROM tb_category_job_vacancy INNER JOIN tb_job_vacancies ON tb_category_job_vacancy.category_id = tb_job_vacancies.category_id GROUP BY tb_job_vacancies.category_id";
-$query4 = "SELECT COUNT(vacancy_id) AS jumlah_event FROM tb_job_vacancies";
+$query3 = "SELECT tb_media.category_id, tb_category_media.category_name, COUNT(tb_media.category_id) AS jumlah_kategori FROM tb_category_media INNER JOIN tb_media ON tb_category_media.category_id = tb_media.category_id GROUP BY tb_media.category_id";
+$query4 = "SELECT COUNT(media_id) AS jumlah_event FROM tb_media";
 $data2 = mysqli_query($conn, $query3);
 $result3 = mysqli_fetch_all($data2);
 
@@ -100,7 +100,7 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 			<nav class="navbar navbar-expand-lg">
 				<div class="container-xl">
 					<!-- site logo -->
-					<a class="navbar-brand" href="index.html"><img src="images/logo.svg" alt="logo" /></a>
+					<a class="navbar-brand" href="index.php"><img src="images/logo.svg" alt="logo" /></a>
 
 					<div class="collapse navbar-collapse">
 						<!-- menus -->
@@ -109,15 +109,15 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 								<a class="nav-link" href="index.php">Home</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" href="listEvent.php">Event</a>
+								<a class="nav-link" href="listMedia">Event</a>
 							</li>
-							<li class="nav-item">
-								<a class="nav-link" href="listBlog.php">Blog</a>
+							<li class="nav-item active">
+								<a class="nav-link" href="listmedia.php">media</a>
 							</li>
 							<li class="nav-item">
 								<a class="nav-link" href="listMedia.php">Media</a>
 							</li>
-							<li class="nav-item active">
+							<li class="nav-item">
 								<a class="nav-link" href="listJobVacancies.php">Loker/Magang</a>
 							</li>
 						</ul>
@@ -127,11 +127,7 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 					<div class="header-right">
 						<!-- social icons -->
 						<ul class="social-icons list-unstyled list-inline mb-0">
-							<li class="list-inline-item"><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-							<li class="list-inline-item"><a href="#"><i class="fab fa-twitter"></i></a></li>
 							<li class="list-inline-item"><a href="#"><i class="fab fa-instagram"></i></a></li>
-							<li class="list-inline-item"><a href="#"><i class="fab fa-pinterest"></i></a></li>
-							<li class="list-inline-item"><a href="#"><i class="fab fa-medium"></i></a></li>
 							<li class="list-inline-item"><a href="#"><i class="fab fa-youtube"></i></a></li>
 						</ul>
 						<!-- header buttons -->
@@ -154,9 +150,9 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 
 				<nav aria-label="breadcrumb">
 					<ol class="breadcrumb">
-						<li class="breadcrumb-item"><a href="#">Home</a></li>
-						<li class="breadcrumb-item"><a href="#">Inspiration</a></li>
-						<li class="breadcrumb-item active" aria-current="page"><?php echo $request["vacancy_title"] ?></li>
+						<li class="breadcrumb-item"><a href="index.php">Home</a></li>
+						<li class="breadcrumb-item"><a href="listmedia.php">media</a></li>
+						<li class="breadcrumb-item active" aria-current="page"><?php echo $request["media_title"]; ?></li>
 					</ol>
 				</nav>
 
@@ -167,7 +163,7 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 						<div class="post post-single">
 							<!-- post header -->
 							<div class="post-header">
-								<h1 class="title mt-0 mb-3"><?php echo $request["vacancy_title"] ?></h1>
+								<h1 class="title mt-0 mb-3"><?php echo $request["media_title"] ?></h1>
 								<ul class="meta list-inline mb-0">
 									<li class="list-inline-item">
 										<a href="#">
@@ -177,7 +173,6 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 											?>
 										</a>
 									</li>
-									<li class="list-inline-item"><a href="#"><?php echo $request["company_name"] ?></a></li>
 									<li class="list-inline-item"><?php echo $request["date_release"] ?></li>
 								</ul>
 							</div>
@@ -187,7 +182,9 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 							</div>
 							<!-- post content -->
 							<div class="post-content clearfix">
-								<?= $request['vacancy_content'] ?>
+								<?php
+								echo $request['media_content'];
+								?>
 							</div>
 							<!-- post bottom section -->
 							<div class="post-bottom">
@@ -335,25 +332,8 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 					</div>
 
 					<div class="col-lg-4">
-
 						<!-- sidebar -->
 						<div class="sidebar">
-							<!-- widget about -->
-							<div class="widget rounded">
-								<div class="widget-about data-bg-image text-center" data-bg-image="images/map-bg.png">
-									<img src="images/logo.svg" alt="logo" class="mb-4" />
-									<p class="mb-4">Hello, We’re content writer who is fascinated by content fashion, celebrity and lifestyle. We helps clients bring the right content to the right people.</p>
-									<ul class="social-icons list-unstyled list-inline mb-0">
-										<li class="list-inline-item"><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-										<li class="list-inline-item"><a href="#"><i class="fab fa-twitter"></i></a></li>
-										<li class="list-inline-item"><a href="#"><i class="fab fa-instagram"></i></a></li>
-										<li class="list-inline-item"><a href="#"><i class="fab fa-pinterest"></i></a></li>
-										<li class="list-inline-item"><a href="#"><i class="fab fa-medium"></i></a></li>
-										<li class="list-inline-item"><a href="#"><i class="fab fa-youtube"></i></a></li>
-									</ul>
-								</div>
-							</div>
-
 							<!-- widget popular posts -->
 							<div class="widget rounded">
 								<div class="widget-header text-center">
@@ -364,23 +344,23 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 									<?php
 									$number = 1;
 									foreach ($result2 as $data) {
-										$popularJobId = $data[0];
-										$popularJobTitle = $data[1];
-										$popularJobDate = $data[2];
+										$popularmediaId = $data[0];
+										$popularmediaTitle = $data[1];
+										$popularmediaDate = $data[2];
 										echo <<<Buat
 											<div class="post post-list-sm circle">
 											<div class="thumb circle">
 												<span class="number">$number</span>
-												<a href="detailJobVacancies.php?jobId=$popularJobId">
+												<a href="detailMedia.php?mediaId=$popularmediaId">
 													<div class="inner">
 														<img src="images/posts/tabs-1.jpg" alt="post-title" />
 													</div>
 												</a>
 											</div>
 											<div class="details clearfix">
-												<h6 class="post-title my-0"><a href="detailJobVacancies.php?jobId=$popularJobId">$popularJobTitle</a></h6>
+												<h6 class="post-title my-0"><a href="detailMedia.php?mediaId=$popularmediaId">$popularmediaTitle</a></h6>
 												<ul class="meta list-inline mt-1 mb-0">
-													<li class="list-inline-item">$popularJobDate</li>
+													<li class="list-inline-item">$popularmediaDate</li>
 												</ul>
 											</div>
 										</div>
@@ -401,11 +381,11 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 									<ul class="list">
 										<?php
 										$jumlah = $result4[0][0];
-										echo "<li><a href='listJobVacancies.php'>ALL</a><span>($jumlah)</span></li>";
-										foreach ($result2 as $isi) {
+										echo "<li><a href='listMedia'>ALL</a><span>($jumlah)</span></li>";
+										foreach ($result3 as $isi) {
 											$categoryName = $isi[1];
 											$jumlah = $isi[2];
-											echo "<li><a href='listJobVacancies.php?category=$categoryName'>$categoryName</a><span>($jumlah)</span></li>";
+											echo "<li><a href='listMedia?category=$categoryName'>$categoryName</a><span>($jumlah)</span></li>";
 										}
 										?>
 
@@ -549,15 +529,15 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 					<a href="index.php">Home</a>
 				</li>
 				<li>
-					<a href="listEvent.php">Event</a>
+					<a href="listMedia">Event</a>
 				</li>
-				<li>
-					<a href="listBlog.php">Blog</a>
+				<li class="active">
+					<a href="listmedia.php">media</a>
 				</li>
 				<li>
 					<a href="listMedia.php">Media</a>
 				</li>
-				<li class="active">
+				<li>
 					<a href="listJobVacancies.php">Loker/Magang</a>
 				</li>
 			</ul>

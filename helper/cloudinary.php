@@ -21,10 +21,31 @@ use Cloudinary\Tag\ImageTag;
 
 
 // Configure an instance of your Cloudinary cloud
-Configuration::instance('cloudinary://687349936855341:YYl-ARmSPNM0vXhBOL3SeY-bQcg@drmtgjbht');
+Configuration::instance([
+    'cloud' => [
+        'cloud_name' => 'dx57frg2b',
+        'api_key' => '777535978957269',
+        'api_secret' => 'y0t83iNgf32i4tHEVI21t5kLiFM'
+    ],
+    'url' => [
+        'secure' => true
+    ]
+]);
 
 
+function imageTagToURL($imgtag)
+{
+    // Use regular expression to extract the source URL
+    $pattern = '/<img src="([^"]+)"/';
+    preg_match($pattern, $imgtag, $matches);
 
+    if (isset($matches[1])) {
+        $sourceUrl = $matches[1];
+        return $sourceUrl;
+    } else {
+        return "";
+    }
+}
 
 function getAdminPhotoId($idAdmin)
 {
@@ -111,14 +132,14 @@ function getImageProfile($urlPhoto, $width = 60)
 
 function getImageDefault($urlPhoto)
 {
-    // Get the asset details
-    $admin = new AdminApi();
-    $imageData = $admin->asset($urlPhoto, [
-        'colors' => TRUE
-    ]);
+    //Get Photo
+    $imgtag = (new ImageTag($urlPhoto))
+        ->resize(Resize::limitFit()->width(1000)->height(670))
+        ->delivery(Delivery::format(
+            Format::auto()
+        ))->delivery(Delivery::quality(60));
 
-    // Return url of the image
-    return $imageData['url'];
+    return imageTagToURL($imgtag);
 }
 
 function getImageNews($urlPhoto)
@@ -139,7 +160,7 @@ function getImageNews($urlPhoto)
         ->resize(Resize::scale()->width(1000)->height(670))
         ->delivery(Delivery::format(
             Format::auto()
-        ));
+        ))->delivery(Delivery::quality(60));
 
     return (string)$imgtag;
 }

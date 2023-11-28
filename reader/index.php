@@ -10,10 +10,13 @@ $result = mysqli_fetch_all($req);
 $sql2 = "SELECT tb_blog.blog_title,tb_blog.date_release,tb_editor.username,tb_category_blog.category_name, tb_blog.blog_id  FROM tb_blog inner join tb_editor on tb_blog.editor_id = tb_editor.editor_id inner join tb_category_blog on tb_blog.category_id = tb_category_blog.category_id ORDER BY tb_blog.views desc limit 4";
 $req2 = mysqli_query($conn, $sql2);
 $result2 = mysqli_fetch_all($req2);
-$sql3 = "SELECT tb_media.media_title,tb_media.date_release,tb_editor.username,tb_category_media.category_name, tb_media.media_id FROM tb_media inner join tb_editor on tb_media.editor_id = tb_editor.editor_id inner join tb_category_media on tb_media.category_id = tb_category_media.category_id ORDER BY tb_media.date_release desc limit 6";
+$sqlRecentBlog = "SELECT tb_blog.blog_title,tb_blog.date_release,tb_editor.username,tb_category_blog.category_name, tb_blog.blog_id  FROM tb_blog inner join tb_editor on tb_blog.editor_id = tb_editor.editor_id inner join tb_category_blog on tb_blog.category_id = tb_category_blog.category_id ORDER BY tb_blog.date_release desc limit 4";
+$reqRecentBlog = mysqli_query($conn, $sqlRecentBlog);
+$resultRecentBlog = mysqli_fetch_all($reqRecentBlog);
+$sql3 = "SELECT tb_media.media_title,tb_media.date_release,tb_editor.username,tb_category_media.category_name, tb_media.media_id, tb_media.thumbnail FROM tb_media inner join tb_editor on tb_media.editor_id = tb_editor.editor_id inner join tb_category_media on tb_media.category_id = tb_category_media.category_id ORDER BY tb_media.date_release desc limit 6";
 $req3 = mysqli_query($conn, $sql3);
 $result3 = mysqli_fetch_all($req3);
-$sqlPopular = "SELECT tb_media.media_title,tb_media.date_release,tb_editor.username,tb_category_media.category_name, tb_media.media_id FROM tb_media inner join tb_editor on tb_media.editor_id = tb_editor.editor_id inner join tb_category_media on tb_media.category_id = tb_category_media.category_id ORDER BY tb_media.views desc limit 3";
+$sqlPopular = "SELECT tb_media.media_title,tb_media.date_release,tb_editor.username,tb_category_media.category_name, tb_media.media_id, tb_media.thumbnail FROM tb_media inner join tb_editor on tb_media.editor_id = tb_editor.editor_id inner join tb_category_media on tb_media.category_id = tb_category_media.category_id ORDER BY tb_media.views desc limit 3";
 $reqPopular = mysqli_query($conn, $sqlPopular);
 $resultPopular = mysqli_fetch_all($reqPopular);
 $sql4 = "SELECT tb_event.event_title,tb_event.date_release,tb_editor.username,tb_category_event.category_name, tb_event.image_url, tb_event.event_id FROM tb_event inner join tb_editor on tb_event.editor_id = tb_editor.editor_id inner join tb_category_event on tb_event.category_id = tb_category_event.category_id ORDER BY tb_event.date_release desc limit 6";
@@ -22,6 +25,15 @@ $result4 = mysqli_fetch_all($req4);
 $sql5 = "SELECT tb_job_vacancies.vacancy_title,tb_job_vacancies.date_release,tb_editor.username,tb_category_job_vacancy.category_name, tb_job_vacancies.image_url, tb_job_vacancies.vacancy_id FROM tb_job_vacancies inner join tb_editor on tb_job_vacancies.editor_id = tb_editor.editor_id inner join tb_category_job_vacancy on tb_job_vacancies.category_id = tb_category_job_vacancy.category_id ORDER BY tb_job_vacancies.date_release desc limit 5";
 $req5 = mysqli_query($conn, $sql5);
 $result5 = mysqli_fetch_all($req5);
+$sql6 = "SELECT tb_blog.blog_title,tb_blog.date_release,tb_editor.username,tb_category_blog.category_name, tb_blog.blog_id, tb_blog.image_url, tb_blog.blog_content FROM tb_blog inner join tb_editor on tb_blog.editor_id = tb_editor.editor_id inner join tb_category_blog on tb_blog.category_id = tb_category_blog.category_id ORDER BY RAND() LIMIT 2";
+$req6 = mysqli_query($conn, $sql6);
+$result6 = mysqli_fetch_all($req6);
+$sql7 = "SELECT tb_media.media_title,tb_media.date_release,tb_editor.username,tb_category_media.category_name, tb_media.media_id, tb_media.thumbnail, tb_media.media_content FROM tb_media inner join tb_editor on tb_media.editor_id = tb_editor.editor_id inner join tb_category_media on tb_media.category_id = tb_category_media.category_id ORDER BY RAND() LIMIT 2";
+$req7 = mysqli_query($conn, $sql7);
+$result7 = mysqli_fetch_all($req7);
+$sqlPopularCat = "SELECT tb_blog.blog_id, tb_category_blog.category_name, tb_blog.blog_title, tb_editor.username, tb_blog.date_release FROM tb_blog INNER JOIN tb_category_blog ON tb_blog.category_id = tb_category_blog.category_id INNER JOIN tb_editor ON tb_blog.editor_id = tb_editor.editor_id WHERE tb_blog.category_id = (SELECT category_id FROM tb_category_blog where popularity = (SELECT MAX(popularity) FROM tb_category_blog) LIMIT 1)";
+$reqPopularCat = mysqli_query($conn, $sqlPopularCat);
+$resultPopularCat = mysqli_fetch_all($reqPopularCat);
 ?>
 
 
@@ -30,8 +42,8 @@ $result5 = mysqli_fetch_all($req5);
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title>Katen - Minimal Blog & Magazine HTML Theme</title>
-	<meta name="description" content="Katen - Minimal Blog & Magazine HTML Theme">
+	<title>Nguliah.id - Media Campus</title>
+	<meta name="description" content="Nguliah.id - Media Campus">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<link rel="shortcut icon" type="image/x-icon" href="images/favicon.png">
 
@@ -155,7 +167,6 @@ $result5 = mysqli_fetch_all($req5);
 								</div>
 							</a>
 						</div>
-
 					</div>
 
 					<div class="col-lg-4">
@@ -205,69 +216,30 @@ $result5 = mysqli_fetch_all($req5);
 								<!-- recent posts -->
 								<div aria-labelledby="recent-tab" class="tab-pane fade" id="recent" role="tabpanel">
 									<!-- post -->
-									<div class="post post-list-sm circle">
+									<?php
+									foreach ($resultRecentBlog as $data) {
+										$blog_title = $data[0];
+										$date_release = $data[1];
+										$blogId = $data[4];
+										echo <<<Buat
+										<div class="post post-list-sm circle">
 										<div class="thumb circle">
-											<a href="blog-single.html">
+											<a href="detailBlog.php?blogId=$blogId">
 												<div class="inner">
 													<img src="images/posts/tabs-2.jpg" alt="post-title" />
 												</div>
 											</a>
 										</div>
 										<div class="details clearfix">
-											<h6 class="post-title my-0"><a href="blog-single.html">An Incredibly Easy Method That Works For All</a></h6>
+											<h6 class="post-title my-0"><a href="detailBlog.php?blogId=$blogId">$blog_title</a></h6>
 											<ul class="meta list-inline mt-1 mb-0">
-												<li class="list-inline-item">29 March 2021</li>
+												<li class="list-inline-item">$date_release</li>
 											</ul>
 										</div>
-									</div>
-									<!-- post -->
-									<div class="post post-list-sm circle">
-										<div class="thumb circle">
-											<a href="blog-single.html">
-												<div class="inner">
-													<img src="images/posts/tabs-1.jpg" alt="post-title" />
-												</div>
-											</a>
 										</div>
-										<div class="details clearfix">
-											<h6 class="post-title my-0"><a href="blog-single.html">3 Easy Ways To Make Your iPhone Faster</a></h6>
-											<ul class="meta list-inline mt-1 mb-0">
-												<li class="list-inline-item">29 March 2021</li>
-											</ul>
-										</div>
-									</div>
-									<!-- post -->
-									<div class="post post-list-sm circle">
-										<div class="thumb circle">
-											<a href="blog-single.html">
-												<div class="inner">
-													<img src="images/posts/tabs-4.jpg" alt="post-title" />
-												</div>
-											</a>
-										</div>
-										<div class="details clearfix">
-											<h6 class="post-title my-0"><a href="blog-single.html">15 Unheard Ways To Achieve Greater Walker</a></h6>
-											<ul class="meta list-inline mt-1 mb-0">
-												<li class="list-inline-item">29 March 2021</li>
-											</ul>
-										</div>
-									</div>
-									<!-- post -->
-									<div class="post post-list-sm circle">
-										<div class="thumb circle">
-											<a href="blog-single.html">
-												<div class="inner">
-													<img src="images/posts/tabs-3.jpg" alt="post-title" />
-												</div>
-											</a>
-										</div>
-										<div class="details clearfix">
-											<h6 class="post-title my-0"><a href="blog-single.html">10 Ways To Immediately Start Selling Furniture</a></h6>
-											<ul class="meta list-inline mt-1 mb-0">
-												<li class="list-inline-item">29 March 2021</li>
-											</ul>
-										</div>
-									</div>
+										Buat;
+									}
+									?>
 								</div>
 							</div>
 						</div>
@@ -282,7 +254,6 @@ $result5 = mysqli_fetch_all($req5);
 		<!-- section main content -->
 		<section class="main-content">
 			<div class="container-xl">
-
 				<div class="row gy-4">
 
 					<div class="col-lg-8">
@@ -301,6 +272,7 @@ $result5 = mysqli_fetch_all($req5);
 									$index = 0;
 									foreach ($result3 as $file) {
 										if ($index == 0) {
+											$image = getImageNews(decryptPhotoProfile($file[5]));
 											echo <<<Buat
 											<div class="post">
 											<div class="thumb rounded">
@@ -310,7 +282,7 @@ $result5 = mysqli_fetch_all($req5);
 												</span>
 												<a href="detailMedia.php?mediaId=$file[4]">
 													<div class="inner">
-														<img src="images/posts/editor-lg.jpg" alt="post-title" />
+														$image
 													</div>
 												</a>
 											</div>
@@ -333,12 +305,13 @@ $result5 = mysqli_fetch_all($req5);
 									$index = 0;
 									foreach ($result3 as $file) {
 										if ($index > 0) {
+											$image = getImageNews(decryptPhotoProfile($file[5]));
 											echo <<<Buat
 											<div class="post post-list-sm square">
 											<div class="thumb rounded">
 												<a href="detailMedia.php?mediaId=$file[4]">
 													<div class="inner">
-														<img src="images/posts/editor-sm-1.jpg" alt="post-title" />
+														$image
 													</div>
 												</a>
 											</div>
@@ -552,164 +525,67 @@ $result5 = mysqli_fetch_all($req5);
 
 								<div class="row">
 
-									<div class="col-md-12 col-sm-6">
-										<!-- post -->
-										<div class="post post-list clearfix">
-											<div class="thumb rounded">
-												<span class="post-format-sm">
-													<i class="icon-picture"></i>
-												</span>
-												<a href="blog-single.html">
-													<div class="inner">
-														<img src="images/posts/latest-sm-1.jpg" alt="post-title" />
+
+									<?php
+									$indexMedia = 0;
+									$indexBlog = 0;
+									for ($loop = 0; $loop < 4; $loop++) {
+										if ($loop % 2 == 0) {
+											$data = $result7;
+											$redirect = "detailMedia.php?mediaId=";
+											$index = $indexMedia++;
+										} else {
+											$data = $result6;
+											$redirect = "detailBlog.php?blogId=";
+											$index = $indexBlog++;
+										}
+										$contentTitle = $data[$index][0];
+										$contentRelease = $data[$index][1];
+										$contentEditor = $data[$index][2];
+										$contentCategory = $data[$index][3];
+										$contentId = $data[$index][4];
+										$contentImage = getImageNews(decryptPhotoProfile($data[$index][5]));
+
+										echo <<<Buat
+											<div class="col-md-12 col-sm-6">
+												<div class="post post-list clearfix">
+													<div class="thumb rounded">
+														<a href="$redirect$contentId">
+															<div class="inner">
+																$contentImage
+															</div>
+														</a>
 													</div>
-												</a>
-											</div>
-											<div class="details">
-												<ul class="meta list-inline mb-3">
-													<li class="list-inline-item"><a href="#"><img src="images/other/author-sm.png" class="author" alt="author" />Katen Doe</a></li>
-													<li class="list-inline-item"><a href="#">Trending</a></li>
-													<li class="list-inline-item">29 March 2021</li>
-												</ul>
-												<h5 class="post-title"><a href="blog-single.html">The Next 60 Things To Immediately Do About Building</a></h5>
-												<p class="excerpt mb-0">A wonderful serenity has taken possession of my entire soul, like these sweet mornings</p>
-												<div class="post-bottom clearfix d-flex align-items-center">
-													<div class="social-share me-auto">
-														<button class="toggle-button icon-share"></button>
-														<ul class="icons list-unstyled list-inline mb-0">
-															<li class="list-inline-item"><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-															<li class="list-inline-item"><a href="#"><i class="fab fa-twitter"></i></a></li>
-															<li class="list-inline-item"><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-															<li class="list-inline-item"><a href="#"><i class="fab fa-pinterest"></i></a></li>
-															<li class="list-inline-item"><a href="#"><i class="fab fa-telegram-plane"></i></a></li>
-															<li class="list-inline-item"><a href="#"><i class="far fa-envelope"></i></a></li>
+													<div class="details">
+														<ul class="meta list-inline mb-3">
+															<li class="list-inline-item"><a href="#">$contentEditor</a></li>
+															<li class="list-inline-item"><a href="#">$contentCategory</a></li>
+															<li class="list-inline-item">$contentRelease</li>
 														</ul>
-													</div>
-													<div class="more-button float-end">
-														<a href="blog-single.html"><span class="icon-options"></span></a>
+														<h5 class="post-title"><a href="$redirect$contentId">$contentTitle</a></h5>
+														<p class="excerpt mb-0"><br><br></p>
+														<div class="post-bottom clearfix d-flex align-items-center">
+															<div class="social-share me-auto">
+																<button class="toggle-button icon-share"></button>
+																<ul class="icons list-unstyled list-inline mb-0">
+																	<li class="list-inline-item"><a href="#"><i class="fab fa-facebook-f"></i></a></li>
+																	<li class="list-inline-item"><a href="#"><i class="fab fa-twitter"></i></a></li>
+																	<li class="list-inline-item"><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
+																	<li class="list-inline-item"><a href="#"><i class="fab fa-pinterest"></i></a></li>
+																	<li class="list-inline-item"><a href="#"><i class="fab fa-telegram-plane"></i></a></li>
+																	<li class="list-inline-item"><a href="#"><i class="far fa-envelope"></i></a></li>
+																</ul>
+															</div>
+															<div class="more-button float-end">
+																<a href="$redirect$contentId"><span class="icon-options"></span></a>
+															</div>
+														</div>
 													</div>
 												</div>
 											</div>
-										</div>
-									</div>
-
-									<div class="col-md-12 col-sm-6">
-										<!-- post -->
-										<div class="post post-list clearfix">
-											<div class="thumb rounded">
-												<a href="blog-single.html">
-													<div class="inner">
-														<img src="images/posts/latest-sm-2.jpg" alt="post-title" />
-													</div>
-												</a>
-											</div>
-											<div class="details">
-												<ul class="meta list-inline mb-3">
-													<li class="list-inline-item"><a href="#"><img src="images/other/author-sm.png" class="author" alt="author" />Katen Doe</a></li>
-													<li class="list-inline-item"><a href="#">Lifestyle</a></li>
-													<li class="list-inline-item">29 March 2021</li>
-												</ul>
-												<h5 class="post-title"><a href="blog-single.html">Master The Art Of Nature With These 7 Tips</a></h5>
-												<p class="excerpt mb-0">A wonderful serenity has taken possession of my entire soul, like these sweet mornings</p>
-												<div class="post-bottom clearfix d-flex align-items-center">
-													<div class="social-share me-auto">
-														<button class="toggle-button icon-share"></button>
-														<ul class="icons list-unstyled list-inline mb-0">
-															<li class="list-inline-item"><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-															<li class="list-inline-item"><a href="#"><i class="fab fa-twitter"></i></a></li>
-															<li class="list-inline-item"><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-															<li class="list-inline-item"><a href="#"><i class="fab fa-pinterest"></i></a></li>
-															<li class="list-inline-item"><a href="#"><i class="fab fa-telegram-plane"></i></a></li>
-															<li class="list-inline-item"><a href="#"><i class="far fa-envelope"></i></a></li>
-														</ul>
-													</div>
-													<div class="more-button float-end">
-														<a href="blog-single.html"><span class="icon-options"></span></a>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-
-									<div class="col-md-12 col-sm-6">
-										<!-- post -->
-										<div class="post post-list clearfix">
-											<div class="thumb rounded">
-												<span class="post-format-sm">
-													<i class="icon-camrecorder"></i>
-												</span>
-												<a href="blog-single.html">
-													<div class="inner">
-														<img src="images/posts/latest-sm-3.jpg" alt="post-title" />
-													</div>
-												</a>
-											</div>
-											<div class="details">
-												<ul class="meta list-inline mb-3">
-													<li class="list-inline-item"><a href="#"><img src="images/other/author-sm.png" class="author" alt="author" />Katen Doe</a></li>
-													<li class="list-inline-item"><a href="#">Fashion</a></li>
-													<li class="list-inline-item">29 March 2021</li>
-												</ul>
-												<h5 class="post-title"><a href="blog-single.html">Facts About Business That Will Help You Success</a></h5>
-												<p class="excerpt mb-0">A wonderful serenity has taken possession of my entire soul, like these sweet mornings</p>
-												<div class="post-bottom clearfix d-flex align-items-center">
-													<div class="social-share me-auto">
-														<button class="toggle-button icon-share"></button>
-														<ul class="icons list-unstyled list-inline mb-0">
-															<li class="list-inline-item"><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-															<li class="list-inline-item"><a href="#"><i class="fab fa-twitter"></i></a></li>
-															<li class="list-inline-item"><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-															<li class="list-inline-item"><a href="#"><i class="fab fa-pinterest"></i></a></li>
-															<li class="list-inline-item"><a href="#"><i class="fab fa-telegram-plane"></i></a></li>
-															<li class="list-inline-item"><a href="#"><i class="far fa-envelope"></i></a></li>
-														</ul>
-													</div>
-													<div class="more-button float-end">
-														<a href="blog-single.html"><span class="icon-options"></span></a>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-
-									<div class="col-md-12 col-sm-6">
-										<!-- post -->
-										<div class="post post-list clearfix">
-											<div class="thumb rounded">
-												<a href="blog-single.html">
-													<div class="inner">
-														<img src="images/posts/latest-sm-4.jpg" alt="post-title" />
-													</div>
-												</a>
-											</div>
-											<div class="details">
-												<ul class="meta list-inline mb-3">
-													<li class="list-inline-item"><a href="#"><img src="images/other/author-sm.png" class="author" alt="author" />Katen Doe</a></li>
-													<li class="list-inline-item"><a href="#">Politic</a></li>
-													<li class="list-inline-item">29 March 2021</li>
-												</ul>
-												<h5 class="post-title"><a href="blog-single.html">Your Light Is About To Stop Being Relevant</a></h5>
-												<p class="excerpt mb-0">A wonderful serenity has taken possession of my entire soul, like these sweet mornings</p>
-												<div class="post-bottom clearfix d-flex align-items-center">
-													<div class="social-share me-auto">
-														<button class="toggle-button icon-share"></button>
-														<ul class="icons list-unstyled list-inline mb-0">
-															<li class="list-inline-item"><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-															<li class="list-inline-item"><a href="#"><i class="fab fa-twitter"></i></a></li>
-															<li class="list-inline-item"><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-															<li class="list-inline-item"><a href="#"><i class="fab fa-pinterest"></i></a></li>
-															<li class="list-inline-item"><a href="#"><i class="fab fa-telegram-plane"></i></a></li>
-															<li class="list-inline-item"><a href="#"><i class="far fa-envelope"></i></a></li>
-														</ul>
-													</div>
-													<div class="more-button float-end">
-														<a href="blog-single.html"><span class="icon-options"></span></a>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-
+											Buat;
+									}
+									?>
 								</div>
 								<!-- load more button -->
 								<div class="text-center">
@@ -720,7 +596,6 @@ $result5 = mysqli_fetch_all($req5);
 						</div>
 					</div>
 					<div class="col-lg-4">
-
 						<!-- sidebar -->
 						<div class="sidebar">
 							<!-- widget popular posts -->
@@ -782,59 +657,32 @@ $result5 = mysqli_fetch_all($req5);
 							<!-- widget post carousel -->
 							<div class="widget rounded">
 								<div class="widget-header text-center">
-									<h3 class="widget-title">Celebration</h3>
+									<h3 class="widget-title"><?php echo $resultPopularCat[0][1] ?></h3>
 									<img src="images/wave.svg" class="wave" alt="wave" />
 								</div>
 								<div class="widget-content">
 									<div class="post-carousel-widget">
-										<!-- post -->
-										<div class="post post-carousel">
-											<div class="thumb rounded">
-												<a href="category.html" class="category-badge position-absolute">How to</a>
-												<a href="blog-single.html">
-													<div class="inner">
-														<img src="images/widgets/widget-carousel-1.jpg" alt="post-title" />
-													</div>
-												</a>
+										<?php
+										foreach ($resultPopularCat as $data) {
+											echo <<<Buat
+											<div class="post post-carousel">
+												<div class="thumb rounded">
+													<a href="category.html" class="category-badge position-absolute">$data[1]</a>
+													<a href="detailBlog.php?blogId=$data[0]">
+														<div class="inner">
+															<img src="images/widgets/widget-carousel-1.jpg" alt="post-title" />
+														</div>
+													</a>
+												</div>
+												<h5 class="post-title mb-0 mt-4"><a href="detailBlog.php?blogId=$data[0]">$data[2]</a></h5>
+												<ul class="meta list-inline mt-2 mb-0">
+													<li class="list-inline-item"><a href="#">$data[3]</a></li>
+													<li class="list-inline-item">$data[4]</li>
+												</ul>
 											</div>
-											<h5 class="post-title mb-0 mt-4"><a href="blog-single.html">5 Easy Ways You Can Turn Future Into Success</a></h5>
-											<ul class="meta list-inline mt-2 mb-0">
-												<li class="list-inline-item"><a href="#">Katen Doe</a></li>
-												<li class="list-inline-item">29 March 2021</li>
-											</ul>
-										</div>
-										<!-- post -->
-										<div class="post post-carousel">
-											<div class="thumb rounded">
-												<a href="category.html" class="category-badge position-absolute">Trending</a>
-												<a href="blog-single.html">
-													<div class="inner">
-														<img src="images/widgets/widget-carousel-2.jpg" alt="post-title" />
-													</div>
-												</a>
-											</div>
-											<h5 class="post-title mb-0 mt-4"><a href="blog-single.html">Master The Art Of Nature With These 7 Tips</a></h5>
-											<ul class="meta list-inline mt-2 mb-0">
-												<li class="list-inline-item"><a href="#">Katen Doe</a></li>
-												<li class="list-inline-item">29 March 2021</li>
-											</ul>
-										</div>
-										<!-- post -->
-										<div class="post post-carousel">
-											<div class="thumb rounded">
-												<a href="category.html" class="category-badge position-absolute">How to</a>
-												<a href="blog-single.html">
-													<div class="inner">
-														<img src="images/widgets/widget-carousel-1.jpg" alt="post-title" />
-													</div>
-												</a>
-											</div>
-											<h5 class="post-title mb-0 mt-4"><a href="blog-single.html">5 Easy Ways You Can Turn Future Into Success</a></h5>
-											<ul class="meta list-inline mt-2 mb-0">
-												<li class="list-inline-item"><a href="#">Katen Doe</a></li>
-												<li class="list-inline-item">29 March 2021</li>
-											</ul>
-										</div>
+											Buat;
+										}
+										?>
 									</div>
 									<!-- carousel arrows -->
 									<div class="slick-arrows-bot">
@@ -869,43 +717,44 @@ $result5 = mysqli_fetch_all($req5);
 						</div>
 					</div>
 				</div>
+			</div>
 		</section>
 
 		<!-- instagram feed -->
 		<div class="instagram">
 			<div class="container-xl">
 				<!-- button -->
-				<a href="#" class="btn btn-default btn-instagram">@Katen on Instagram</a>
+				<a href="https://www.instagram.com/kolabfit/" class="btn btn-default btn-instagram">@Ko+Lab on Instagram</a>
 				<!-- images -->
 				<div class="instagram-feed d-flex flex-wrap">
 					<div class="insta-item col-sm-2 col-6 col-md-2">
 						<a href="#">
-							<img src="images/insta/insta-1.jpg" alt="insta-title" />
+							<img src="images/instagram/instagram-content1.jpg" alt="insta-title" />
 						</a>
 					</div>
 					<div class="insta-item col-sm-2 col-6 col-md-2">
 						<a href="#">
-							<img src="images/insta/insta-2.jpg" alt="insta-title" />
+							<img src="images/instagram/instagram-content2.jpg" alt="insta-title" />
 						</a>
 					</div>
 					<div class="insta-item col-sm-2 col-6 col-md-2">
 						<a href="#">
-							<img src="images/insta/insta-3.jpg" alt="insta-title" />
+							<img src="images/instagram/instagram-content3.jpg" alt="insta-title" />
 						</a>
 					</div>
 					<div class="insta-item col-sm-2 col-6 col-md-2">
 						<a href="#">
-							<img src="images/insta/insta-4.jpg" alt="insta-title" />
+							<img src="images/instagram/instagram-content4.jpg" alt="insta-title" />
 						</a>
 					</div>
 					<div class="insta-item col-sm-2 col-6 col-md-2">
 						<a href="#">
-							<img src="images/insta/insta-5.jpg" alt="insta-title" />
+							<img src="images/instagram/instagram-content5.jpg" alt="insta-title" />
 						</a>
 					</div>
 					<div class="insta-item col-sm-2 col-6 col-md-2">
 						<a href="#">
-							<img src="images/insta/insta-6.jpg" alt="insta-title" />
+							<img src="images/instagram/instagram-content6.jpg" alt="insta-title" />
 						</a>
 					</div>
 				</div>
@@ -919,17 +768,13 @@ $result5 = mysqli_fetch_all($req5);
 					<div class="row d-flex align-items-center gy-4">
 						<!-- copyright text -->
 						<div class="col-md-4">
-							<span class="copyright">© 2021 Katen. Template by ThemeGer.</span>
+							<span class="copyright">© 2023 Nguliah.id</span>
 						</div>
 
 						<!-- social icons -->
 						<div class="col-md-4 text-center">
 							<ul class="social-icons list-unstyled list-inline mb-0">
-								<li class="list-inline-item"><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fab fa-twitter"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fab fa-instagram"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fab fa-pinterest"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fab fa-medium"></i></a></li>
+								<li class="list-inline-item"><a href="https://www.instagram.com/kolabfit/"><i class="fab fa-instagram"></i></a></li>
 								<li class="list-inline-item"><a href="#"><i class="fab fa-youtube"></i></a></li>
 							</ul>
 						</div>

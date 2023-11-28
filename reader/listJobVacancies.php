@@ -32,8 +32,8 @@ $result4 = mysqli_fetch_all($data4);
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title>Katen - Minimal Blog & Magazine HTML Theme</title>
-	<meta name="description" content="Katen - Minimal Blog & Magazine HTML Theme">
+	<title>Nguliah.id - Media Campus</title>
+	<meta name="description" content="Nguliah.id - Media Campus">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<link rel="shortcut icon" type="image/x-icon" href="images/favicon.png">
 
@@ -53,7 +53,7 @@ $result4 = mysqli_fetch_all($data4);
 
 <body>
 
-	<!-- preloader
+	<!-- preloader -->
 	<div id="preloader">
 		<div class="book">
 			<div class="inner">
@@ -82,7 +82,7 @@ $result4 = mysqli_fetch_all($data4);
 				<li></li>
 			</ul>
 		</div>
-	</div> -->
+	</div>
 
 	<!-- site wrapper -->
 	<div class="site-wrapper">
@@ -104,7 +104,7 @@ $result4 = mysqli_fetch_all($data4);
 
 					<div class="col-md-4 col-sm-12 col-xs-12 text-center">
 						<!-- site logo -->
-						<a class="navbar-brand" href="personal.html"><img src="images/logo-text.png" height="30" alt="logo" /></a>
+						<a class="navbar-brand" href="index.php"><img src="images/logo-text.png" height="30" alt="logo" /></a>
 					</div>
 
 					<div class="col-md-4 col-sm-12 col-xs-12">
@@ -179,7 +179,7 @@ $result4 = mysqli_fetch_all($data4);
 									$jobId = $isi[0];
 									$jobTitle = $isi[1];
 									$dateRelease = $isi[2];
-									$image = $isi[3];
+									$image = getImageNews(decryptPhotoProfile($isi[3]));
 									$editorUsername = $isi[4];
 									$categoryName = $isi[5];
 
@@ -191,7 +191,7 @@ $result4 = mysqli_fetch_all($data4);
 													<a href="category.html" class="category-badge position-absolute">$categoryName</a>
 													<a href="detailJobVacancies.php?jobId=$jobId">
 														<div class="inner">
-															<img src="images/posts/post-md-2.jpg" alt="post-title" />
+															$image
 														</div>
 													</a>
 												</div>
@@ -337,37 +337,37 @@ $result4 = mysqli_fetch_all($data4);
 		<div class="instagram">
 			<div class="container-xl">
 				<!-- button -->
-				<a href="#" class="btn btn-default btn-instagram">@Ko+Lab on Instagram</a>
+				<a href="https://www.instagram.com/kolabfit/" class="btn btn-default btn-instagram">@Ko+Lab on Instagram</a>
 				<!-- images -->
 				<div class="instagram-feed d-flex flex-wrap">
 					<div class="insta-item col-sm-2 col-6 col-md-2">
 						<a href="#">
-							<img src="images/insta/insta-1.jpg" alt="insta-title" />
+							<img src="images/instagram/instagram-content1.jpg" alt="insta-title" />
 						</a>
 					</div>
 					<div class="insta-item col-sm-2 col-6 col-md-2">
 						<a href="#">
-							<img src="images/insta/insta-2.jpg" alt="insta-title" />
+							<img src="images/instagram/instagram-content2.jpg" alt="insta-title" />
 						</a>
 					</div>
 					<div class="insta-item col-sm-2 col-6 col-md-2">
 						<a href="#">
-							<img src="images/insta/insta-3.jpg" alt="insta-title" />
+							<img src="images/instagram/instagram-content3.jpg" alt="insta-title" />
 						</a>
 					</div>
 					<div class="insta-item col-sm-2 col-6 col-md-2">
 						<a href="#">
-							<img src="images/insta/insta-4.jpg" alt="insta-title" />
+							<img src="images/instagram/instagram-content4.jpg" alt="insta-title" />
 						</a>
 					</div>
 					<div class="insta-item col-sm-2 col-6 col-md-2">
 						<a href="#">
-							<img src="images/insta/insta-5.jpg" alt="insta-title" />
+							<img src="images/instagram/instagram-content5.jpg" alt="insta-title" />
 						</a>
 					</div>
 					<div class="insta-item col-sm-2 col-6 col-md-2">
 						<a href="#">
-							<img src="images/insta/insta-6.jpg" alt="insta-title" />
+							<img src="images/instagram/instagram-content6.jpg" alt="insta-title" />
 						</a>
 					</div>
 				</div>
@@ -381,13 +381,13 @@ $result4 = mysqli_fetch_all($data4);
 					<div class="row d-flex align-items-center gy-4">
 						<!-- copyright text -->
 						<div class="col-md-4">
-							<span class="copyright">© 2023 Ko+Lab.</span>
+							<span class="copyright">© 2023 Nguliah.id</span>
 						</div>
 
 						<!-- social icons -->
 						<div class="col-md-4 text-center">
 							<ul class="social-icons list-unstyled list-inline mb-0">
-								<li class="list-inline-item"><a href="#"><i class="fab fa-instagram"></i></a></li>
+								<li class="list-inline-item"><a href="https://www.instagram.com/kolabfit/"><i class="fab fa-instagram"></i></a></li>
 								<li class="list-inline-item"><a href="#"><i class="fab fa-youtube"></i></a></li>
 							</ul>
 						</div>

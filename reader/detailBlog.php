@@ -9,11 +9,11 @@ increaseBlog($blogId);
 
 $conn = getConnectionMysqli();
 
-$query = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_blog.date_release, tb_blog.image_url, tb_editor.username, tb_blog.blog_content, tb_editor.profile_photo FROM tb_blog INNER JOIN tb_editor ON tb_blog.editor_id = tb_editor.editor_id WHERE tb_blog.blog_id = '$blogId'";
+$query = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_blog.date_release, tb_blog.image_url, tb_editor.username, tb_blog.blog_content, tb_editor.profile_photo, tb_editor.description FROM tb_blog INNER JOIN tb_editor ON tb_blog.editor_id = tb_editor.editor_id WHERE tb_blog.blog_id = '$blogId'";
 $result = mysqli_query($conn, $query);
 $request = mysqli_fetch_array($result);
 
-$query2 = "SELECT blog_id, blog_title, date_release, views, image_url FROM tb_blog ORDER BY views desc limit 3";
+$query2 = "SELECT blog_id, blog_title, date_release, views FROM tb_blog ORDER BY views desc limit 3";
 $data = mysqli_query($conn, $query2);
 $result2 = mysqli_fetch_all($data);
 
@@ -38,8 +38,8 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title>Katen - Minimal Blog & Magazine HTML Theme</title>
-	<meta name="description" content="Katen - Minimal Blog & Magazine HTML Theme">
+	<title>Nguliah.id - Media Campus</title>
+	<meta name="description" content="Nguliah.id - Media Campus">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<link rel="shortcut icon" type="image/x-icon" href="images/favicon.png">
 
@@ -214,12 +214,9 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 						<div class="spacer" data-height="50"></div>
 
 						<div class="about-author padding-30 rounded">
-							<div class="thumb">
-								<img src="images/other/avatar-about.png" alt="Katen Doe" />
-							</div>
-							<div class="details">
-								<h4 class="name"><a href="#">Katen Doe</a></h4>
-								<p>Hello, I’m a content writer who is fascinated by content fashion, celebrity and lifestyle. She helps clients bring the right content to the right people.</p>
+							<div>
+								<h4 class="name"><?php echo $request['username'] ?></h4>
+								<p><?php echo $request['description'] ?></p>
 								<!-- social icons -->
 								<ul class="social-icons list-unstyled list-inline mb-0">
 									<li class="list-inline-item"><a href="#"><i class="fab fa-facebook-f"></i></a></li>
@@ -335,25 +332,8 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 					</div>
 
 					<div class="col-lg-4">
-
 						<!-- sidebar -->
 						<div class="sidebar">
-							<!-- widget about -->
-							<div class="widget rounded">
-								<div class="widget-about data-bg-image text-center" data-bg-image="images/map-bg.png">
-									<img src="images/logo.svg" alt="logo" class="mb-4" />
-									<p class="mb-4">Hello, We’re content writer who is fascinated by content fashion, celebrity and lifestyle. We helps clients bring the right content to the right people.</p>
-									<ul class="social-icons list-unstyled list-inline mb-0">
-										<li class="list-inline-item"><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-										<li class="list-inline-item"><a href="#"><i class="fab fa-twitter"></i></a></li>
-										<li class="list-inline-item"><a href="#"><i class="fab fa-instagram"></i></a></li>
-										<li class="list-inline-item"><a href="#"><i class="fab fa-pinterest"></i></a></li>
-										<li class="list-inline-item"><a href="#"><i class="fab fa-medium"></i></a></li>
-										<li class="list-inline-item"><a href="#"><i class="fab fa-youtube"></i></a></li>
-									</ul>
-								</div>
-							</div>
-
 							<!-- widget popular posts -->
 							<div class="widget rounded">
 								<div class="widget-header text-center">
@@ -449,37 +429,37 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 		<div class="instagram">
 			<div class="container-xl">
 				<!-- button -->
-				<a href="#" class="btn btn-default btn-instagram">@Katen on Instagram</a>
+				<a href="https://www.instagram.com/kolabfit/" class="btn btn-default btn-instagram">@Ko+Lab on Instagram</a>
 				<!-- images -->
 				<div class="instagram-feed d-flex flex-wrap">
 					<div class="insta-item col-sm-2 col-6 col-md-2">
 						<a href="#">
-							<img src="images/insta/insta-1.jpg" alt="insta-title" />
+							<img src="images/instagram/instagram-content1.jpg" alt="insta-title" />
 						</a>
 					</div>
 					<div class="insta-item col-sm-2 col-6 col-md-2">
 						<a href="#">
-							<img src="images/insta/insta-2.jpg" alt="insta-title" />
+							<img src="images/instagram/instagram-content2.jpg" alt="insta-title" />
 						</a>
 					</div>
 					<div class="insta-item col-sm-2 col-6 col-md-2">
 						<a href="#">
-							<img src="images/insta/insta-3.jpg" alt="insta-title" />
+							<img src="images/instagram/instagram-content3.jpg" alt="insta-title" />
 						</a>
 					</div>
 					<div class="insta-item col-sm-2 col-6 col-md-2">
 						<a href="#">
-							<img src="images/insta/insta-4.jpg" alt="insta-title" />
+							<img src="images/instagram/instagram-content4.jpg" alt="insta-title" />
 						</a>
 					</div>
 					<div class="insta-item col-sm-2 col-6 col-md-2">
 						<a href="#">
-							<img src="images/insta/insta-5.jpg" alt="insta-title" />
+							<img src="images/instagram/instagram-content5.jpg" alt="insta-title" />
 						</a>
 					</div>
 					<div class="insta-item col-sm-2 col-6 col-md-2">
 						<a href="#">
-							<img src="images/insta/insta-6.jpg" alt="insta-title" />
+							<img src="images/instagram/instagram-content6.jpg" alt="insta-title" />
 						</a>
 					</div>
 				</div>
@@ -493,17 +473,13 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 					<div class="row d-flex align-items-center gy-4">
 						<!-- copyright text -->
 						<div class="col-md-4">
-							<span class="copyright">© 2021 Katen. Template by ThemeGer.</span>
+							<span class="copyright">© 2023 Nguliah.id</span>
 						</div>
 
 						<!-- social icons -->
 						<div class="col-md-4 text-center">
 							<ul class="social-icons list-unstyled list-inline mb-0">
-								<li class="list-inline-item"><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fab fa-twitter"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fab fa-instagram"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fab fa-pinterest"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fab fa-medium"></i></a></li>
+								<li class="list-inline-item"><a href="https://www.instagram.com/kolabfit/"><i class="fab fa-instagram"></i></a></li>
 								<li class="list-inline-item"><a href="#"><i class="fab fa-youtube"></i></a></li>
 							</ul>
 						</div>

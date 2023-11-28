@@ -8,21 +8,21 @@ $conn = getConnectionMysqli();
 $getCategory = isset($_GET['category']) ? $_GET['category'] : null;
 
 if (is_null($getCategory)) {
-	$query = "SELECT tb_event.event_id, tb_event.event_title, tb_event.date_release, tb_event.image_url, tb_editor.username, tb_category_event.category_name FROM tb_event INNER JOIN tb_editor ON tb_event.editor_id = tb_editor.editor_id INNER JOIN  tb_category_event ON tb_category_event.category_id = tb_event.category_id";
+	$query = "SELECT tb_media.media_id, tb_media.media_title, tb_media.date_release, tb_media.thumbnail, tb_editor.username, tb_category_media.category_name FROM tb_media INNER JOIN tb_editor ON tb_media.editor_id = tb_editor.editor_id INNER JOIN  tb_category_media ON tb_category_media.category_id = tb_media.category_id";
 } else {
-	$query = "SELECT tb_event.event_id, tb_event.event_title, tb_event.date_release, tb_event.image_url, tb_editor.username, tb_category_event.category_name FROM tb_event INNER JOIN tb_editor ON tb_event.editor_id = tb_editor.editor_id INNER JOIN  tb_category_event ON tb_category_event.category_id = tb_event.category_id WHERE tb_category_event.category_name = '$getCategory'";
+	$query = "SELECT tb_media.media_id, tb_media.media_title, tb_media.date_release, tb_media.thumbnail, tb_editor.username, tb_category_media.category_name FROM tb_media INNER JOIN tb_editor ON tb_media.editor_id = tb_editor.editor_id INNER JOIN  tb_category_media ON tb_category_media.category_id = tb_media.category_id WHERE tb_category_media.category_name = '$getCategory'";
 }
 
 $data = mysqli_query($conn, $query);
 $result = mysqli_fetch_all($data);
-$query2 = "SELECT tb_event.category_id, tb_category_event.category_name, COUNT(tb_event.category_id) AS jumlah_kategori FROM tb_category_event INNER JOIN tb_event ON tb_category_event.category_id = tb_event.category_id GROUP BY tb_event.category_id";
-$query3 = "SELECT COUNT(event_id) AS jumlah_event FROM tb_event";
+$query2 = "SELECT tb_media.category_id, tb_category_media.category_name, COUNT(tb_media.category_id) AS jumlah_kategori FROM tb_category_media INNER JOIN tb_media ON tb_category_media.category_id = tb_media.category_id GROUP BY tb_media.category_id";
+$query3 = "SELECT COUNT(media_id) AS jumlah_media FROM tb_media";
 $data2 = mysqli_query($conn, $query2);
 $result2 = mysqli_fetch_all($data2);
 $data3 = mysqli_query($conn, $query3);
 $result3 = mysqli_fetch_array($data3);
 
-$query4 = "SELECT event_id, event_title, date_release, views, image_url FROM tb_event ORDER BY views desc limit 3";
+$query4 = "SELECT media_id, media_title, date_release, views, thumbnail FROM tb_media ORDER BY views desc limit 3";
 $data4 = mysqli_query($conn, $query4);
 $result4 = mysqli_fetch_all($data4);
 ?>
@@ -35,7 +35,7 @@ $result4 = mysqli_fetch_all($data4);
 	<title>Nguliah.id - Media Campus</title>
 	<meta name="description" content="Nguliah.id - Media Campus">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-	<link rel="shortcut icon" type="image/x-icon" href="images/favicon.png">
+	<link rel="shortcut icon" type="image/x-icon" href="images/logoNgampus2.png">
 
 	<!-- STYLES -->
 	<link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" media="all">
@@ -54,7 +54,7 @@ $result4 = mysqli_fetch_all($data4);
 <body>
 
 	<!-- preloader -->
-	<div id="preloader">
+	<!-- <div id="preloader">
 		<div class="book">
 			<div class="inner">
 				<div class="left"></div>
@@ -82,7 +82,7 @@ $result4 = mysqli_fetch_all($data4);
 				<li></li>
 			</ul>
 		</div>
-	</div>
+	</div> -->
 
 	<!-- site wrapper -->
 	<div class="site-wrapper">
@@ -131,13 +131,13 @@ $result4 = mysqli_fetch_all($data4);
 							<li class="nav-item">
 								<a class="nav-link" href="index.php">Home</a>
 							</li>
-							<li class="nav-item active">
+							<li class="nav-item">
 								<a class="nav-link" href="listEvent.php">Event</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" href="listBlog.php">Blog</a>
+								<a class="nav-link" href="listMedia.php">media</a>
 							</li>
-							<li class="nav-item">
+							<li class="nav-item active">
 								<a class="nav-link" href="listMedia.php">Media</a>
 							</li>
 							<li class="nav-item">
@@ -153,11 +153,11 @@ $result4 = mysqli_fetch_all($data4);
 		<section class="page-header">
 			<div class="container-xl">
 				<div class="text-center">
-					<h1 class="mt-0 mb-2">Event</h1>
+					<h1 class="mt-0 mb-2">media</h1>
 					<nav aria-label="breadcrumb">
 						<ol class="breadcrumb justify-content-center mb-0">
 							<li class="breadcrumb-item"><a href="#">Home</a></li>
-							<li class="breadcrumb-item active" aria-current="page">Event</li>
+							<li class="breadcrumb-item active" aria-current="page">media</li>
 						</ol>
 					</nav>
 				</div>
@@ -176,8 +176,8 @@ $result4 = mysqli_fetch_all($data4);
 							<?php
 							if (mysqli_num_rows($data) > 0) {
 								foreach ($result as $isi) {
-									$eventId = $isi[0];
-									$eventTitle = $isi[1];
+									$mediaId = $isi[0];
+									$mediaTitle = $isi[1];
 									$dateRelease = $isi[2];
 									$image = getImageNews(decryptPhotoProfile($isi[3]));
 									$editorUsername = $isi[4];
@@ -189,7 +189,7 @@ $result4 = mysqli_fetch_all($data4);
 											<div class="post post-grid rounded bordered">
 												<div class="thumb top-rounded">
 													<a href="category.html" class="category-badge position-absolute">$categoryName</a>
-													<a href="detailEvent.php?eventId=$eventId">
+													<a href="detailmedia.php?mediaId=$mediaId">
 														<div class="inner">
 															$image
 														</div>
@@ -197,10 +197,10 @@ $result4 = mysqli_fetch_all($data4);
 												</div>
 												<div class="details">
 													<ul class="meta list-inline mb-0">
-														<li class="list-inline-item"><a href="#">$editorUsername</a></li>
+														<li class="list-inline-item"><a href="detailmedia.php?mediaId=$mediaId">$editorUsername</a></li>
 														<li class="list-inline-item">$dateRelease</li>
 													</ul>
-													<h5 class="post-title mb-3 mt-3"><a href="detailEvent.php?eventId=$eventId">$eventTitle</a></h5>
+													<h5 class="post-title mb-3 mt-3"><a href="detailmedia.php?mediaId=$mediaId">$mediaTitle</a></h5>
 												</div>
 												<div class="post-bottom clearfix d-flex align-items-center">
 													<div class="social-share me-auto">
@@ -215,7 +215,7 @@ $result4 = mysqli_fetch_all($data4);
 														</ul>
 													</div>
 													<div class="more-button float-end">
-														<a href="detailEvent.php?eventId=$eventId"><span class="icon-options"></span></a>
+														<a href="detailmedia.php?mediaId=$mediaId"><span class="icon-options"></span></a>
 													</div>
 												</div>
 											</div>
@@ -254,23 +254,23 @@ $result4 = mysqli_fetch_all($data4);
 									<?php
 									$number = 1;
 									foreach ($result4 as $data) {
-										$popularEventId = $data[0];
-										$popularEventTitle = $data[1];
-										$popularEventDate = $data[2];
+										$popularmediaId = $data[0];
+										$popularmediaTitle = $data[1];
+										$popularmediaDate = $data[2];
 										echo <<<Buat
 											<div class="post post-list-sm circle">
 											<div class="thumb circle">
 												<span class="number">$number</span>
-												<a href="detailEvent.php?eventId=$popularEventId">
+												<a href="detailmedia.php?mediaId=$popularmediaId">
 													<div class="inner">
 														<img src="images/posts/tabs-1.jpg" alt="post-title" />
 													</div>
 												</a>
 											</div>
 											<div class="details clearfix">
-												<h6 class="post-title my-0"><a href="detailEvent.php?eventId=$popularEventId">$popularEventTitle</a></h6>
+												<h6 class="post-title my-0"><a href="detailmedia.php?mediaId=$popularmediaId">$popularmediaTitle</a></h6>
 												<ul class="meta list-inline mt-1 mb-0">
-													<li class="list-inline-item">$popularEventDate</li>
+													<li class="list-inline-item">$popularmediaDate</li>
 												</ul>
 											</div>
 										</div>
@@ -291,11 +291,11 @@ $result4 = mysqli_fetch_all($data4);
 									<ul class="list">
 										<?php
 										$jumlah = $result3[0][0];
-										echo "<li><a href='listEvent.php'>ALL</a><span>($jumlah)</span></li>";
+										echo "<li><a href='listMedia.php'>ALL</a><span>($jumlah)</span></li>";
 										foreach ($result2 as $isi) {
 											$categoryName = $isi[1];
 											$jumlah = $isi[2];
-											echo "<li><a href='listEvent.php?category=$categoryName'>$categoryName</a><span>($jumlah)</span></li>";
+											echo "<li><a href='listMedia.php?category=$categoryName'>$categoryName</a><span>($jumlah)</span></li>";
 										}
 										?>
 
@@ -440,7 +440,7 @@ $result4 = mysqli_fetch_all($data4);
 					<a href="index.html">Home</a>
 				</li>
 				<li><a class="active" href="category.html">Event</a></li>
-				<li><a href="category.html">Blog</a></li>
+				<li><a href="category.html">media</a></li>
 				<li>
 					<a href="#">Media</a>
 				</li>

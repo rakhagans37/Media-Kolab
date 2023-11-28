@@ -60,7 +60,6 @@ if (isset($_POST['blog-submit'])) {
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 	<meta name="description" content="Portal - Bootstrap 5 Admin Dashboard Template For Developers">
 	<meta name="author" content="Xiaoying Riley at 3rd Wave Media">
 	<link rel="shortcut icon" href="favicon.ico">
@@ -77,13 +76,50 @@ if (isset($_POST['blog-submit'])) {
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-	<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+	<script src="https://cdn.tiny.cloud/1/nzng1kbb69fr6bk6p4r9k59igb52we1skltelld77fektcxi/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/js/bootstrap-datepicker.js"></script>
 
 
 	<script>
 		tinymce.init({
 			selector: 'textarea#editor',
+			paste_as_text: true,
+			font_formats: 'Roboto=Roboto',
+			content_style: "@import url('https://fonts.googleapis.com/css2?family=Lato:wght@900&family=Roboto&display=swap'); body { font-family: 'Roboto', sans-serif; } h1,h2,h3,h4,h5,h6 { font-family: 'Lato', sans-serif; }",
+			menu: {
+				file: {
+					title: 'File',
+					items: 'newdocument restoredraft | preview | export print | deleteallconversations'
+				},
+				edit: {
+					title: 'Edit',
+					items: 'undo redo | cut copy paste pastetext | selectall | searchreplace'
+				},
+				view: {
+					title: 'View',
+					items: 'code | visualaid visualchars visualblocks | spellchecker | preview fullscreen | showcomments'
+				},
+				insert: {
+					title: 'Insert',
+					items: 'image link media addcomment pageembed template codesample inserttable | charmap emoticons hr | pagebreak nonbreaking anchor tableofcontents | insertdatetime'
+				},
+				format: {
+					title: 'Format',
+					items: 'bold italic underline strikethrough superscript subscript codeformat | styles blocks fontsize align lineheight | forecolor backcolor | language | removeformat'
+				},
+				tools: {
+					title: 'Tools',
+					items: 'spellchecker spellcheckerlanguage | a11ycheck code wordcount'
+				},
+				table: {
+					title: 'Table',
+					items: 'inserttable | cell row column | advtablesort | tableprops deletetable'
+				},
+				help: {
+					title: 'Help',
+					items: 'help'
+				}
+			}
 		});
 	</script>
 
