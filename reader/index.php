@@ -31,7 +31,7 @@ $result6 = mysqli_fetch_all($req6);
 $sql7 = "SELECT tb_media.media_title,tb_media.date_release,tb_editor.username,tb_category_media.category_name, tb_media.media_id, tb_media.thumbnail, tb_media.media_content FROM tb_media inner join tb_editor on tb_media.editor_id = tb_editor.editor_id inner join tb_category_media on tb_media.category_id = tb_category_media.category_id ORDER BY RAND() LIMIT 2";
 $req7 = mysqli_query($conn, $sql7);
 $result7 = mysqli_fetch_all($req7);
-$sqlPopularCat = "SELECT tb_blog.blog_id, tb_category_blog.category_name, tb_blog.blog_title, tb_editor.username, tb_blog.date_release FROM tb_blog INNER JOIN tb_category_blog ON tb_blog.category_id = tb_category_blog.category_id INNER JOIN tb_editor ON tb_blog.editor_id = tb_editor.editor_id WHERE tb_blog.category_id = (SELECT category_id FROM tb_category_blog where popularity = (SELECT MAX(popularity) FROM tb_category_blog) LIMIT 1)";
+$sqlPopularCat = "SELECT tb_blog.blog_id, tb_category_blog.category_name, tb_blog.blog_title, tb_editor.username, tb_blog.date_release, tb_blog.image_url FROM tb_blog INNER JOIN tb_category_blog ON tb_blog.category_id = tb_category_blog.category_id INNER JOIN tb_editor ON tb_blog.editor_id = tb_editor.editor_id WHERE tb_blog.category_id = (SELECT category_id FROM tb_category_blog where popularity = (SELECT MAX(popularity) FROM tb_category_blog) LIMIT 1) ORDER BY RAND() LIMIT 5";
 $reqPopularCat = mysqli_query($conn, $sqlPopularCat);
 $resultPopularCat = mysqli_fetch_all($reqPopularCat);
 ?>
@@ -664,13 +664,14 @@ $resultPopularCat = mysqli_fetch_all($reqPopularCat);
 									<div class="post-carousel-widget">
 										<?php
 										foreach ($resultPopularCat as $data) {
+											$image = getImageNews(decryptPhotoProfile($data[5]));
 											echo <<<Buat
 											<div class="post post-carousel">
 												<div class="thumb rounded">
 													<a href="category.html" class="category-badge position-absolute">$data[1]</a>
 													<a href="detailBlog.php?blogId=$data[0]">
 														<div class="inner">
-															<img src="images/widgets/widget-carousel-1.jpg" alt="post-title" />
+															$image
 														</div>
 													</a>
 												</div>

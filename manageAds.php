@@ -2,6 +2,8 @@
 require_once __DIR__ . "/helper/getConnection.php";
 require_once __DIR__ . "/helper/validateLogin.php";
 require_once __DIR__ . "/helper/getConnectionMsqli.php";
+require_once __DIR__ . "/helper/hash.php";
+
 $conn = getConnectionMysqli();
 
 //Script php untuk delete ads
@@ -264,17 +266,13 @@ $request = mysqli_query($conn, $sql);
                                             <button type="submit" class="btn app-btn-secondary" name="search-ads">Search</button>
                                         </div>
                                     </form>
-
                                 </div><!--//col-->
                                 <div class="col-auto">
-
-                                    <select class="form-select w-auto">
-                                        <option selected value="option-1">All</option>
-                                        <option value="option-2">This week</option>
-                                        <option value="option-3">This month</option>
-                                        <option value="option-4">Last 3 months</option>
-
-                                    </select>
+                                    <a class="btn app-btn-secondary" data-toggle="modal" href="#create-new-ads">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z" />
+                                        </svg>
+                                    </a>
                                 </div>
                             </div><!--//row-->
                         </div><!--//table-utilities-->
@@ -347,7 +345,34 @@ $request = mysqli_query($conn, $sql);
                     </div><!--//tab-pane-->
                 </div><!--//tab-content-->
 
-                <!-- Modal -->
+                <!-- Modal Create-->
+                <div class="modal fade" id="create-new-ads" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Insert New Ads</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Buatlah iklan!</p>
+                                <form action="manageAds.php" method="GET" enctype="multipart/form-data" id="add-new-ads">
+                                    <input type="text" name="new-ads-title" id="new-ads-title">
+                                    <input type="file" name="new-ads-image" id="new-ads-image">
+                                    <input type="date" name="new-ads-dateRelease" id="new-ads-dateRelease">
+                                    <input type="date" name="new-ads-dateExpire" id="new-ads-dateRelease">
+                                    <input type="submit" id="submit" name="deleteButton" class="btn app-btn-confirmation" value="Ya, saya yakin">
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn app-btn-secondary" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Delete-->
                 <div class="modal fade" id="delete-ads" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">

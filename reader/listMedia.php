@@ -135,7 +135,7 @@ $result4 = mysqli_fetch_all($data4);
 								<a class="nav-link" href="listEvent.php">Event</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" href="listMedia.php">media</a>
+								<a class="nav-link" href="listMedia.php">Blog</a>
 							</li>
 							<li class="nav-item active">
 								<a class="nav-link" href="listMedia.php">Media</a>

@@ -4,9 +4,7 @@ require_once __DIR__ . "/../helper/getConnection.php";
 require_once __DIR__ . "/../helper/getConnectionMsqli.php";
 require_once __DIR__ . "/../helper/blogfunctions.php";
 require_once __DIR__ . "/../helper/validateLoginEditor.php";
-
-// Nanti ganti pake sessuai session ya
-$editor_id_cur_session = "1305b549-8";
+require_once __DIR__ . "/../helper/cloudinary.php";
 
 // Get connections
 $conn = getConnectionMysqli();
@@ -29,27 +27,23 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 		$createTitle = $_POST['createTitle'];
 		$content = $_POST['createContent'];
 		$currentDate = date("Y-m-d");
-		if ($_POST['createImageUrl']) {
-			$imageCreateUrl = $_POST['createImageUrl'];
-		} else {
-			$imageCreateUrl = "";
-		}
+		$imageName = uploadImageNews($_FILES['createImageUrl']['tmp_name']);
 		$tagId = $_POST['taginput'];
 		$categoryId = $_POST['catinput'];
 
 		$dbConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		$sqlCreate = "INSERT INTO tb_blog (blog_id, blog_title, blog_content, date_release, image_url, views, tag_id, category_id, editor_id)
-				VALUES (:blogId, :createTitle, :content, :currentDate, :image_url, 0, :tagId, :categoryId, :editor_id_cur_session)";
+				VALUES (:blogId, :createTitle, :content, :currentDate, :image_url, 0, :tagId, :categoryId, :editorId)";
 		$request = $dbConnection->prepare($sqlCreate);
 
 		$request->bindParam('blogId', $blogId);
 		$request->bindParam('createTitle', $createTitle);
 		$request->bindParam('content', $content);
 		$request->bindParam('currentDate', $currentDate);
-		$request->bindParam('image_url', $imageCreateUrl);
+		$request->bindParam('image_url', $imageName);
 		$request->bindParam('tagId', $tagId);
 		$request->bindParam('categoryId', $categoryId);
-		$request->bindParam('editor_id_cur_session', $editor_id_cur_session);
+		$request->bindParam('editorId', $editorId);
 		$request->execute();
 
 		echo '<script>alert("Data berhasil ditambahkan!");</script>';
@@ -147,11 +141,11 @@ mysqli_close($conn);
 	<link rel="shortcut icon" href="favicon.ico">
 
 	<!-- Script -->
-	<script defer src="assets/plugins/fontawesome/js/all.min.js"></script>
+	<script defer src="../assets/plugins/fontawesome/js/all.min.js"></script>
 
 	<!-- CSS -->
-	<link id="theme-style" rel="stylesheet" href="assets/css/portal.css">
-	<link id="theme-style" rel="stylesheet" href="assets\scss\portal.css">
+	<link id="theme-style" rel="stylesheet" href="../assets/css/portal.css">
+	<link id="theme-style" rel="stylesheet" href="../assets\scss\portal.css">
 </head>
 
 <body class="app">
@@ -278,7 +272,7 @@ mysqli_close($conn);
 								</div>
 								<div class="form-outline mb-4">
 									<label class="form-label">Url Media</label>
-									<input type="text" name="createImageUrl" class="form-control form-control-lg">
+									<input type="file" name="createImageUrl" id="createImageUrl" class="form-control form-control-lg">
 								</div>
 								<div class="form-outline mb-4">
 									<label class="form-label">Tag</label>
@@ -472,11 +466,11 @@ mysqli_close($conn);
 	</div>
 
 	<!-- Scripts -->
-	<script src="assets/plugins/popper.min.js"></script>
+	<script src="../assets/plugins/popper.min.js"></script>
 	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-	<script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-	<script src="assets/js/app.js"></script>
+	<script src="../assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+	<script src="../assets/js/app.js"></script>
 	<script>
 		function getDeleteBlogId(blogId) {
 			console.log(blogId)

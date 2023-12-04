@@ -81,16 +81,52 @@ if (isset($_POST['event-submit'])) {
 	<!-- <link id="theme-style" rel="stylesheet" href="assets/css/portal.css"> -->
 	<link id="theme-style" rel="stylesheet" href="../assets/css/portal.css">
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/css/bootstrap-datepicker.css" rel="stylesheet" />
-
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-	<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+	<script src="https://cdn.tiny.cloud/1/nzng1kbb69fr6bk6p4r9k59igb52we1skltelld77fektcxi/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/js/bootstrap-datepicker.js"></script>
 
 
 	<script>
 		tinymce.init({
 			selector: 'textarea#editor',
+			paste_as_text: true,
+			font_formats: 'Roboto=Roboto',
+			content_style: "@import url('https://fonts.googleapis.com/css2?family=Lato:wght@900&family=Roboto&display=swap'); body { font-family: 'Roboto', sans-serif; } h1,h2,h3,h4,h5,h6 { font-family: 'Lato', sans-serif; }",
+			menu: {
+				file: {
+					title: 'File',
+					items: 'newdocument restoredraft | preview | export print | deleteallconversations'
+				},
+				edit: {
+					title: 'Edit',
+					items: 'undo redo | cut copy paste pastetext | selectall | searchreplace'
+				},
+				view: {
+					title: 'View',
+					items: 'code | visualaid visualchars visualblocks | spellchecker | preview fullscreen | showcomments'
+				},
+				insert: {
+					title: 'Insert',
+					items: 'image link media addcomment pageembed template codesample inserttable | charmap emoticons hr | pagebreak nonbreaking anchor tableofcontents | insertdatetime'
+				},
+				format: {
+					title: 'Format',
+					items: 'bold italic underline strikethrough superscript subscript codeformat | styles blocks fontsize align lineheight | forecolor backcolor | language | removeformat'
+				},
+				tools: {
+					title: 'Tools',
+					items: 'spellchecker spellcheckerlanguage | a11ycheck code wordcount'
+				},
+				table: {
+					title: 'Table',
+					items: 'inserttable | cell row column | advtablesort | tableprops deletetable'
+				},
+				help: {
+					title: 'Help',
+					items: 'help'
+				}
+			}
 		});
 	</script>
 
@@ -147,10 +183,21 @@ if (isset($_POST['event-submit'])) {
 						</div><!--//app-search-box-->
 
 						<div class="app-utilities col-auto">
+							<div class="app-utility-item">
+								<a href="settings.php" title="Settings">
+									<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-gear icon" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+										<path fill-rule="evenodd" d="M8.837 1.626c-.246-.835-1.428-.835-1.674 0l-.094.319A1.873 1.873 0 0 1 4.377 3.06l-.292-.16c-.764-.415-1.6.42-1.184 1.185l.159.292a1.873 1.873 0 0 1-1.115 2.692l-.319.094c-.835.246-.835 1.428 0 1.674l.319.094a1.873 1.873 0 0 1 1.115 2.693l-.16.291c-.415.764.42 1.6 1.185 1.184l.292-.159a1.873 1.873 0 0 1 2.692 1.116l.094.318c.246.835 1.428.835 1.674 0l.094-.319a1.873 1.873 0 0 1 2.693-1.115l.291.16c.764.415 1.6-.42 1.184-1.185l-.159-.291a1.873 1.873 0 0 1 1.116-2.693l.318-.094c.835-.246.835-1.428 0-1.674l-.319-.094a1.873 1.873 0 0 1-1.115-2.692l.16-.292c.415-.764-.42-1.6-1.185-1.184l-.291.159A1.873 1.873 0 0 1 8.93 1.945l-.094-.319zm-2.633-.283c.527-1.79 3.065-1.79 3.592 0l.094.319a.873.873 0 0 0 1.255.52l.292-.16c1.64-.892 3.434.901 2.54 2.541l-.159.292a.873.873 0 0 0 .52 1.255l.319.094c1.79.527 1.79 3.065 0 3.592l-.319.094a.873.873 0 0 0-.52 1.255l.16.292c.893 1.64-.902 3.434-2.541 2.54l-.292-.159a.873.873 0 0 0-1.255.52l-.094.319c-.527 1.79-3.065 1.79-3.592 0l-.094-.319a.873.873 0 0 0-1.255-.52l-.292.16c-1.64.893-3.433-.902-2.54-2.541l.159-.292a.873.873 0 0 0-.52-1.255l-.319-.094c-1.79-.527-1.79-3.065 0-3.592l.319-.094a.873.873 0 0 0 .52-1.255l-.16-.292c-.892-1.64.902-3.433 2.541-2.54l.292.159a.873.873 0 0 0 1.255-.52l.094-.319z" />
+										<path fill-rule="evenodd" d="M8 5.754a2.246 2.246 0 1 0 0 4.492 2.246 2.246 0 0 0 0-4.492zM4.754 8a3.246 3.246 0 1 1 6.492 0 3.246 3.246 0 0 1-6.492 0z" />
+									</svg>
+								</a>
+							</div><!--//app-utility-item-->
+
 							<div class="app-utility-item app-user-dropdown dropdown">
 								<a class="dropdown-toggle" id="user-dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false"><?php echo $editorProfilePhoto; ?></a>
 								<ul class="dropdown-menu" aria-labelledby="user-dropdown-toggle">
-									<li><a class="dropdown-item" href="accountEditor.php">Account</a></li>
+									<li><a class="dropdown-item" href="account.php">Account</a></li>
+									<li><a class="dropdown-item" href="settings.php">Settings</a></li>
 									<li>
 										<hr class="dropdown-divider">
 									</li>
@@ -167,25 +214,52 @@ if (isset($_POST['event-submit'])) {
 			<div class="sidepanel-inner d-flex flex-column">
 				<a href="#" id="sidepanel-close" class="sidepanel-close d-xl-none">&times;</a>
 				<div class="app-branding">
-					<a class="app-logo" href="indexEditor.php"><img class="logo-icon me-2" defer src="../assets/images/app-logo.png" alt="logo"><span class="logo-text">PORTAL</span></a>
+					<a class="app-logo" href="index.php"><img class="logo-icon me-2" defer src="../assets/images/app-logo.svg" alt="logo"><span class="logo-text">PORTAL</span></a>
+
 				</div><!--//app-branding-->
 				<nav id="app-nav-main" class="app-nav app-nav-main flex-grow-1">
 					<ul class="app-menu list-unstyled accordion" id="menu-accordion">
 						<li class="nav-item">
 							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-							<a class="nav-link" href="indexEditor.php">
+							<a class="nav-link" href="index.php">
 								<span class="nav-icon">
 									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-house-door" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
 										<path fill-rule="evenodd" d="M7.646 1.146a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 .146.354v7a.5.5 0 0 1-.5.5H9.5a.5.5 0 0 1-.5-.5v-4H7v4a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .146-.354l6-6zM2.5 7.707V14H6v-4a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v4h3.5V7.707L8 2.207l-5.5 5.5z" />
 										<path fill-rule="evenodd" d="M13 2.5V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z" />
 									</svg>
 								</span>
-								<span class="nav-link-text">Home</span>
+								<span class="nav-link-text">Overview</span>
 							</a><!--//nav-link-->
 						</li><!--//nav-item-->
+						<li class="nav-item has-submenu">
+							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+							<a class="nav-link submenu-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#submenu-1" aria-expanded="false" aria-controls="submenu-1">
+								<span class="nav-icon">
+									<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-files" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+										<path fill-rule="evenodd" d="M4 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4z" />
+										<path d="M6 0h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2v-1a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H6a1 1 0 0 0-1 1H4a2 2 0 0 1 2-2z" />
+									</svg>
+								</span>
+								<span class="nav-link-text">Manage User</span>
+								<span class="submenu-arrow">
+									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-chevron-down" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+										<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+									</svg>
+								</span>
+								<!--//submenu-arrow-->
+							</a>
+							<!--//nav-link-->
+							<div id="submenu-1" class="collapse submenu submenu-1" data-bs-parent="#menu-accordion">
+								<ul class="submenu-list list-unstyled">
+									<li class="submenu-item"><a class="submenu-link" href="manageuser.php">Users Account</a></li>
+									<li class="submenu-item"><a class="submenu-link" href="roles.php">Users Roles</a></li>
+								</ul>
+							</div>
+						</li>
 						<li class="nav-item">
 							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-							<a class="nav-link" href="createBlog.php">
+							<a class="nav-link" href="news.php">
 								<span class="nav-icon">
 									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-card-list" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
 										<path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z" />
@@ -197,7 +271,7 @@ if (isset($_POST['event-submit'])) {
 						</li><!--//nav-item-->
 						<li class="nav-item">
 							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-							<a class="nav-link active" href="createEvent.php">
+							<a class="nav-link active" href="event.php">
 								<span class="nav-icon">
 									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar4-event" viewBox="0 0 16 16">
 										<path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM2 2a1 1 0 0 0-1 1v1h14V3a1 1 0 0 0-1-1H2zm13 3H1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V5z" />
@@ -222,7 +296,7 @@ if (isset($_POST['event-submit'])) {
 										<path d="M6 0h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2v-1a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H6a1 1 0 0 0-1 1H4a2 2 0 0 1 2-2z" />
 									</svg>
 								</span>
-								<span class="nav-link-text">User</span>
+								<span class="nav-link-text">Pages</span>
 								<span class="submenu-arrow">
 									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-chevron-down" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
 										<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
@@ -231,7 +305,8 @@ if (isset($_POST['event-submit'])) {
 							</a><!--//nav-link-->
 							<div id="submenu-2" class="collapse submenu submenu-2" data-bs-parent="#menu-accordion">
 								<ul class="submenu-list list-unstyled">
-									<li class="submenu-item"><a class="submenu-link" href="accountEditor.php">Account</a></li>
+									<li class="submenu-item"><a class="submenu-link" href="account.php">Account</a></li>
+
 								</ul>
 							</div>
 						</li><!--//nav-item-->
@@ -251,6 +326,24 @@ if (isset($_POST['event-submit'])) {
 						</li><!--//nav-item-->
 					</ul><!--//app-menu-->
 				</nav><!--//app-nav-->
+				<div class="app-sidepanel-footer">
+					<nav class="app-nav app-nav-footer">
+						<ul class="app-menu footer-menu list-unstyled">
+							<li class="nav-item">
+								<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+								<a class="nav-link" href="settings.php">
+									<span class="nav-icon">
+										<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-gear" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+											<path fill-rule="evenodd" d="M8.837 1.626c-.246-.835-1.428-.835-1.674 0l-.094.319A1.873 1.873 0 0 1 4.377 3.06l-.292-.16c-.764-.415-1.6.42-1.184 1.185l.159.292a1.873 1.873 0 0 1-1.115 2.692l-.319.094c-.835.246-.835 1.428 0 1.674l.319.094a1.873 1.873 0 0 1 1.115 2.693l-.16.291c-.415.764.42 1.6 1.185 1.184l.292-.159a1.873 1.873 0 0 1 2.692 1.116l.094.318c.246.835 1.428.835 1.674 0l.094-.319a1.873 1.873 0 0 1 2.693-1.115l.291.16c.764.415 1.6-.42 1.184-1.185l-.159-.291a1.873 1.873 0 0 1 1.116-2.693l.318-.094c.835-.246.835-1.428 0-1.674l-.319-.094a1.873 1.873 0 0 1-1.115-2.692l.16-.292c.415-.764-.42-1.6-1.185-1.184l-.291.159A1.873 1.873 0 0 1 8.93 1.945l-.094-.319zm-2.633-.283c.527-1.79 3.065-1.79 3.592 0l.094.319a.873.873 0 0 0 1.255.52l.292-.16c1.64-.892 3.434.901 2.54 2.541l-.159.292a.873.873 0 0 0 .52 1.255l.319.094c1.79.527 1.79 3.065 0 3.592l-.319.094a.873.873 0 0 0-.52 1.255l.16.292c.893 1.64-.902 3.434-2.541 2.54l-.292-.159a.873.873 0 0 0-1.255.52l-.094.319c-.527 1.79-3.065 1.79-3.592 0l-.094-.319a.873.873 0 0 0-1.255-.52l-.292.16c-1.64.893-3.433-.902-2.54-2.541l.159-.292a.873.873 0 0 0-.52-1.255l-.319-.094c-1.79-.527-1.79-3.065 0-3.592l.319-.094a.873.873 0 0 0 .52-1.255l-.16-.292c-.892-1.64.902-3.433 2.541-2.54l.292.159a.873.873 0 0 0 1.255-.52l.094-.319z" />
+											<path fill-rule="evenodd" d="M8 5.754a2.246 2.246 0 1 0 0 4.492 2.246 2.246 0 0 0 0-4.492zM4.754 8a3.246 3.246 0 1 1 6.492 0 3.246 3.246 0 0 1-6.492 0z" />
+										</svg>
+									</span>
+									<span class="nav-link-text">Settings</span>
+								</a><!--//nav-link-->
+							</li><!--//nav-item-->
+						</ul><!--//footer-menu-->
+					</nav>
+				</div><!--//app-sidepanel-footer-->
 			</div><!--//sidepanel-inner-->
 		</div><!--//app-sidepanel-->
 	</header><!--//app-header-->

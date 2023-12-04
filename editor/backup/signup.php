@@ -65,7 +65,7 @@ if (isset($_POST['signup-submit'])) {
 	<script defer src="../assets/plugins/fontawesome/js/all.min.js"></script>
 
 	<!-- App CSS -->
-	<link id="theme-style" rel="stylesheet" href="../assets/scss/portal.css">
+	<link id="theme-style" rel="stylesheet" href="../assets/css/portal.css">
 
 </head>
 
@@ -91,7 +91,7 @@ if (isset($_POST['signup-submit'])) {
 			?>
 			<div class="d-flex flex-column align-content-end">
 				<div class="app-auth-body mx-auto">
-					<div class="app-auth-branding mb-4"><a class="app-logo" href="index.html"><img class="logo-icon me-2" src="../assets/images/app-logo.png" alt="logo"></a></div>
+					<div class="app-auth-branding mb-4"><a class="app-logo" href="index.html"><img class="logo-icon me-2" src="../assets/images/app-logo.svg" alt="logo"></a></div>
 					<h2 class="auth-heading text-center mb-4">Sign up to Portal</h2>
 
 					<div class="auth-form-container text-start mx-auto">

@@ -1,13 +1,7 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 require_once __DIR__ . '/../helper/getConnection.php';
 require_once __DIR__ . '/../helper/cloudinary.php';
 require_once __DIR__ . '/../helper/hash.php';
-
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 
 if (isset($_COOKIE['editorLoginStatus']) || isset($_SESSION['editorLoginStatus'])) {
     header('Location:indexEditor.php');
@@ -53,7 +47,7 @@ if (isset($_POST['login'])) {
                 if ($remember) {
                     setcookie('editorId', $editorId, time() + (86400 * 7));
                     setcookie('editorLoginStatus', $loginStatus, time() + (86400 * 7));
-                    setcookie('editorProfilePhoto', $imgtag, time() + (80400 * 7));
+                    setcookie('editorProfilePhoto', $imgtag);
                 } else {
                     $_SESSION['editorLoginStatus'] = $loginStatus;
                     $_SESSION['editorId'] = $editorId;
@@ -112,7 +106,7 @@ if (isset($_POST['login'])) {
             ?>
             <div class="d-flex flex-column align-content-end">
                 <div class="app-auth-body mx-auto">
-                    <div class="app-auth-branding mb-4"><a class="app-logo" href="indexEditor.php"><img class="logo-icon me-2" src="../assets/images/app-logo.png" alt="logo"></a></div>
+                    <div class="app-auth-branding mb-4"><a class="app-logo" href="indexEditor.php"><img class="logo-icon me-2" src="../assets/images/app-logo.svg" alt="logo"></a></div>
                     <h2 class="auth-heading text-center mb-5">Log in to Portal</h2>
                     <div class="auth-form-container text-start">
                         <form class="auth-form login-form" method="POST">
