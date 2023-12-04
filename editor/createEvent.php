@@ -16,7 +16,7 @@ if (isset($_POST['event-submit'])) {
 	$eventTitle = $_POST['eventtitle'];
 	$eventContent = $_POST['eventcontent'];
 	$eventUrl = $_POST['eventurl'];
-	$dateRelease = $_POST['daterelease'];
+	$dateRelease = date("Y-m-d");
 	$dateEvent = $_POST['dateevent'];
 	$videoUrl = $_POST['videourl'];
 	$tagId = $_POST['tagid'];
@@ -61,14 +61,14 @@ if (isset($_POST['event-submit'])) {
 <html lang="en">
 
 <head>
-	<title>Portal - Bootstrap 5 Admin Dashboard Template For Developers</title>
+	<title>Nguliah.id - For Editor</title>
 
 	<!-- Meta -->
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<meta name="description" content="Portal - Bootstrap 5 Admin Dashboard Template For Developers">
+	<meta name="description" content="Nguliah.id - For Editor">
 	<meta name="author" content="Xiaoying Riley at 3rd Wave Media">
 	<link rel="shortcut icon" href="favicon.ico">
 	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -84,22 +84,51 @@ if (isset($_POST['event-submit'])) {
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-	<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/js/bootstrap-datepicker.js"></script>
 
+	<!-- Tiny MCE -->
+	<script src="https://cdn.tiny.cloud/1/lhv9f0avcbklw7a4sdsja88fhk03p5b55kreb9wvfmt40mmf/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 
 	<script>
 		tinymce.init({
 			selector: 'textarea#editor',
-		});
-	</script>
-
-	<script>
-		tinymce.init({
-			selector: 'textarea#editor',
-			plugins: 'lists, link, image, media',
-			toolbar: 'h1 h2 bold italic strikethrough blockquote bullist numlist backcolor | link image media | removeformat help',
-			menubar: false,
+			paste_as_text: true,
+			menu: {
+				file: {
+					title: 'File',
+					items: 'newdocument restoredraft | preview | export print | deleteallconversations'
+				},
+				edit: {
+					title: 'Edit',
+					items: 'undo redo | cut copy paste | selectall | searchreplace'
+				},
+				view: {
+					title: 'View',
+					items: 'code | visualaid visualchars visualblocks | spellchecker | preview fullscreen | showcomments'
+				},
+				insert: {
+					title: 'Insert',
+					items: 'image link media addcomment pageembed template codesample inserttable | charmap emoticons hr | pagebreak nonbreaking anchor tableofcontents | insertdatetime'
+				},
+				format: {
+					title: 'Format',
+					items: 'bold italic underline strikethrough superscript subscript codeformat | styles blocks fontfamily fontstyle fontsize align lineheight | forecolor backcolor | language | removeformat'
+				},
+				tools: {
+					title: 'Tools',
+					items: 'spellchecker spellcheckerlanguage | a11ycheck code wordcount'
+				},
+				table: {
+					title: 'Table',
+					items: 'inserttable | cell row column | advtablesort | tableprops deletetable'
+				},
+				help: {
+					title: 'Help',
+					items: 'help'
+				}
+			},
+			font_family_formats: 'Georgia=georgia,palatino',
+			line_height_formats: '0.5 1 1.2 1.4 1.6 2',
 			setup: (editor) => {
 				// Apply the focus effect
 				editor.on("init", () => {
@@ -113,7 +142,7 @@ if (isset($_POST['event-submit'])) {
 					(editor.getContainer().style.boxShadow = ""),
 					(editor.getContainer().style.borderColor = "");
 				});
-			},
+			}
 		});
 	</script>
 
@@ -167,7 +196,7 @@ if (isset($_POST['event-submit'])) {
 			<div class="sidepanel-inner d-flex flex-column">
 				<a href="#" id="sidepanel-close" class="sidepanel-close d-xl-none">&times;</a>
 				<div class="app-branding">
-					<a class="app-logo" href="indexEditor.php"><img class="logo-icon me-2" defer src="../assets/images/app-logo.png" alt="logo"><span class="logo-text">PORTAL</span></a>
+					<a class="app-logo" href="indexEditor.php"><img class="logo-icon me-2" defer src="../assets/images/app-logo.png" alt="logo"><span class="logo-text">Nguliah.id</span></a>
 				</div><!--//app-branding-->
 				<nav id="app-nav-main" class="app-nav app-nav-main flex-grow-1">
 					<ul class="app-menu list-unstyled accordion" id="menu-accordion">
@@ -185,7 +214,7 @@ if (isset($_POST['event-submit'])) {
 						</li><!--//nav-item-->
 						<li class="nav-item">
 							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-							<a class="nav-link" href="createBlog.php">
+							<a class="nav-link" href="manageEvent.php">
 								<span class="nav-icon">
 									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-card-list" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
 										<path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z" />
@@ -197,7 +226,7 @@ if (isset($_POST['event-submit'])) {
 						</li><!--//nav-item-->
 						<li class="nav-item">
 							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-							<a class="nav-link active" href="createEvent.php">
+							<a class="nav-link active" href="manageEvent.php">
 								<span class="nav-icon">
 									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar4-event" viewBox="0 0 16 16">
 										<path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM2 2a1 1 0 0 0-1 1v1h14V3a1 1 0 0 0-1-1H2zm13 3H1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V5z" />
@@ -262,37 +291,10 @@ if (isset($_POST['event-submit'])) {
 
 				<div class="row g-3 mb-4 align-items-center justify-content-between">
 					<div class="col-auto">
-						<h1 class="app-page-title mb-0">Event</h1>
+						<h1 class="app-page-title mb-0">Create Event</h1>
 					</div>
-
-					<div class="col-auto">
-						<div class="page-utilities">
-							<div class="row g-2 justify-content-start justify-content-md-end align-items-center">
-								<div class="col-auto">
-									<form class="table-search-form row gx-1 align-items-center" action="news.php" method="GET">
-										<div class="col-auto">
-											<input type="text" id="search-orders" name="searchorders" class="form-control search-orders" placeholder="Search">
-										</div>
-										<div class="col-auto">
-											<button type="submit" class="btn app-btn-secondary" name="search-news">Search</button>
-										</div>
-									</form>
-
-								</div><!--//col-->
-								<div class="col-auto">
-
-									<select class="form-select w-auto">
-										<option selected value="option-1">All</option>
-										<option value="option-2">This week</option>
-										<option value="option-3">This month</option>
-										<option value="option-4">Last 3 months</option>
-
-									</select>
-								</div>
-							</div><!--//row-->
-						</div><!--//table-utilities-->
-					</div><!--//col-auto-->
 				</div><!--//row-->
+
 				<div class="container mt-4 mb-4">
 					<div class="row justify-content-md-center">
 						<form class="col-md-20 col-lg-10" enctype="multipart/form-data" id="event-submit" action="createEvent.php" method="post">
@@ -305,21 +307,7 @@ if (isset($_POST['event-submit'])) {
 							<label>Event URL</label>
 
 							<div class="input-group">
-
 								<input type="text" class="form-control" name="eventurl" id="basic-url" aria-describedby="basic-addon3">
-							</div>
-
-							<label>Date Release</label>
-
-							<div class="input-group">
-
-								<input type="text" class="date form-control" style="width: 200px" name="daterelease" />
-								<script type="text/javascript">
-									$(".date").datepicker({
-										format: "yyyy-mm-dd",
-									});
-								</script>
-
 							</div>
 
 							<label>Date Event</label>

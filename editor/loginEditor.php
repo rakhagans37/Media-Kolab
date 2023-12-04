@@ -79,14 +79,14 @@ if (isset($_POST['login'])) {
 <html lang="en">
 
 <head>
-    <title>Portal - Bootstrap 5 Admin Dashboard Template For Developers</title>
+    <title>Nguliah.id - For Editor</title>
 
     <!-- Meta -->
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="description" content="Portal - Bootstrap 5 Admin Dashboard Template For Developers">
+    <meta name="description" content="Nguliah.id - For Editor">
     <meta name="author" content="Xiaoying Riley at 3rd Wave Media">
     <link rel="shortcut icon" href="favicon.ico">
 
@@ -113,7 +113,7 @@ if (isset($_POST['login'])) {
             <div class="d-flex flex-column align-content-end">
                 <div class="app-auth-body mx-auto">
                     <div class="app-auth-branding mb-4"><a class="app-logo" href="indexEditor.php"><img class="logo-icon me-2" src="../assets/images/app-logo.png" alt="logo"></a></div>
-                    <h2 class="auth-heading text-center mb-5">Log in to Portal</h2>
+                    <h2 class="auth-heading text-center mb-5">Log in to Nguliah.id</h2>
                     <div class="auth-form-container text-start">
                         <form class="auth-form login-form" method="POST">
                             <div class="email mb-3">

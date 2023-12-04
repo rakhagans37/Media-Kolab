@@ -8,9 +8,9 @@ $conn = getConnectionMysqli();
 $getCategory = isset($_GET['category']) ? $_GET['category'] : null;
 
 if (is_null($getCategory)) {
-	$query = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_blog.date_release, tb_blog.image_url, tb_editor.username, tb_category_blog.category_name FROM tb_blog INNER JOIN tb_editor ON tb_blog.editor_id = tb_editor.editor_id INNER JOIN  tb_category_blog ON tb_category_blog.category_id = tb_blog.category_id";
+	$query = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_blog.date_release, tb_blog.image_url, tb_editor.username, tb_category_blog.category_name FROM tb_blog INNER JOIN tb_editor ON tb_blog.editor_id = tb_editor.editor_id INNER JOIN  tb_category_blog ON tb_category_blog.category_id = tb_blog.category_id ORDER BY RAND()";
 } else {
-	$query = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_blog.date_release, tb_blog.image_url, tb_editor.username, tb_category_blog.category_name FROM tb_blog INNER JOIN tb_editor ON tb_blog.editor_id = tb_editor.editor_id INNER JOIN  tb_category_blog ON tb_category_blog.category_id = tb_blog.category_id WHERE tb_category_blog.category_name = '$getCategory'";
+	$query = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_blog.date_release, tb_blog.image_url, tb_editor.username, tb_category_blog.category_name FROM tb_blog INNER JOIN tb_editor ON tb_blog.editor_id = tb_editor.editor_id INNER JOIN  tb_category_blog ON tb_category_blog.category_id = tb_blog.category_id WHERE tb_category_blog.category_name = '$getCategory' ORDER BY RAND()";
 }
 
 $data = mysqli_query($conn, $query);

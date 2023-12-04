@@ -15,8 +15,7 @@ if (isset($_POST['blog-submit'])) {
 	$blogId = generateIdBlog();
 	$blogTitle = $_POST['blogTitle'];
 	$blogContent = $_POST['blogContent'];
-
-	$dateRelease = $_POST['dateRelease'];
+	$dateRelease = date('Y-m-d');
 	$tagId = $_POST['tagid'];
 	$categoryId = $_POST['categoryid'];
 	$editorId = $editorId;
@@ -44,7 +43,7 @@ if (isset($_POST['blog-submit'])) {
 	$request->bindParam(2, $blogId);
 	$request->execute();
 
-	header("location:createBlog.php");
+	header("location:manageBlog.php");
 	exit;
 }
 
@@ -54,14 +53,14 @@ if (isset($_POST['blog-submit'])) {
 <html lang="en">
 
 <head>
-	<title>Portal - Bootstrap 5 Admin Dashboard Template For Developers</title>
+	<title>Nguliah.id - For Editor</title>
 
 	<!-- Meta -->
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<meta name="description" content="Portal - Bootstrap 5 Admin Dashboard Template For Developers">
+	<meta name="description" content="Nguliah.id - For Editor">
 	<meta name="author" content="Xiaoying Riley at 3rd Wave Media">
 	<link rel="shortcut icon" href="favicon.ico">
 	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -80,19 +79,49 @@ if (isset($_POST['blog-submit'])) {
 	<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/js/bootstrap-datepicker.js"></script>
 
+	<!-- Tiny MCE -->
+	<script src="https://cdn.tiny.cloud/1/lhv9f0avcbklw7a4sdsja88fhk03p5b55kreb9wvfmt40mmf/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 
 	<script>
 		tinymce.init({
 			selector: 'textarea#editor',
-		});
-	</script>
-
-	<script>
-		tinymce.init({
-			selector: 'textarea#editor',
-			plugins: 'lists, link, image, media',
-			toolbar: 'h1 h2 bold italic strikethrough blockquote bullist numlist backcolor | link image media | removeformat help',
-			menubar: false,
+			paste_as_text: true,
+			menu: {
+				file: {
+					title: 'File',
+					items: 'newdocument restoredraft | preview | export print | deleteallconversations'
+				},
+				edit: {
+					title: 'Edit',
+					items: 'undo redo | cut copy paste | selectall | searchreplace'
+				},
+				view: {
+					title: 'View',
+					items: 'code | visualaid visualchars visualblocks | spellchecker | preview fullscreen | showcomments'
+				},
+				insert: {
+					title: 'Insert',
+					items: 'image link media addcomment pageembed template codesample inserttable | charmap emoticons hr | pagebreak nonbreaking anchor tableofcontents | insertdatetime'
+				},
+				format: {
+					title: 'Format',
+					items: 'bold italic underline strikethrough superscript subscript codeformat | styles blocks fontfamily fontstyle fontsize align lineheight | forecolor backcolor | language | removeformat'
+				},
+				tools: {
+					title: 'Tools',
+					items: 'spellchecker spellcheckerlanguage | a11ycheck code wordcount'
+				},
+				table: {
+					title: 'Table',
+					items: 'inserttable | cell row column | advtablesort | tableprops deletetable'
+				},
+				help: {
+					title: 'Help',
+					items: 'help'
+				}
+			},
+			font_family_formats: 'Georgia=georgia,palatino',
+			line_height_formats: '0.5 1 1.2 1.4 1.6 2',
 			setup: (editor) => {
 				// Apply the focus effect
 				editor.on("init", () => {
@@ -106,7 +135,7 @@ if (isset($_POST['blog-submit'])) {
 					(editor.getContainer().style.boxShadow = ""),
 					(editor.getContainer().style.borderColor = "");
 				});
-			},
+			}
 		});
 	</script>
 
@@ -155,13 +184,13 @@ if (isset($_POST['blog-submit'])) {
 			<div class="sidepanel-inner d-flex flex-column">
 				<a href="#" id="sidepanel-close" class="sidepanel-close d-xl-none">&times;</a>
 				<div class="app-branding">
-					<a class="app-logo" href="indexEditor.php"><img class="logo-icon me-2" defer src="../assets/images/app-logo.png" alt="logo"><span class="logo-text">PORTAL</span></a>
+					<a class="app-logo" href="indexEditor.php"><img class="logo-icon me-2" defer src="../assets/images/app-logo.png" alt="logo"><span class="logo-text">Nguliah.id</span></a>
 				</div><!--//app-branding-->
 				<nav id="app-nav-main" class="app-nav app-nav-main flex-grow-1">
 					<ul class="app-menu list-unstyled accordion" id="menu-accordion">
 						<li class="nav-item">
 							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-							<a class="nav-link" href="indexEditor.php">
+							<a class="nav-link" href="manageEvent.php">
 								<span class="nav-icon">
 									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-house-door" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
 										<path fill-rule="evenodd" d="M7.646 1.146a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 .146.354v7a.5.5 0 0 1-.5.5H9.5a.5.5 0 0 1-.5-.5v-4H7v4a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .146-.354l6-6zM2.5 7.707V14H6v-4a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v4h3.5V7.707L8 2.207l-5.5 5.5z" />
@@ -173,7 +202,7 @@ if (isset($_POST['blog-submit'])) {
 						</li><!--//nav-item-->
 						<li class="nav-item">
 							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-							<a class="nav-link active" href="createBlog.php">
+							<a class="nav-link active" href="manageBlog.php">
 								<span class="nav-icon">
 									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-card-list" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
 										<path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z" />
@@ -252,65 +281,21 @@ if (isset($_POST['blog-submit'])) {
 					<div class="col-auto">
 						<h1 class="app-page-title mb-0">Create Blog</h1>
 					</div>
-
-					<div class="col-auto">
-						<div class="page-utilities">
-							<div class="row g-2 justify-content-start justify-content-md-end align-items-center">
-								<div class="col-auto">
-									<form class="table-search-form row gx-1 align-items-center" action="news.php" method="GET">
-										<div class="col-auto">
-											<input type="text" id="search-orders" name="searchorders" class="form-control search-orders" placeholder="Search">
-										</div>
-										<div class="col-auto">
-											<button type="submit" class="btn app-btn-secondary" name="search-news">Search</button>
-										</div>
-									</form>
-
-								</div><!--//col-->
-								<div class="col-auto">
-
-									<select class="form-select w-auto">
-										<option selected value="option-1">All</option>
-										<option value="option-2">This week</option>
-										<option value="option-3">This month</option>
-										<option value="option-4">Last 3 months</option>
-
-									</select>
-								</div>
-							</div><!--//row-->
-						</div><!--//table-utilities-->
-					</div><!--//col-auto-->
 				</div><!--//row-->
 				<div class="container mt-4 mb-4">
 					<div class="row justify-content-md-center">
 						<form class="col-md-20 col-lg-10" enctype="multipart/form-data" id="blog-submit" action="createBlog.php" method="post">
 							<label>Blog Title</label>
-
 							<div class="input-group ">
 								<input type="text" class="form-control" name="blogTitle" aria-label="blogTitle" aria-describedby="basic-addon2">
 							</div>
-
-							<label>Date Release</label>
-
-							<div class="input-group">
-
-								<input type="text" class="date form-control" style="width: 200px" name="dateRelease" />
-								<script type="text/javascript">
-									$(".date").datepicker({
-										format: "yyyy-mm-dd",
-									});
-								</script>
-
-							</div>
-
 
 							<label>Image URL</label>
 							<div class="input-group ">
 								<input type="file" name="new-image" id="new-image" required>
 							</div>
 
-							<label>Tag ID</label>
-
+							<label>Tag</label>
 							<div class="input-group ">
 
 								<select class="form-select" name="tagid" aria-label="Default select example" required>
@@ -333,8 +318,7 @@ if (isset($_POST['blog-submit'])) {
 								</select>
 							</div>
 
-							<label>Categori ID</label>
-
+							<label>Category</label>
 							<div class="input-group ">
 
 								<select class="form-select" name="categoryid" aria-label="Default select example" required>
@@ -359,7 +343,6 @@ if (isset($_POST['blog-submit'])) {
 
 							<label>Blog Content</label>
 							<!--Bootstrap classes arrange web page components into columns and rows in a grid -->
-
 							<div class="form-group">
 								<textarea id="editor" name="blogContent"></textarea>
 							</div>
