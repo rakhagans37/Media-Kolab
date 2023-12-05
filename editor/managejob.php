@@ -2,9 +2,9 @@
 require_once __DIR__ . "/../helper/hash.php";
 require_once __DIR__ . "/../helper/getConnection.php";
 require_once __DIR__ . "/../helper/getConnectionMsqli.php";
-require_once __DIR__ . "/../helper/mediafunctions.php";
-require_once __DIR__ . '/../helper/validateLoginEditor.php';
-require_once __DIR__ . '/../helper/cloudinary.php';
+require_once __DIR__ . "/../helper/jobfunctions.php";
+require_once __DIR__ . "/../helper/validateLoginEditor.php";
+require_once __DIR__ . "/../helper/cloudinary.php";
 
 // Get connections
 $conn = getConnectionMysqli();
@@ -15,179 +15,85 @@ $query = $dbConnection->query("SELECT * FROM tb_tag");
 $tags = $query->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetching data from the tb_category table
-$query = $dbConnection->query("SELECT * FROM tb_category_media");
+$query = $dbConnection->query("SELECT * FROM tb_category_job_vacancy");
 $categories = $query->fetchAll(PDO::FETCH_ASSOC);
 
 // Post Detection
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
-
-	// Script Create New Media
-	if (isset($_POST['createMedia'])) {
-		$mediaId = generateIdMedia();
-		$thumbName = random_int(0, PHP_INT_MAX) . date("dmYHis") . $mediaId;
-		$hashedThumbnail = hashPhotoProfile($thumbName);
-		$createTitle = $_POST['createTitle'];
-		$content = $_POST['createContent'];
-		$currentDate = date("Y-m-d");
-		if ($_POST['createImageUrl']) {
-			$imageCreateUrl = $_POST['createImageUrl'];
-		} else {
-			$imageCreateUrl = "";
-		}
-		if ($_POST['createVideoUrl']) {
-			$videoCreateUrl = $_POST['createVideoUrl'];
-		} else {
-			$videoCreateUrl = "";
-		}
-		$tagId = $_POST['taginput'];
-		$categoryId = $_POST['catinput'];
-
+	// Script Delete Job
+	if (isset($_POST['deleteButton'])) {
+		$vacancy_id = $_POST['jobId'];
 		$dbConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$sqlCreate = "INSERT INTO tb_media (media_id, thumbnail, media_title, media_content, date_release, image_url, video_url, views, tag_id, category_id, editor_id)
-				VALUES (:mediaId, :thumbnail, :createTitle, :content, :currentDate, :image_url, :video_url, 0, :tagId, :categoryId, :editorId)";
-		$request = $dbConnection->prepare($sqlCreate);
 
-		$request->bindParam('mediaId', $mediaId);
-		$request->bindParam('thumbnail', $hashedThumbnail);
-		$request->bindParam('createTitle', $createTitle);
-		$request->bindParam('content', $content);
-		$request->bindParam('currentDate', $currentDate);
-		$request->bindParam('image_url', $imageCreateUrl);
-		$request->bindParam('video_url', $videoCreateUrl);
-		$request->bindParam('tagId', $tagId);
-		$request->bindParam('categoryId', $categoryId);
-		$request->bindParam('editorId', $editorId);
-		$request->execute();
+		$fetchLogoName = $dbConnection->prepare("SELECT logo FROM tb_job_vacancies WHERE vacancy_id = :vacancy_id");
+		$fetchLogoName->bindParam('vacancy_id', $vacancy_id);
+		$fetchLogoName->execute();
+		$result = $fetchLogoName->fetch(PDO::FETCH_ASSOC);
 
-		$success = uploadImageMedia($thumbName, $_FILES['thumbnail']);
-		if ($success) {
-			echo '<script>alert("Data berhasil ditambahkan!");</script>';
+		if ($result) {
+			$companyLogoName = $result['logo'];
+			deleteImageJob($companyLogoName);
 		} else {
-			echo '<script>alert("Data gagal ditambahkan!");</script>';
+			echo '<script>alert("Tidak ada Logo!");</script>';
 		}
-		header("Location:managemedia.php");
+		$sqlDelete = "DELETE FROM tb_job_tag WHERE vacancy_id = ?";
+		$requestDelete = mysqli_prepare($conn, $sqlDelete);
+
+		mysqli_stmt_bind_param($requestDelete, "s", $vacancy_id);
+		mysqli_stmt_execute($requestDelete);
+		mysqli_stmt_close($requestDelete);
+
+		$sqlDelete = "DELETE FROM tb_job_vacancies WHERE vacancy_id = ?";
+		$requestDelete = mysqli_prepare($conn, $sqlDelete);
+
+		mysqli_stmt_bind_param($requestDelete, "s", $vacancy_id);
+		mysqli_stmt_execute($requestDelete);
+		mysqli_stmt_close($requestDelete);
 	}
 
-	// Script Update Media
+	// Script Update event
 	if (isset($_POST['updateButton'])) {
 		try {
-			$mediaId = $_POST['mediaId'];
-			if (isset($_FILES['thumbnailUpdate']) && $_FILES['thumbnailUpdate'] && !empty($_FILES['thumbnailUpdate']) && $_FILES['thumbnailUpdate']['error'] !== UPLOAD_ERR_NO_FILE) {
-				try {
-					$dbConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-					$fetchThumbnailName = $dbConnection->prepare("SELECT thumbnail FROM tb_media WHERE media_id = :mediaId");
-					$fetchThumbnailName->bindParam(':mediaId', $mediaId);
-					$fetchThumbnailName->execute();
-					$result = $fetchThumbnailName->fetch(PDO::FETCH_ASSOC);
-
-					if ($result) {
-						$thumbnailName = $result['thumbnail'];
-					} else {
-						echo '<script>alert("Tidak ada Thumbnail!");</script>';
-					}
-					$success = uploadImageMedia($thumbnailName, $_FILES['thumbnailUpdate']);
-					if ($success) {
-						echo '<script>alert("Data berhasil diupdate!");</script>';
-					} else {
-						echo '<script>alert("Data gagal diupdate!");</script>';
-					}
-				} catch (PDOException $e) {
-					echo '<script>alert("Tidak ada koneksi!");</script>';
-				}
-			}
+			$vacancyId = $_POST['jobId'];
 			$updateTitle = $_POST['updateTitle'];
-			$updateContent = $_POST['updateContent'];
-			$currentDate = date("Y-m-d");
-			if ($_POST['updateImageUrl']) {
-				$imageUpdateUrl = $_POST['updateImageUrl'];
-			} else {
-				$imageUpdateUrl = NULL;
-			}
-			if ($_POST['updateVideoUrl']) {
-				$videoUpdateUrl = $_POST['updateVideoUrl'];
-			} else {
-				$videoUpdateUrl = NULL;
-			}
 			$categoryId = $_POST['catinput'];
 
 			$dbConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-			$sqlUpdate = "UPDATE tb_media SET 
-					media_title = :updateTitle,
-					media_content = :updateContent,
-					date_release = :currentDate,
-					image_url = :image_url,
-					video_url = :video_url,
+			$sqlUpdate = "UPDATE tb_job_vacancies SET 
+					vacancy_title = :updateTitle,
 					category_id = :categoryId
-					WHERE media_id = :mediaId";
+					WHERE vacancy_id = :vacancyId";
 
 			$request = $dbConnection->prepare($sqlUpdate);
 
 			$request->bindParam('updateTitle', $updateTitle);
-			$request->bindParam('updateContent', $updateContent);
-			$request->bindParam('currentDate', $currentDate);
-			$request->bindParam('image_url', $imageUpdateUrl);
-			$request->bindParam('video_url', $videoUpdateUrl);
-			$request->bindParam('tagId', $tagId);
 			$request->bindParam('categoryId', $categoryId);
-			$request->bindParam('mediaId', $mediaId);
+			$request->bindParam('vacancyId', $vacancyId);
 			$request->execute();
 
-			header("Location:managemedia.php");
+			header("Location:manageevent.php");
 		} catch (PDOException $e) {
 			echo "<script>alert('Error! $e');</script>";
 		}
 	}
 
-	// Script Delete Media
-	if (isset($_POST['deleteButton'])) {
-		$mediaId = $_POST['mediaId'];
-		$dbConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-		$fetchThumbnailName = $dbConnection->prepare("SELECT thumbnail FROM tb_media WHERE media_id = :mediaId");
-		$fetchThumbnailName->bindParam('mediaId', $mediaId);
-		$fetchThumbnailName->execute();
-		$result = $fetchThumbnailName->fetch(PDO::FETCH_ASSOC);
-
-		if ($result) {
-			$thumbnailName = $result['thumbnail'];
-			deleteImageMedia($thumbnailName);
-		} else {
-			echo '<script>alert("Tidak ada Thumbnail!");</script>';
-		}
-		$sqlDelete = "DELETE FROM tb_media_tag WHERE media_id = ?";
-		$requestDelete = mysqli_prepare($conn, $sqlDelete);
-
-		mysqli_stmt_bind_param($requestDelete, "s", $mediaId);
-		mysqli_stmt_execute($requestDelete);
-		mysqli_stmt_close($requestDelete);
-
-		$sqlDelete = "DELETE FROM tb_media WHERE media_id = ?";
-		$requestDelete = mysqli_prepare($conn, $sqlDelete);
-
-		mysqli_stmt_bind_param($requestDelete, "s", $mediaId);
-		mysqli_stmt_execute($requestDelete);
-		mysqli_stmt_close($requestDelete);
-	}
-
-	header("location:managemedia.php");
-	exit;
+	header("location:managejob.php");
 }
 
-if (isset($_GET['search-media'])) {
-	$searchMedia = $_GET['searchorders'];
-	$sql = "SELECT * FROM tb_media WHERE media_title LIKE '%$searchMedia%'";
+if (isset($_GET['search-job'])) {
+	$searchJob = $_GET['searchorders'];
+	$sql = "SELECT * FROM tb_job_vacancies WHERE vacancy_title LIKE '%$searchJob%'";
 } else {
-	$sql = "SELECT * FROM tb_media";
+	$sql = "SELECT * FROM tb_job_vacancies";
 }
 
-// Setting Media Datasets
-$medias = mysqli_query($conn, $sql);
+// Setting Job Datasets
+$jobs = mysqli_query($conn, $sql);
 
-if ($medias) {
-	$mediaArray = [];
-	while ($media = mysqli_fetch_assoc($medias)) {
-		$mediaArray[] = $media;
+if ($jobs) {
+	$jobArray = [];
+	while ($job = mysqli_fetch_assoc($jobs)) {
+		$jobArray[] = $job;
 	}
 } else {
 	echo "Error executing the query: " . mysqli_error($conn);
@@ -215,6 +121,57 @@ mysqli_close($conn);
 	<!-- CSS -->
 	<link id="theme-style" rel="stylesheet" href="../assets/css/portal.css">
 	<link id="theme-style" rel="stylesheet" href="../assets\scss\portal.css">
+
+	<!-- Scripts -->
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/css/bootstrap-datepicker.css" rel="stylesheet" />
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+	<script src="https://cdn.tiny.cloud/1/nzng1kbb69fr6bk6p4r9k59igb52we1skltelld77fektcxi/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/js/bootstrap-datepicker.js"></script>
+
+
+	<script>
+		tinymce.init({
+			selector: 'textarea#editor',
+			paste_as_text: true,
+			font_formats: 'Roboto=Roboto',
+			content_style: "@import url('https://fonts.googleapis.com/css2?family=Lato:wght@900&family=Roboto&display=swap'); body { font-family: 'Roboto', sans-serif; } h1,h2,h3,h4,h5,h6 { font-family: 'Lato', sans-serif; }",
+		});
+	</script>
+
+	<script>
+		tinymce.init({
+			selector: 'textarea#editor',
+			plugins: 'lists, link',
+			toolbar: 'h1 h2 bold italic strikethrough blockquote bullist numlist backcolor | link | removeformat help',
+			menubar: false,
+			setup: (editor) => {
+				// Apply the focus effect
+				editor.on("init", () => {
+					editor.getContainer().style.transition = "border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out";
+				});
+				editor.on("focus", () => {
+					(editor.getContainer().style.boxShadow = "0 0 0 .2rem rgba(0, 123, 255, .25)"),
+					(editor.getContainer().style.borderColor = "#80bdff");
+				});
+				editor.on("blur", () => {
+					(editor.getContainer().style.boxShadow = ""),
+					(editor.getContainer().style.borderColor = "");
+				});
+			},
+		});
+	</script>
+
+	<script>
+		document.getElementById('myForm').addEventListener('submit', function(event) {
+			const content = tinyMCE.get('editor').getContent();
+
+			if (!content.trim()) { // Check if content is empty or contains only whitespace
+				event.preventDefault(); // Prevent form submission
+				alert('Content is required'); // Display an alert or handle validation error
+			}
+		});
+	</script>
 </head>
 
 <body class="app">
@@ -309,10 +266,10 @@ mysqli_close($conn);
 								<!--//submenu-arrow-->
 							</a>
 							<!--//nav-link-->
-							<div id="submenu-2" class="collapse submenu submenu-2 show" data-bs-parent="#menu-accordion">
+							<div id="submenu-2" class="collapse submenu submenu-2" data-bs-parent="#menu-accordion">
 								<ul class="submenu-list list-unstyled">
 									<li class="submenu-item"><a class="submenu-link" href="manageBlog.php">Blog</a></li>
-									<li class="submenu-item"><a class="submenu-link active" href="manageMedia.php">Media</a></li>
+									<li class="submenu-item"><a class="submenu-link" href="manageMedia.php">Media</a></li>
 								</ul>
 							</div>
 						</li>
@@ -338,7 +295,7 @@ mysqli_close($conn);
 						<!--//nav-item -->
 						<li class="nav-item">
 							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-							<a class="nav-link" href="manageJob.php">
+							<a class="nav-link active" href="manageJob.php">
 								<span class="nav-icon">
 									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-briefcase" viewBox="0 0 16 16">
 										<path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5m1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 .772 0M1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.129 7.948a.5.5 0 0 1-.258 0L1 6.116V4.5a.5.5 0 0 1 .5-.5" />
@@ -396,23 +353,23 @@ mysqli_close($conn);
 			<div class="container-xl">
 				<div class="row g-3 mb-4 align-items-center justify-content-between">
 					<div class="col-auto">
-						<h1 class="app-page-title mb-0">Media</h1>
+						<h1 class="app-page-title mb-0">My Job</h1>
 					</div>
 					<div class="col-auto">
 						<div class="page-utilities">
 							<div class="row g-2 justify-content-start justify-content-md-end align-items-center">
 								<div class="col-auto">
-									<form class="table-search-form row gx-1 align-items-center" action="managemedia.php" method="GET">
+									<form class="table-search-form row gx-1 align-items-center" action="managejob.php" method="GET">
 										<div class="col-auto">
 											<input type="text" id="search-orders" name="searchorders" class="form-control search-orders" placeholder="Search">
 										</div>
 										<div class="col-auto">
-											<button type="submit" class="btn app-btn-secondary" name="search-media">Search</button>
+											<button type="submit" class="btn app-btn-secondary" name="search-job">Search</button>
 										</div>
 									</form>
 								</div>
 								<div class="col-auto">
-									<a class="btn app-btn-secondary" href="createMedia.php">
+									<a class="btn app-btn-secondary" href="createJob.php">
 										<svg xmlns=" http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
 											<path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z" />
 										</svg>
@@ -431,9 +388,10 @@ mysqli_close($conn);
 									<table class="table app-table-hover mb-0 text-center">
 										<thead>
 											<tr>
-												<th class="cekk">Media Id</th>
+												<th class="cell">ID</th>
 												<th class="cell">Title</th>
-												<th class="cell">Date Release</th>
+												<th class="cell">Company</th>
+												<th class="cell">Date Released</th>
 												<th class="cell">Views</th>
 												<th class="cell">Category</th>
 												<th class="cell">Action</th>
@@ -441,20 +399,21 @@ mysqli_close($conn);
 										</thead>
 										<tbody>
 											<?php
-											foreach ($mediaArray as $media) {
-												$mediaId = $media['media_id'];
-												$categname = getCategoryMediaNameFromId($media['category_id']);
+											foreach ($jobArray as $job) {
+												$vacancy_id = $job['vacancy_id'];
+												$categname = getCategoryJobNameFromId($job['category_id']);
 												echo <<<TULIS
 														<tr>
-															<td class="cell"><strong>{$media['media_id']}</strong></td>
-															<td class="cell">{$media['media_title']}</td>
-															<td class="cell">{$media['date_release']}</td>
-															<td class="cell">{$media['views']}</td>
+															<td class="cell"><strong>{$job['vacancy_id']}</strong></td>
+															<td class="cell">{$job['vacancy_title']}</td>
+															<td class="cell">{$job['company_name']}</td>
+															<td class="cell">{$job['date_release']}</td>
+															<td class="cell">{$job['views']}</td>
 															<td class="cell">{$categname}</td>
 															<td class="cell">
-																<a class="btn btn-light" href="../reader/detailMedia.php?mediaId={$media['media_id']}">View</a>
-																<a class="btn btn-secondary" data-toggle="modal" href="#update-media-{$media['media_id']}">Edit</a>
-																<a class="btn btn-danger" data-toggle="modal" href="#delete-media" onclick="getDeleteMediaId('$mediaId')">Delete</a>
+																<a class="btn btn-light" href="../reader/detailJobVacancies.php?jobId={$job['vacancy_id']}">View</a>
+																<a class="btn btn-secondary" data-toggle="modal" href="#update-job-{$job['vacancy_id']}">Edit</a>
+																<a class="btn btn-danger" data-toggle="modal" href="#delete-job" onclick="getDeleteJobId('$vacancy_id')">Delete</a>
 															</td>
 														</tr>
 													TULIS;
@@ -472,23 +431,53 @@ mysqli_close($conn);
 
 		<footer class="app-footer">
 			<div class="container text-center py-3">
-				<small class="copyright">Designed with <span class="sr-only">love</span><i class="fas fa-heart" style="color: #fb866a;"></i> by <a class="app-link" href="http://themes.3rdwavemedia.com" target="_blank">Xiaoying Riley</a> for developers</small>
+				<small class="copyright">Designed with <span class="sr-only">love</span><i class="fas fa-heart" style="color: #fb866a;"></i> by <a class="app-link" href="http://themes.3rdwavejob.com" target="_blank">Xiaoying Riley</a> for developers</small>
 			</div>
 		</footer>
 	</div>
 
-	<!-- Update Media Modal Pop Up -->
-	<?php foreach ($mediaArray as $media) {
-		$categname = getCategoryMediaNameFromId($media['category_id']);
-		$formattedDate = dateFormatter($media['date_release']);
+	<!-- Delete Job Modal Pop Up -->
+	<div class="modal fade" id="delete-job" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Deletion Confirmation</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<p>Are you sure you want to delete this job?</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn app-btn-secondary" data-dismiss="modal">Close</button>
+					<form action="" method="POST" id="formDeleteJob">
+						<input type="submit" id="submit" name="deleteButton" class="btn app-btn-confirmation" value="Yes">
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Update Job Modal Pop Up -->
+	<?php foreach ($jobArray as $job) {
+		$categname = getCategoryJobNameFromId($job['category_id']);
+		$formattedDate = dateFormatter($job['date_release']);
 		$categoryselections = "";
+		foreach ($categories as $category) {
+			if ($category['category_id'] == $job['category_id']) {
+				$categoryselections .= "<option value='{$category['category_id']}' selected>{$category['category_name']}</option>";
+			} else {
+				$categoryselections .= "<option value='{$category['category_id']}'>{$category['category_name']}</option>";
+			}
+		}
 		echo <<<TULIS
-			<div class="modal fade" id="update-media-{$media['media_id']}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-				<form action="" method="POST" id="formUpdateMedia" enctype="multipart/form-data">
+			<div class="modal fade" id="update-job-{$job['vacancy_id']}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+				<form action="" method="POST" id="formUpdateJob" enctype="multipart/form-data">
 					<div class="modal-dialog">
 						<div class="modal-content">
 							<div class="modal-header">
-								<h3>Update Media</h3>
+								<h3>Update Job</h3>
 								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 									<span aria-hidden="true">&times;</span>
 								</button>
@@ -496,10 +485,10 @@ mysqli_close($conn);
 							<div class="modal-body">
 								<div class="row d-flex justify-content-center align-items-center">
 									<div class="card-body p-4">
-										<input type="hidden" name="mediaId" value="{$media['media_id']}">
+										<input type="hidden" name="jobId" value="{$job['vacancy_id']}">
 										<div class="form-outline mb-4">
-											<label class="form-label">Judul Media</label>
-											<input type="text" name="updateTitle" class="form-control form-control-lg" required value='{$media['media_title']}'>
+											<label class="form-label">Judul Job</label>
+											<input type="text" name="updateTitle" class="form-control form-control-lg" required value='{$job['vacancy_title']}'>
 										</div>
 										<div class="form-outline mb-4">
 											<label class="form-label">Categories</label>
@@ -521,29 +510,6 @@ mysqli_close($conn);
 		TULIS;
 	} ?>
 
-	<!-- Delete Media Modal Pop Up -->
-	<div class="modal fade" id="delete-media" tabindex="-1" role="dialog" aria-hidden="true">
-		<div class="modal-dialog" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">Deletion Confirmation</h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body">
-					<p>Are you sure you want to delete this media?</p>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn app-btn-secondary" data-dismiss="modal">Close</button>
-					<form action="" method="POST" id="formDeleteMedia">
-						<input type="submit" id="submit" name="deleteButton" class="btn app-btn-confirmation" value="Yes">
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
-
 	<!-- Scripts -->
 	<script src="../assets/plugins/popper.min.js"></script>
 	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
@@ -551,14 +517,13 @@ mysqli_close($conn);
 	<script src="../assets/plugins/bootstrap/js/bootstrap.min.js"></script>
 	<script src="../assets/js/app.js"></script>
 	<script>
-		function getDeleteMediaId(mediaId) {
-			console.log(mediaId)
-			const formDelete = document.getElementById("formDeleteMedia");
+		function getDeleteJobId(jobId) {
+			const formDelete = document.getElementById("formDeleteJob");
 			const deleteInput = document.createElement("input");
 
 			deleteInput.setAttribute("type", "hidden");
-			deleteInput.setAttribute("name", "mediaId");
-			deleteInput.setAttribute("value", mediaId);
+			deleteInput.setAttribute("name", "jobId");
+			deleteInput.setAttribute("value", jobId);
 
 			formDelete.appendChild(deleteInput);
 		}

@@ -4,6 +4,7 @@ require_once "../helper/validateLoginEditor.php";
 require_once "../helper/getConnectionMsqli.php";
 require_once "../helper/cloudinary.php";
 require_once "../helper/hash.php";
+require_once __DIR__ . "/../helper/tag.php";
 require "../vendor/autoload.php";
 
 
@@ -26,8 +27,8 @@ if (isset($_POST['event-submit'])) {
 
 	// Menyimpan data ke database
 	$sql = "INSERT INTO tb_event (event_id, event_title, event_content, event_url, date_release, date_event, 
-	 video_url, tag_id, category_id, editor_id, link_google_map) 
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	 video_url, category_id, editor_id, link_google_map) 
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	$request = $conn->prepare($sql);
 	// Bind the values to the placeholders
 	$request->bindParam(1, $eventId);
@@ -37,10 +38,9 @@ if (isset($_POST['event-submit'])) {
 	$request->bindParam(5, $dateRelease);
 	$request->bindParam(6, $dateEvent);
 	$request->bindParam(7, $videoUrl);
-	$request->bindParam(8, $tagId);
-	$request->bindParam(9, $categoryId);
-	$request->bindParam(10, $editorId);
-	$request->bindParam(11, $linkGoogleMap);
+	$request->bindParam(8, $categoryId);
+	$request->bindParam(9, $editorId);
+	$request->bindParam(10, $linkGoogleMap);
 	// Execute the prepared statement
 	$request->execute();
 
@@ -51,6 +51,7 @@ if (isset($_POST['event-submit'])) {
 	$request->bindParam(2, $eventId);
 	$request->execute();
 
+	insertEventTag(separateTag($tagId), $eventId);
 	header("location:createEvent.php");
 	exit;
 }
@@ -164,40 +165,49 @@ if (isset($_POST['event-submit'])) {
 									<path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path>
 								</svg>
 							</a>
-						</div><!--//col-->
+						</div>
+						<!--//col-->
 						<div class="search-mobile-trigger d-sm-none col">
 							<i class="search-mobile-trigger-icon fa-solid fa-magnifying-glass"></i>
-						</div><!--//col-->
-						<div class="app-search-box col">
-							<form class="app-search-form">
-								<input type="text" placeholder="Search..." name="search" class="form-control search-input">
-								<button type="submit" class="btn search-btn btn-primary" value="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
-							</form>
-						</div><!--//app-search-box-->
+						</div>
 
 						<div class="app-utilities col-auto">
+							<div class="app-utility-item app-notifications-dropdown dropdown">
+								<div class="dropdown-menu p-0" aria-labelledby="notifications-dropdown-toggle">
+									<!--//dropdown-menu-title-->
+									<!--//dropdown-menu-content-->
+								</div>
+								<!--//dropdown-menu-->
+							</div>
+
 							<div class="app-utility-item app-user-dropdown dropdown">
-								<a class="dropdown-toggle" id="user-dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false"><?php echo $editorProfilePhoto; ?></a>
+								<a class="dropdown-toggle" id="user-dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false"><?php echo $editorProfilePhoto ?></a>
 								<ul class="dropdown-menu" aria-labelledby="user-dropdown-toggle">
 									<li><a class="dropdown-item" href="accountEditor.php">Account</a></li>
 									<li>
 										<hr class="dropdown-divider">
 									</li>
-									<li><a class="dropdown-item" href="logoutEditor.php">Log Out</a></li>
+									<li><a class="dropdown-item" href="logoutEditor.php" id="logout">Log Out</a></li>
 								</ul>
-							</div><!--//app-user-dropdown-->
-						</div><!--//app-utilities-->
-					</div><!--//row-->
-				</div><!--//app-header-content-->
-			</div><!--//container-fluid-->
-		</div><!--//app-header-inner-->
-		<div id="app-sidepanel" class="app-sidepanel sidepanel-hidden">
+							</div>
+							<!--//app-user-dropdown-->
+						</div>
+						<!--//app-utilities-->
+					</div>
+					<!--//row-->
+				</div>
+				<!--//app-header-content-->
+			</div>
+			<!--//container-fluid-->
+		</div>
+		<div id="app-sidepanel" class="app-sidepanel">
 			<div id="sidepanel-drop" class="sidepanel-drop"></div>
 			<div class="sidepanel-inner d-flex flex-column">
 				<a href="#" id="sidepanel-close" class="sidepanel-close d-xl-none">&times;</a>
 				<div class="app-branding">
-					<a class="app-logo" href="indexEditor.php"><img class="logo-icon me-2" defer src="../assets/images/app-logo.png" alt="logo"><span class="logo-text">Nguliah.id</span></a>
-				</div><!--//app-branding-->
+					<a class="app-logo" href="indexEditor.php"><img class="logo-icon me-2" src="../assets/images//app-logo.png" alt="logo"><span class="logo-text">Nguliah.id</span></a>
+				</div>
+				<!--//app-branding-->
 				<nav id="app-nav-main" class="app-nav app-nav-main flex-grow-1">
 					<ul class="app-menu list-unstyled accordion" id="menu-accordion">
 						<li class="nav-item">
@@ -210,20 +220,38 @@ if (isset($_POST['event-submit'])) {
 									</svg>
 								</span>
 								<span class="nav-link-text">Home</span>
-							</a><!--//nav-link-->
-						</li><!--//nav-item-->
-						<li class="nav-item">
+							</a>
+							<!--//nav-link-->
+						</li>
+						<!--//nav-item-->
+						<li class="nav-item has-submenu">
 							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-							<a class="nav-link" href="manageEvent.php">
+							<a class="nav-link submenu-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#submenu-2" aria-expanded="false" aria-controls="submenu-2">
 								<span class="nav-icon">
-									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-card-list" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-										<path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z" />
-										<path fill-rule="evenodd" d="M5 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 5 8zm0-2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0 5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5z" />
+									<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-files" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+										<path fill-rule="evenodd" d="M4 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4z" />
+										<path d="M6 0h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2v-1a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H6a1 1 0 0 0-1 1H4a2 2 0 0 1 2-2z" />
 									</svg>
 								</span>
 								<span class="nav-link-text">News</span>
-							</a><!--//nav-link-->
-						</li><!--//nav-item-->
+								<span class="submenu-arrow">
+									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-chevron-down" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+										<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+									</svg>
+								</span>
+								<!--//submenu-arrow-->
+							</a>
+							<!--//nav-link-->
+							<div id="submenu-2" class="collapse submenu submenu-2" data-bs-parent="#menu-accordion">
+								<ul class="submenu-list list-unstyled">
+									<li class="submenu-item"><a class="submenu-link" href="manageBlog.php">Blog</a></li>
+									<li class="submenu-item"><a class="submenu-link" href="manageMedia.php">Media</a></li>
+								</ul>
+							</div>
+						</li>
+
+						<!--//nav-item -->
 						<li class="nav-item">
 							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
 							<a class="nav-link active" href="manageEvent.php">
@@ -241,31 +269,21 @@ if (isset($_POST['event-submit'])) {
 							<!--//nav-link-->
 						</li>
 
-						<li class="nav-item has-submenu">
+						<!--//nav-item -->
+						<li class="nav-item">
 							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-							<a class="nav-link submenu-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#submenu-2" aria-expanded="false" aria-controls="submenu-2">
+							<a class="nav-link" href="manageJob.php">
 								<span class="nav-icon">
-									<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-files" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-										<path fill-rule="evenodd" d="M4 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4z" />
-										<path d="M6 0h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2v-1a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H6a1 1 0 0 0-1 1H4a2 2 0 0 1 2-2z" />
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-briefcase" viewBox="0 0 16 16">
+										<path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5m1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 .772 0M1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.129 7.948a.5.5 0 0 1-.258 0L1 6.116V4.5a.5.5 0 0 1 .5-.5" />
 									</svg>
 								</span>
-								<span class="nav-link-text">User</span>
-								<span class="submenu-arrow">
-									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-chevron-down" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-										<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
-									</svg>
-								</span><!--//submenu-arrow-->
-							</a><!--//nav-link-->
-							<div id="submenu-2" class="collapse submenu submenu-2" data-bs-parent="#menu-accordion">
-								<ul class="submenu-list list-unstyled">
-									<li class="submenu-item"><a class="submenu-link" href="accountEditor.php">Account</a></li>
-								</ul>
-							</div>
-						</li><!--//nav-item-->
+								<span class="nav-link-text">Job Vacancies</span>
+							</a>
+							<!--//nav-link-->
+						</li>
 
-
+						<!--//nav-item-->
 						<li class="nav-item">
 							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
 							<a class="nav-link" href="help.php">
@@ -276,13 +294,36 @@ if (isset($_POST['event-submit'])) {
 									</svg>
 								</span>
 								<span class="nav-link-text">Help</span>
-							</a><!--//nav-link-->
-						</li><!--//nav-item-->
-					</ul><!--//app-menu-->
-				</nav><!--//app-nav-->
-			</div><!--//sidepanel-inner-->
-		</div><!--//app-sidepanel-->
-	</header><!--//app-header-->
+							</a>
+							<!--//nav-link-->
+						</li>
+						<!--//nav-item-->
+					</ul>
+					<!--//app-menu-->
+				</nav>
+				<div class="app-sidepanel-footer">
+					<nav class="app-nav app-nav-footer">
+						<ul class="app-menu footer-menu list-unstyled">
+							<li class="nav-item">
+								<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+								<a class="nav-link" href="accountEditor.php">
+									<span class="nav-icon">
+										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+											<path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z" />
+										</svg>
+									</span>
+									<span class="nav-link-text">Account</span>
+								</a><!--//nav-link-->
+							</li><!--//nav-item-->
+						</ul><!--//footer-menu-->
+					</nav>
+				</div><!--//app-sidepanel-footer-->
+			</div>
+			<!--//sidepanel-inner-->
+		</div>
+		<!--//app-sidepanel-->
+	</header>
+	<!--//app-header-->
 
 	<div class="app-wrapper">
 
@@ -333,32 +374,13 @@ if (isset($_POST['event-submit'])) {
 							<label>Video URL</label>
 
 							<div class="input-group ">
-
 								<input type="text" class="form-control" name="videourl" aria-label="EventID" aria-describedby="basic-addon1">
 							</div>
 
-							<label>Tag ID</label>
+							<label>Tag</label>
 
 							<div class="input-group ">
-
-								<select class="form-select" name="tagid" aria-label="Default select example" required>
-									<option value="" disabled selected hidden>Pilih Tag Anda</option>
-									<?php
-									$sqlRole = "SELECT * from tb_tag";
-
-									$request = $conn->prepare($sqlRole);
-									$request->execute();
-
-									if ($result = $request->fetchAll()) {
-										foreach ($result as $index) {
-											$tagId = $index['tag_id'];
-											$tagName = $index['tag_name'];
-
-											echo "<option value='$tagId'>$tagName</option>";
-										}
-									}
-									?>
-								</select>
+								<input type="text" class="form-control" name="tagid" aria-label="tagid" aria-describedby="basic-addon1" placeholder="tag1,tag2,tag3 (Separate by comma)">
 							</div>
 
 							<label>Categori ID</label>

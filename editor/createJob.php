@@ -4,50 +4,59 @@ require_once "../helper/validateLoginEditor.php";
 require_once "../helper/getConnectionMsqli.php";
 require_once "../helper/cloudinary.php";
 require_once "../helper/hash.php";
-require_once "../helper/tag.php";
+require_once __DIR__ . "/../helper/tag.php";
 require "../vendor/autoload.php";
-
 
 $conn = getConnection();
 
+if (isset($_POST['vacancy-submit'])) {
 
-if (isset($_POST['blog-submit'])) {
-
-	$blogId = generateIdBlog();
-	$blogTitle = $_POST['blogTitle'];
-	$blogContent = $_POST['blogContent'];
+	$vacancy_id = generateIdJobVacancies();
+	$vacancyTitle = $_POST['vacancyTitle'];
+	$vacancyContent = $_POST['vacancyContent'];
+	$company = $_POST['company'];
+	$requirement = $_POST['requirement'];
 	$dateRelease = date('Y-m-d');
 	$tagId = $_POST['tagid'];
 	$categoryId = $_POST['categoryid'];
 	$editorId = $editorId;
 
 	// Menyimpan data ke database
-	$sql = "INSERT INTO tb_blog (blog_id, blog_title, blog_content, date_release, 
-	category_id, editor_id) 
-	VALUES (?, ?, ?, ?, ?, ?)";
+	$sql = "INSERT INTO tb_job_vacancies (vacancy_id, vacancy_title, vacancy_content, company_name, vacancy_requirement, date_release, 
+ 	category_id, editor_id) 
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 	$request = $conn->prepare($sql);
-	// Bind the values to the placeholders
-	$request->bindParam(1, $blogId);
-	$request->bindParam(2, $blogTitle);
-	$request->bindParam(3, $blogContent);
-	$request->bindParam(4, $dateRelease);
-	$request->bindParam(5, $categoryId);
-	$request->bindParam(6, $editorId);
-	// Execute the prepared statement
+	$request->bindParam(1, $vacancy_id);
+	$request->bindParam(2, $vacancyTitle);
+	$request->bindParam(3, $vacancyContent);
+	$request->bindParam(4, $company);
+	$request->bindParam(5, $requirement);
+	$request->bindParam(6, $dateRelease);
+	$request->bindParam(7, $categoryId);
+	$request->bindParam(8, $editorId);
 	$request->execute();
 
+	// Menyimpan image ke database dan cloudinary
 	$imageUrl = uploadImageNews($_FILES['new-image']['tmp_name']);
-	$sql2 = 'UPDATE tb_blog SET image_url = ? WHERE blog_id = ?';
-	$request = $conn->prepare($sql2);
-	$request->bindParam(1, $imageUrl);
-	$request->bindParam(2, $blogId);
-	$request->execute();
+	$sql2 = 'UPDATE tb_job_vacancies SET image_url = ? WHERE vacancy_id = ?';
+	$requestInsertImage = $conn->prepare($sql2);
+	$requestInsertImage->bindParam(1, $imageUrl);
+	$requestInsertImage->bindParam(2, $vacancy_id);
+	$requestInsertImage->execute();
 
-	insertBlogTag(separateTag($tagId), $blogId);
-	header("location:manageBlog.php");
+	// Menyimpan logo ke database dan cloudinary
+	$companyLogo = uploadImageNews($_FILES['company-logo']['tmp_name']);
+	$sql2 = 'UPDATE tb_job_vacancies SET logo = ? WHERE vacancy_id = ?';
+	$requestInsertLogo = $conn->prepare($sql2);
+	$requestInsertLogo->bindParam(1, $companyLogo);
+	$requestInsertLogo->bindParam(2, $vacancy_id);
+	$requestInsertLogo->execute();
+
+	//Insert Tag
+	insertJobTag(separateTag($tagId), $vacancy_id);
+	header("Location:managejob.php");
 	exit;
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -139,9 +148,6 @@ if (isset($_POST['blog-submit'])) {
 			}
 		});
 	</script>
-
-
-
 </head>
 
 <body class="app">
@@ -236,9 +242,9 @@ if (isset($_POST['blog-submit'])) {
 								<!--//submenu-arrow-->
 							</a>
 							<!--//nav-link-->
-							<div id="submenu-2" class="collapse submenu submenu-2 show" data-bs-parent="#menu-accordion">
+							<div id="submenu-2" class="collapse submenu submenu-2" data-bs-parent="#menu-accordion">
 								<ul class="submenu-list list-unstyled">
-									<li class="submenu-item"><a class="submenu-link active" href="manageBlog.php">Blog</a></li>
+									<li class="submenu-item"><a class="submenu-link" href="manageBlog.php">Blog</a></li>
 									<li class="submenu-item"><a class="submenu-link" href="manageMedia.php">Media</a></li>
 								</ul>
 							</div>
@@ -265,7 +271,7 @@ if (isset($_POST['blog-submit'])) {
 						<!--//nav-item -->
 						<li class="nav-item">
 							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-							<a class="nav-link" href="manageJob.php">
+							<a class="nav-link active" href="manageJob.php">
 								<span class="nav-icon">
 									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-briefcase" viewBox="0 0 16 16">
 										<path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5m1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 .772 0M1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.129 7.948a.5.5 0 0 1-.258 0L1 6.116V4.5a.5.5 0 0 1 .5-.5" />
@@ -325,15 +331,25 @@ if (isset($_POST['blog-submit'])) {
 
 				<div class="row g-3 mb-4 align-items-center justify-content-between">
 					<div class="col-auto">
-						<h1 class="app-page-title mb-0">Create Blog</h1>
+						<h1 class="app-page-title mb-0">Create Job</h1>
 					</div>
 				</div><!--//row-->
 				<div class="container mt-4 mb-4">
 					<div class="row justify-content-md-center">
-						<form class="col-md-20 col-lg-10" enctype="multipart/form-data" id="blog-submit" action="createBlog.php" method="post">
-							<label>Blog Title</label>
+						<form class="col-md-20 col-lg-10" enctype="multipart/form-data" id="vacancy-submit" action="createJob.php" method="post">
+							<label>Job Title</label>
 							<div class="input-group ">
-								<input type="text" class="form-control" name="blogTitle" aria-label="blogTitle" aria-describedby="basic-addon2">
+								<input type="text" class="form-control" name="vacancyTitle" aria-label="vacancyTitle" aria-describedby="basic-addon2">
+							</div>
+
+							<label>Job Company</label>
+							<div class="input-group ">
+								<input type="text" class="form-control" name="company" aria-label="company" aria-describedby="basic-addon2">
+							</div>
+
+							<label>Company Logo</label>
+							<div class="input-group ">
+								<input type="file" name="company-logo" id="company-logo" required>
 							</div>
 
 							<label>Image URL</label>
@@ -343,7 +359,7 @@ if (isset($_POST['blog-submit'])) {
 
 							<label>Tag</label>
 							<div class="input-group ">
-								<input type="text" class="form-control" name="tagid" aria-label="tagid" aria-describedby="basic-addon2">
+								<input type="text" class="form-control" name="tagid" aria-label="tagid" aria-describedby="basic-addon2" placeholder="tag1,tag2,tag3 (Separate by comma)">
 							</div>
 
 							<label>Category</label>
@@ -352,7 +368,7 @@ if (isset($_POST['blog-submit'])) {
 								<select class="form-select" name="categoryid" aria-label="Default select example" required>
 									<option value="" disabled selected hidden>Pilih Kategori Anda</option>
 									<?php
-									$sqlRole = "SELECT * from tb_category_blog";
+									$sqlRole = "SELECT * from tb_category_job_vacancy";
 
 									$request = $conn->prepare($sqlRole);
 									$request->execute();
@@ -369,12 +385,19 @@ if (isset($_POST['blog-submit'])) {
 								</select>
 							</div>
 
-							<label>Blog Content</label>
+							<label>Job Content</label>
 							<!--Bootstrap classes arrange web page components into columns and rows in a grid -->
 							<div class="form-group">
-								<textarea id="editor" name="blogContent"></textarea>
+								<textarea id="editor" name="vacancyContent"></textarea>
 							</div>
-							<button type="submit" name="blog-submit" class="btn btn-primary">Submit</button>
+
+							<label>Job Requirements</label>
+							<!--Bootstrap classes arrange web page components into columns and rows in a grid -->
+							<div class="form-group">
+								<textarea id="editor" name="requirement"></textarea>
+							</div>
+
+							<button type="submit" name="vacancy-submit" class="btn btn-primary">Submit</button>
 						</form>
 					</div>
 				</div>

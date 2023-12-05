@@ -25,6 +25,10 @@ $result3 = mysqli_fetch_all($data2);
 $data3 = mysqli_query($conn, $query4);
 $result4 = mysqli_fetch_all($data3);
 
+$queryTag = "SELECT tb_event_tag.tag_id, tb_tag.tag_name FROM tb_event_tag INNER JOIN tb_tag ON tb_tag.tag_id = tb_event_tag.tag_id WHERE tb_event_tag.event_id = '$eventId'";
+$dataTag = mysqli_query($conn, $queryTag);
+$resultTag = mysqli_fetch_all($dataTag);
+
 //Get Editor Profile Photo
 if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 	$editorProfilePhoto = getImageProfile(decryptPhotoProfile($editorPhotoUrl), 35);
@@ -198,9 +202,11 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 								<div class="row d-flex align-items-center">
 									<div class="col-md-6 col-12 text-center text-md-start">
 										<!-- tags -->
-										<a href="#" class="tag">#Trending</a>
-										<a href="#" class="tag">#Video</a>
-										<a href="#" class="tag">#Featured</a>
+										<?php
+										foreach ($resultTag as $data) {
+											echo "<a href='listTag.php?tagId={$data[0]}' class='tag'>#{$data[1]}</a>";
+										}
+										?>
 									</div>
 									<div class="col-md-6 col-12">
 										<!-- social icons -->

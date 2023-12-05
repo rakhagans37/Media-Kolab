@@ -11,40 +11,49 @@ require "../vendor/autoload.php";
 $conn = getConnection();
 
 
-if (isset($_POST['blog-submit'])) {
+if (isset($_POST['media-submit'])) {
 
-	$blogId = generateIdBlog();
-	$blogTitle = $_POST['blogTitle'];
-	$blogContent = $_POST['blogContent'];
+	$mediaId = generateIdMedia();
+	$mediaTitle = $_POST['mediaTitle'];
+	$mediaContent = $_POST['mediaContent'];
 	$dateRelease = date('Y-m-d');
 	$tagId = $_POST['tagid'];
 	$categoryId = $_POST['categoryid'];
+	$videoUrl = $_POST['video-url'];
 	$editorId = $editorId;
 
 	// Menyimpan data ke database
-	$sql = "INSERT INTO tb_blog (blog_id, blog_title, blog_content, date_release, 
-	category_id, editor_id) 
-	VALUES (?, ?, ?, ?, ?, ?)";
+	$sql = "INSERT INTO tb_media (media_id, media_title, media_content, date_release, category_id, editor_id, video_url) 
+	VALUES (?, ?, ?, ?, ?, ?, ?)";
 	$request = $conn->prepare($sql);
-	// Bind the values to the placeholders
-	$request->bindParam(1, $blogId);
-	$request->bindParam(2, $blogTitle);
-	$request->bindParam(3, $blogContent);
+	$request->bindParam(1, $mediaId);
+	$request->bindParam(2, $mediaTitle);
+	$request->bindParam(3, $mediaContent);
 	$request->bindParam(4, $dateRelease);
 	$request->bindParam(5, $categoryId);
 	$request->bindParam(6, $editorId);
-	// Execute the prepared statement
+	$request->bindParam(7, $videoUrl);
 	$request->execute();
 
+	// Menyimpan image ke database dan cloudinary
 	$imageUrl = uploadImageNews($_FILES['new-image']['tmp_name']);
-	$sql2 = 'UPDATE tb_blog SET image_url = ? WHERE blog_id = ?';
+	$sql2 = 'UPDATE tb_media SET image_url = ? WHERE media_id = ?';
 	$request = $conn->prepare($sql2);
 	$request->bindParam(1, $imageUrl);
-	$request->bindParam(2, $blogId);
+	$request->bindParam(2, $mediaId);
 	$request->execute();
 
-	insertBlogTag(separateTag($tagId), $blogId);
-	header("location:manageBlog.php");
+	// Menyimpan image ke database dan cloudinary
+	$imageUrl = uploadImageNews($_FILES['thumbnail']['tmp_name']);
+	$sql3 = 'UPDATE tb_media SET thumbnail = ? WHERE media_id = ?';
+	$request = $conn->prepare($sql3);
+	$request->bindParam(1, $imageUrl);
+	$request->bindParam(2, $mediaId);
+	$request->execute();
+
+	insertMediaTag(separateTag($tagId), $mediaId);
+
+	header("location:managemedia.php");
 	exit;
 }
 
@@ -238,8 +247,8 @@ if (isset($_POST['blog-submit'])) {
 							<!--//nav-link-->
 							<div id="submenu-2" class="collapse submenu submenu-2 show" data-bs-parent="#menu-accordion">
 								<ul class="submenu-list list-unstyled">
-									<li class="submenu-item"><a class="submenu-link active" href="manageBlog.php">Blog</a></li>
-									<li class="submenu-item"><a class="submenu-link" href="manageMedia.php">Media</a></li>
+									<li class="submenu-item"><a class="submenu-link" href="manageBlog.php">Blog</a></li>
+									<li class="submenu-item"><a class="submenu-link active" href="manageMedia.php">Media</a></li>
 								</ul>
 							</div>
 						</li>
@@ -325,25 +334,35 @@ if (isset($_POST['blog-submit'])) {
 
 				<div class="row g-3 mb-4 align-items-center justify-content-between">
 					<div class="col-auto">
-						<h1 class="app-page-title mb-0">Create Blog</h1>
+						<h1 class="app-page-title mb-0">Create Media</h1>
 					</div>
 				</div><!--//row-->
 				<div class="container mt-4 mb-4">
 					<div class="row justify-content-md-center">
-						<form class="col-md-20 col-lg-10" enctype="multipart/form-data" id="blog-submit" action="createBlog.php" method="post">
-							<label>Blog Title</label>
-							<div class="input-group ">
-								<input type="text" class="form-control" name="blogTitle" aria-label="blogTitle" aria-describedby="basic-addon2">
+						<form class="col-md-20 col-lg-10" enctype="multipart/form-data" id="media-submit" action="createMedia.php" method="post">
+							<label>Media Title</label>
+							<div class="input-group">
+								<input type="text" class="form-control" name="mediaTitle" aria-label="mediaTitle" aria-describedby="basic-addon2">
+							</div>
+
+							<label>Thumbnail</label>
+							<div class="input-group">
+								<input type="file" name="thumbnail" id="thumbnail" required>
 							</div>
 
 							<label>Image URL</label>
-							<div class="input-group ">
-								<input type="file" name="new-image" id="new-image" required>
+							<div class="input-group">
+								<input type="file" name="new-image" id="new-image">
+							</div>
+
+							<label>Youtube Video URL</label>
+							<div class="input-group">
+								<input type="text" class="form-control" name="video-url" aria-label="video-url" aria-describedby="basic-addon2" placeholder="https://www.youtube.com/watch?v=abcdefg">
 							</div>
 
 							<label>Tag</label>
 							<div class="input-group ">
-								<input type="text" class="form-control" name="tagid" aria-label="tagid" aria-describedby="basic-addon2">
+								<input type="text" class="form-control" name="tagid" aria-label="tagid" aria-describedby="basic-addon2" placeholder="tag,anothertag,anothertag (separate by comma)">
 							</div>
 
 							<label>Category</label>
@@ -352,7 +371,7 @@ if (isset($_POST['blog-submit'])) {
 								<select class="form-select" name="categoryid" aria-label="Default select example" required>
 									<option value="" disabled selected hidden>Pilih Kategori Anda</option>
 									<?php
-									$sqlRole = "SELECT * from tb_category_blog";
+									$sqlRole = "SELECT * from tb_category_media";
 
 									$request = $conn->prepare($sqlRole);
 									$request->execute();
@@ -369,12 +388,12 @@ if (isset($_POST['blog-submit'])) {
 								</select>
 							</div>
 
-							<label>Blog Content</label>
+							<label>Media Content</label>
 							<!--Bootstrap classes arrange web page components into columns and rows in a grid -->
 							<div class="form-group">
-								<textarea id="editor" name="blogContent"></textarea>
+								<textarea id="editor" name="mediaContent"></textarea>
 							</div>
-							<button type="submit" name="blog-submit" class="btn btn-primary">Submit</button>
+							<button type="submit" name="media-submit" class="btn btn-primary">Submit</button>
 						</form>
 					</div>
 				</div>

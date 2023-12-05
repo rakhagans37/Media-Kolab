@@ -7,6 +7,12 @@ $conn = getConnectionMysqli();
 //Script php untuk delete media
 if (isset($_GET['deleteButton'])) {
 	$mediaId = $_GET['mediaId'];
+	$sqlDelete = "DELETE FROM tb_media_tag WHERE media_id = ?";
+	$requestDelete = mysqli_prepare($conn, $sqlDelete);
+
+	mysqli_stmt_bind_param($requestDelete, "s", $mediaId);
+	mysqli_stmt_execute($requestDelete);
+	mysqli_stmt_close($requestDelete);
 
 	$sqlDelete = "DELETE FROM tb_media WHERE media_id = ?";
 	$requestDelete = mysqli_prepare($conn, $sqlDelete);

@@ -8,6 +8,13 @@ $conn = getConnectionMysqli();
 if (isset($_GET['deleteButton'])) {
 	$blogId = $_GET['blogId'];
 
+	$sqlDelete = "DELETE FROM tb_blog_tag WHERE blog_id = ?";
+	$requestDelete = mysqli_prepare($conn, $sqlDelete);
+
+	mysqli_stmt_bind_param($requestDelete, "s", $blogId);
+	mysqli_stmt_execute($requestDelete);
+	mysqli_stmt_close($requestDelete);
+
 	$sqlDelete = "DELETE FROM tb_blog WHERE blog_id = ?";
 	$requestDelete = mysqli_prepare($conn, $sqlDelete);
 

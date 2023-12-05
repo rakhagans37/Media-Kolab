@@ -8,6 +8,14 @@ $conn = getConnectionMysqli();
 if (isset($_GET['deleteButton'])) {
 	$eventId = $_GET['eventId'];
 
+	$eventId = $_POST['eventId'];
+	$sqlDelete = "DELETE FROM tb_event_tag WHERE event_id = ?";
+	$requestDelete = mysqli_prepare($conn, $sqlDelete);
+
+	mysqli_stmt_bind_param($requestDelete, "s", $eventId);
+	mysqli_stmt_execute($requestDelete);
+	mysqli_stmt_close($requestDelete);
+
 	$sqlDelete = "DELETE FROM tb_event WHERE event_id = ?";
 	$requestDelete = mysqli_prepare($conn, $sqlDelete);
 

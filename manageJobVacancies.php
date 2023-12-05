@@ -8,6 +8,13 @@ $conn = getConnectionMysqli();
 if (isset($_GET['deleteButton'])) {
     $jobId = $_GET['jobId'];
 
+    $sqlDelete = "DELETE FROM tb_job_tag WHERE vacancy_id = ?";
+    $requestDelete = mysqli_prepare($conn, $sqlDelete);
+
+    mysqli_stmt_bind_param($requestDelete, "s", $jobId);
+    mysqli_stmt_execute($requestDelete);
+    mysqli_stmt_close($requestDelete);
+
     $sqlDelete = "DELETE FROM tb_job_vacancies WHERE vacancy_id = ?";
     $requestDelete = mysqli_prepare($conn, $sqlDelete);
 

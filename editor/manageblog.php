@@ -20,55 +20,22 @@ $categories = $query->fetchAll(PDO::FETCH_ASSOC);
 
 // Post Detection
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
-
-	// Script Create New Blog
-	if (isset($_POST['createBlog'])) {
-		$blogId = generateIdBlog();
-		$createTitle = $_POST['createTitle'];
-		$content = $_POST['createContent'];
-		$currentDate = date("Y-m-d");
-		$imageName = uploadImageNews($_FILES['createImageUrl']['tmp_name']);
-		$tagId = $_POST['taginput'];
-		$categoryId = $_POST['catinput'];
-
-		$dbConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$sqlCreate = "INSERT INTO tb_blog (blog_id, blog_title, blog_content, date_release, image_url, views, tag_id, category_id, editor_id)
-				VALUES (:blogId, :createTitle, :content, :currentDate, :image_url, 0, :tagId, :categoryId, :editorId)";
-		$request = $dbConnection->prepare($sqlCreate);
-
-		$request->bindParam('blogId', $blogId);
-		$request->bindParam('createTitle', $createTitle);
-		$request->bindParam('content', $content);
-		$request->bindParam('currentDate', $currentDate);
-		$request->bindParam('image_url', $imageName);
-		$request->bindParam('tagId', $tagId);
-		$request->bindParam('categoryId', $categoryId);
-		$request->bindParam('editorId', $editorId);
-		$request->execute();
-
-		echo '<script>alert("Data berhasil ditambahkan!");</script>';
-		header("Location:manageblog.php");
-	}
-
 	// Script Update Blog
 	if (isset($_POST['updateButton'])) {
 		try {
 			$blogId = $_POST['blogId'];
 			$updateTitle = $_POST['updateTitle'];
-			$tagId = $_POST['taginput'];
 			$categoryId = $_POST['catinput'];
 
 			$dbConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 			$sqlUpdate = "UPDATE tb_blog SET 
 					blog_title = :updateTitle,
-					tag_id = :tagId,
 					category_id = :categoryId
 					WHERE blog_id = :blogId";
 
 			$request = $dbConnection->prepare($sqlUpdate);
 
 			$request->bindParam('updateTitle', $updateTitle);
-			$request->bindParam('tagId', $tagId);
 			$request->bindParam('categoryId', $categoryId);
 			$request->bindParam('blogId', $blogId);
 			$request->execute();
@@ -82,6 +49,13 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	// Script Delete Blog
 	if (isset($_POST['deleteButton'])) {
 		$blogId = $_POST['blogId'];
+
+		$sqlDelete = "DELETE FROM tb_blog_tag WHERE blog_id = ?";
+		$requestDelete = mysqli_prepare($conn, $sqlDelete);
+
+		mysqli_stmt_bind_param($requestDelete, "s", $blogId);
+		mysqli_stmt_execute($requestDelete);
+		mysqli_stmt_close($requestDelete);
 
 		$sqlDelete = "DELETE FROM tb_blog WHERE blog_id = ?";
 		$requestDelete = mysqli_prepare($conn, $sqlDelete);
@@ -208,22 +182,34 @@ mysqli_close($conn);
 							<!--//nav-link-->
 						</li>
 						<!--//nav-item-->
-						<li class="nav-item">
+						<li class="nav-item has-submenu">
 							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-							<a class="nav-link active" href="manageBlog.php">
+							<a class="nav-link submenu-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#submenu-2" aria-expanded="false" aria-controls="submenu-2">
 								<span class="nav-icon">
-									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-card-list" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-										<path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z" />
-										<path fill-rule="evenodd" d="M5 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 5 8zm0-2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0 5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5z" />
-										<circle cx="3.5" cy="5.5" r=".5" />
-										<circle cx="3.5" cy="8" r=".5" />
-										<circle cx="3.5" cy="10.5" r=".5" />
+									<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-files" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+										<path fill-rule="evenodd" d="M4 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4z" />
+										<path d="M6 0h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2v-1a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H6a1 1 0 0 0-1 1H4a2 2 0 0 1 2-2z" />
 									</svg>
 								</span>
 								<span class="nav-link-text">News</span>
+								<span class="submenu-arrow">
+									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-chevron-down" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+										<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+									</svg>
+								</span>
+								<!--//submenu-arrow-->
 							</a>
 							<!--//nav-link-->
+							<div id="submenu-2" class="collapse submenu submenu-2 show" data-bs-parent="#menu-accordion">
+								<ul class="submenu-list list-unstyled">
+									<li class="submenu-item"><a class="submenu-link active" href="manageBlog.php">Blog</a></li>
+									<li class="submenu-item"><a class="submenu-link" href="manageMedia.php">Media</a></li>
+								</ul>
+							</div>
 						</li>
+
+						<!--//nav-item -->
 						<li class="nav-item">
 							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
 							<a class="nav-link" href="manageEvent.php">
@@ -240,34 +226,22 @@ mysqli_close($conn);
 							</a>
 							<!--//nav-link-->
 						</li>
-						<!--//nav-item-->
-						<li class="nav-item has-submenu">
+
+						<!--//nav-item -->
+						<li class="nav-item">
 							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-							<a class="nav-link submenu-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#submenu-2" aria-expanded="false" aria-controls="submenu-2">
+							<a class="nav-link" href="manageJob.php">
 								<span class="nav-icon">
-									<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-files" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-										<path fill-rule="evenodd" d="M4 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4z" />
-										<path d="M6 0h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2v-1a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H6a1 1 0 0 0-1 1H4a2 2 0 0 1 2-2z" />
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-briefcase" viewBox="0 0 16 16">
+										<path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5m1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 .772 0M1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.129 7.948a.5.5 0 0 1-.258 0L1 6.116V4.5a.5.5 0 0 1 .5-.5" />
 									</svg>
 								</span>
-								<span class="nav-link-text">User</span>
-								<span class="submenu-arrow">
-									<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-chevron-down" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-										<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
-									</svg>
-								</span>
-								<!--//submenu-arrow-->
+								<span class="nav-link-text">Job Vacancies</span>
 							</a>
 							<!--//nav-link-->
-							<div id="submenu-2" class="collapse submenu submenu-2" data-bs-parent="#menu-accordion">
-								<ul class="submenu-list list-unstyled">
-									<li class="submenu-item"><a class="submenu-link" href="accountEditor.php">Account</a></li>
-								</ul>
-							</div>
 						</li>
-						<!--//nav-item-->
 
+						<!--//nav-item-->
 						<li class="nav-item">
 							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
 							<a class="nav-link" href="help.php">
@@ -285,6 +259,23 @@ mysqli_close($conn);
 					</ul>
 					<!--//app-menu-->
 				</nav>
+				<div class="app-sidepanel-footer">
+					<nav class="app-nav app-nav-footer">
+						<ul class="app-menu footer-menu list-unstyled">
+							<li class="nav-item">
+								<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+								<a class="nav-link" href="accountEditor.php">
+									<span class="nav-icon">
+										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+											<path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z" />
+										</svg>
+									</span>
+									<span class="nav-link-text">Account</span>
+								</a><!--//nav-link-->
+							</li><!--//nav-item-->
+						</ul><!--//footer-menu-->
+					</nav>
+				</div><!--//app-sidepanel-footer-->
 			</div>
 			<!--//sidepanel-inner-->
 		</div>
@@ -337,7 +328,6 @@ mysqli_close($conn);
 												<th class="cell">Date Release</th>
 												<th class="cell">Views</th>
 												<th class="cell">Category</th>
-												<th class="cell">Tag</th>
 												<th class="cell">Action</th>
 											</tr>
 										</thead>
@@ -345,7 +335,6 @@ mysqli_close($conn);
 											<?php
 											foreach ($blogArray as $blog) {
 												$blogId = $blog['blog_id'];
-												$tagname = getTagNameFromId($blog['tag_id']);
 												$categname = getCategoryBlogNameFromId($blog['category_id']);
 												echo <<<TULIS
 														<tr>
@@ -354,9 +343,8 @@ mysqli_close($conn);
 															<td class="cell">{$blog['date_release']}</td>
 															<td class="cell">{$blog['views']}</td>
 															<td class="cell">{$categname}</td>
-															<td class="cell">{$tagname}</td>
 															<td class="cell">
-																<a class="btn btn-light" data-toggle="modal" href="#view-blog-{$blog['blog_id']}">View</a>
+																<a class="btn btn-light" href="../reader/detailBlog.php?blogId={$blog['blog_id']}">View</a>
 																<a class="btn btn-secondary" data-toggle="modal" href="#update-blog-{$blog['blog_id']}">Edit</a>
 																<a class="btn btn-danger" data-toggle="modal" href="#delete-blog" onclick="getDeleteBlogId('$blogId')">Delete</a>
 															</td>
@@ -432,74 +420,8 @@ mysqli_close($conn);
 		</div>
 	</form>
 
-	<!-- View Blog Modal Pop Up -->
-	<?php foreach ($blogArray as $blog) {
-		$tagname = getTagNameFromId($blog['tag_id']);
-		$categname = getCategoryBlogNameFromId($blog['category_id']);
-		$formattedDate = dateFormatter($blog['date_release']);
-		if ($blog['image_url'] != "") {
-			$imageurl = "<div class='form-outline mb-4'><h3>Image</h3><p><a href='{$blog['image_url']}' target='_blank'><img src='{$blog['image_url']}' alt='Image'></a></div>";
-		} else {
-			$imageurl = "";
-		}
-		echo <<<TULIS
-			<div class="modal fade" id="view-blog-{$blog['blog_id']}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h3>View Blog</h3>
-							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-								<span aria-hidden="true">&times;</span>
-							</button>
-						</div>
-						<div class="modal-body">
-							<div class="row d-flex justify-content-center align-items-center">
-								<div class="card-body p-4">
-									<div class="form-outline mb-4">
-										<h3>Blog ID</h3>
-										<p>{$blog['blog_id']}</p>
-									</div>
-									<div class="form-outline mb-4">
-										<h3>Title</h3>
-										<p>{$blog['blog_title']}</p>
-									</div>
-									<div class="form-outline mb-4">
-										<h3>Content</h3>
-										<p>{$blog['blog_content']}</p>
-									</div>
-									<div class="form-outline mb-4">
-										<h3>Date Release</h3>
-										<p>{$formattedDate}</p>
-									</div>
-									{$imageurl}
-									<div class="form-outline mb-4">
-										<h3>Views</h3>
-										<p>{$blog['views']}</p>
-									</div>
-									<div class="form-outline mb-4">
-										<h3>Tag</h3>
-										<p>{$tagname}</p>
-									</div>
-									<div class="form-outline mb-4">
-										<h3>Category</h3>
-										<p>{$categname}</p>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="modal-footer">
-							<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-						</div>
-					</div>
-				</div>
-			</div>
-
-		TULIS;
-	} ?>
-
 	<!-- Update Blog Modal Pop Up -->
 	<?php foreach ($blogArray as $blog) {
-		$tagname = getTagNameFromId($blog['tag_id']);
 		$categname = getCategoryBlogNameFromId($blog['category_id']);
 		$formattedDate = dateFormatter($blog['date_release']);
 		if ($blog['image_url'] != "") {
@@ -509,13 +431,6 @@ mysqli_close($conn);
 		}
 		$tagselections = "";
 		$categoryselections = "";
-		foreach ($tags as $tag) {
-			if ($tag['tag_id'] == $blog['tag_id']) {
-				$tagselections .= "<option value='{$tag['tag_id']}' selected>{$tag['tag_name']}</option>";
-			} else {
-				$tagselections .= "<option value='{$tag['tag_id']}'>{$tag['tag_name']}</option>";
-			}
-		}
 		foreach ($categories as $category) {
 			if ($category['category_id'] == $blog['category_id']) {
 				$categoryselections .= "<option value='{$category['category_id']}' selected>{$category['category_name']}</option>";
@@ -541,12 +456,6 @@ mysqli_close($conn);
 										<div class="form-outline mb-4">
 											<label class="form-label">Judul Blog</label>
 											<input type="text" name="updateTitle" class="form-control form-control-lg" required value='{$blog['blog_title']}'>
-										</div>
-										<div class="form-outline mb-4">
-											<label class="form-label">Tag</label>
-											<select name="taginput" id="taginput" class="form-control">
-											{$tagselections}
-											</select>
 										</div>
 										<div class="form-outline mb-4">
 											<label class="form-label">Categories</label>

@@ -9,7 +9,7 @@ increasemedia($mediaId);
 
 $conn = getConnectionMysqli();
 
-$query = "SELECT tb_media.media_id, tb_media.media_title, tb_media.date_release, tb_media.image_url, tb_editor.username, tb_media.media_content, tb_editor.profile_photo, tb_editor.description FROM tb_media INNER JOIN tb_editor ON tb_media.editor_id = tb_editor.editor_id WHERE tb_media.media_id = '$mediaId'";
+$query = "SELECT tb_media.media_id, tb_media.media_title, tb_media.date_release, tb_media.image_url, tb_editor.username, tb_media.media_content, tb_editor.profile_photo, tb_editor.description, tb_media.video_url FROM tb_media INNER JOIN tb_editor ON tb_media.editor_id = tb_editor.editor_id WHERE tb_media.media_id = '$mediaId'";
 $result = mysqli_query($conn, $query);
 $request = mysqli_fetch_array($result);
 
@@ -24,6 +24,10 @@ $result3 = mysqli_fetch_all($data2);
 
 $data3 = mysqli_query($conn, $query4);
 $result4 = mysqli_fetch_all($data3);
+
+$queryTag = "SELECT tb_media_tag.tag_id, tb_tag.tag_name FROM tb_media_tag INNER JOIN tb_tag ON tb_tag.tag_id = tb_media_tag.tag_id WHERE tb_media_tag.media_id = '$mediaId'";
+$dataTag = mysqli_query($conn, $queryTag);
+$resultTag = mysqli_fetch_all($dataTag);
 
 //Get Editor Profile Photo
 if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
@@ -186,14 +190,21 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 								echo $request['media_content'];
 								?>
 							</div>
+							<!-- post youtube video -->
+							<div style="height: 400px; width: 100%">
+								<!-- !-- Replace " VIDEO_ID" with the actual ID of your YouTube video -->
+								<iframe class="w-100 h-100" src="https://www.youtube.com/embed/<?= $request['video_url'] ?>" frameborder="0" allowfullscreen></iframe>
+							</div>
 							<!-- post bottom section -->
 							<div class="post-bottom">
 								<div class="row d-flex align-items-center">
 									<div class="col-md-6 col-12 text-center text-md-start">
-										<!-- tags -->
-										<a href="#" class="tag">#Trending</a>
-										<a href="#" class="tag">#Video</a>
-										<a href="#" class="tag">#Featured</a>
+										<!-- Tags -->
+										<?php
+										foreach ($resultTag as $data) {
+											echo "<a href='listTag.php?tagId={$data[0]}' class='tag'>#{$data[1]}</a>";
+										}
+										?>
 									</div>
 									<div class="col-md-6 col-12">
 										<!-- social icons -->
