@@ -9,7 +9,7 @@ increaseEvent($eventId);
 
 $conn = getConnectionMysqli();
 
-$query = "SELECT tb_event.event_id, tb_event.event_title, tb_event.date_release, tb_event.image_url, tb_editor.username, tb_event.event_content, tb_event.date_event, tb_event.link_google_map, tb_editor.profile_photo, tb_editor.description FROM tb_event INNER JOIN tb_editor ON tb_event.editor_id=tb_editor.editor_id WHERE tb_event.event_id = '$eventId'";
+$query = "SELECT tb_event.event_id, tb_event.event_title, tb_event.date_release, tb_event.image_url, tb_editor.username, tb_event.event_content, tb_event.date_event, tb_event.link_google_map, tb_editor.profile_photo, tb_editor.description, tb_event.event_url FROM tb_event INNER JOIN tb_editor ON tb_event.editor_id=tb_editor.editor_id WHERE tb_event.event_id = '$eventId'";
 $result = mysqli_query($conn, $query);
 $request = mysqli_fetch_array($result);
 
@@ -28,6 +28,11 @@ $result4 = mysqli_fetch_all($data3);
 $queryTag = "SELECT tb_event_tag.tag_id, tb_tag.tag_name FROM tb_event_tag INNER JOIN tb_tag ON tb_tag.tag_id = tb_event_tag.tag_id WHERE tb_event_tag.event_id = '$eventId'";
 $dataTag = mysqli_query($conn, $queryTag);
 $resultTag = mysqli_fetch_all($dataTag);
+
+//Get all tag on tb_event_tag
+$queryExploreTag = "SELECT DISTINCT tb_tag.tag_name, tb_tag.tag_id FROM tb_event_tag INNER JOIN tb_tag ON tb_event_tag.tag_id = tb_tag.tag_id";
+$reqTag = mysqli_query($conn, $queryExploreTag);
+$resultExploreTag = mysqli_fetch_all($reqTag);
 
 //Get Editor Profile Photo
 if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
@@ -104,7 +109,10 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 			<nav class="navbar navbar-expand-lg">
 				<div class="container-xl">
 					<!-- site logo -->
-					<a class="navbar-brand" href="index.html"><img src="images/logo.svg" alt="logo" /></a>
+					<!-- site logo -->
+					<a class="navbar-brand" href="index.php">
+						<img src="images/logo-text.png" alt="logo" width="160" />
+					</a>
 
 					<div class="collapse navbar-collapse">
 						<!-- menus -->
@@ -196,6 +204,11 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 								<?php
 								echo $request['event_content'];
 								?>
+
+								<blockquote>
+									<h4>Catat Tanggalnya : <?= date_format(new DateTime($request['date_event']), "l, d F Y") ?></h4>
+									<p>Untuk info lebih lengkapnya, silahkan kunjungi link berikut ini : <a href="<?= $request['event_url'] ?>"><?= $request['event_url'] ?></a></p>
+								</blockquote>
 							</div>
 							<!-- post bottom section -->
 							<div class="post-bottom">
@@ -422,11 +435,11 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 									<img src="images/wave.svg" class="wave" alt="wave" />
 								</div>
 								<div class="widget-content">
-									<a href="#" class="tag">#Trending</a>
-									<a href="#" class="tag">#Video</a>
-									<a href="#" class="tag">#Featured</a>
-									<a href="#" class="tag">#Gallery</a>
-									<a href="#" class="tag">#Celebrities</a>
+									<?php
+									foreach ($resultExploreTag as $data) {
+										echo "<a href='listTag.php?tagId={$data[1]}' class='tag'>#{$data[0]}</a>";
+									}
+									?>
 								</div>
 							</div>
 
@@ -533,7 +546,7 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 
 		<!-- logo -->
 		<div class="logo">
-			<img src="images/logo.svg" alt="Katen" />
+			<img src="images/logo-text.png" alt="Nguliah.id" />
 		</div>
 
 		<!-- menu -->

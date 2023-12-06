@@ -8,7 +8,7 @@ $conn = getConnectionMysqli();
 $getCategory = isset($_GET['category']) ? $_GET['category'] : null;
 
 if (is_null($getCategory)) {
-	$query = "SELECT tb_job_vacancies.vacancy_id, tb_job_vacancies.vacancy_title, tb_job_vacancies.date_release, tb_job_vacancies.image_url, tb_editor.username, tb_category_job_vacancy.category_name FROM tb_job_vacancies INNER JOIN tb_editor ON tb_job_vacancies.editor_id = tb_editor.editor_id INNER JOIN  tb_category_job_vacancy ON tb_category_job_vacancy.category_id = tb_job_vacancies.category_id";
+	$query = "SELECT tb_job_vacancies.vacancy_id, tb_job_vacancies.vacancy_title, tb_job_vacancies.date_release, tb_job_vacancies.image_url, tb_job_vacancies.company_name, tb_category_job_vacancy.category_name FROM tb_job_vacancies INNER JOIN tb_editor ON tb_job_vacancies.editor_id = tb_editor.editor_id INNER JOIN  tb_category_job_vacancy ON tb_category_job_vacancy.category_id = tb_job_vacancies.category_id";
 } else {
 	$query = "SELECT tb_job_vacancies.vacancy_id, tb_job_vacancies.vacancy_title, tb_job_vacancies.date_release, tb_job_vacancies.image_url, tb_editor.username, tb_category_job_vacancy.category_name FROM tb_job_vacancies INNER JOIN tb_editor ON tb_job_vacancies.editor_id = tb_editor.editor_id INNER JOIN  tb_category_job_vacancy ON tb_category_job_vacancy.category_id = tb_job_vacancies.category_id WHERE tb_category_job_vacancy.category_name = '$getCategory'";
 }
@@ -25,6 +25,11 @@ $result3 = mysqli_fetch_array($data3);
 $query4 = "SELECT vacancy_id, vacancy_title, date_release, views, logo FROM tb_job_vacancies ORDER BY views desc limit 3";
 $data4 = mysqli_query($conn, $query4);
 $result4 = mysqli_fetch_all($data4);
+
+//Get all tag on tb_job_tag
+$queryExploreTag = "SELECT DISTINCT tb_tag.tag_name, tb_tag.tag_id FROM tb_job_tag INNER JOIN tb_tag ON tb_job_tag.tag_id = tb_tag.tag_id";
+$reqTag = mysqli_query($conn, $queryExploreTag);
+$resultExploreTag = mysqli_fetch_all($reqTag);
 ?>
 
 <!DOCTYPE html>
@@ -180,7 +185,7 @@ $result4 = mysqli_fetch_all($data4);
 									$jobTitle = $isi[1];
 									$dateRelease = $isi[2];
 									$image = getImageNews(decryptPhotoProfile($isi[3]));
-									$editorUsername = $isi[4];
+									$companyName = $isi[4];
 									$categoryName = $isi[5];
 
 									echo <<<BERITA
@@ -197,7 +202,7 @@ $result4 = mysqli_fetch_all($data4);
 												</div>
 												<div class="details">
 													<ul class="meta list-inline mb-0">
-														<li class="list-inline-item"><a href="#"><img src="images/other/author-sm.png" class="author" alt="author" />$editorUsername</a></li>
+														<li class="list-inline-item"><a href="#">$companyName</a></li>
 														<li class="list-inline-item">$dateRelease</li>
 													</ul>
 													<h5 class="post-title mb-3 mt-3"><a href="detailJobVacancies.php?jobId=$jobId">$jobTitle</a></h5>
@@ -316,11 +321,11 @@ $result4 = mysqli_fetch_all($data4);
 									<img src="images/wave.svg" class="wave" alt="wave" />
 								</div>
 								<div class="widget-content">
-									<a href="#" class="tag">#Trending</a>
-									<a href="#" class="tag">#Video</a>
-									<a href="#" class="tag">#Featured</a>
-									<a href="#" class="tag">#Gallery</a>
-									<a href="#" class="tag">#Celebrities</a>
+									<?php
+									foreach ($resultExploreTag as $data) {
+										echo "<a href='listTag.php?tagId={$data[1]}' class='tag'>#{$data[0]}</a>";
+									}
+									?>
 								</div>
 							</div>
 
@@ -427,7 +432,7 @@ $result4 = mysqli_fetch_all($data4);
 
 		<!-- logo -->
 		<div class="logo">
-			<img src="images/logo.svg" alt="Katen" />
+			<img src="images/logo-text.png" alt="Nguliah.id" />
 		</div>
 
 		<!-- menu -->

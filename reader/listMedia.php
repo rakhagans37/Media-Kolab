@@ -25,6 +25,11 @@ $result3 = mysqli_fetch_array($data3);
 $query4 = "SELECT media_id, media_title, date_release, views, thumbnail FROM tb_media ORDER BY views desc limit 3";
 $data4 = mysqli_query($conn, $query4);
 $result4 = mysqli_fetch_all($data4);
+
+//Get all tag on tb_media_tag
+$queryExploreTag = "SELECT DISTINCT tb_tag.tag_name, tb_tag.tag_id FROM tb_media_tag INNER JOIN tb_tag ON tb_media_tag.tag_id = tb_tag.tag_id";
+$reqTag = mysqli_query($conn, $queryExploreTag);
+$resultExploreTag = mysqli_fetch_all($reqTag);
 ?>
 
 <!DOCTYPE html>
@@ -189,7 +194,7 @@ $result4 = mysqli_fetch_all($data4);
 											<div class="post post-grid rounded bordered">
 												<div class="thumb top-rounded">
 													<a href="category.html" class="category-badge position-absolute">$categoryName</a>
-													<a href="detailmedia.php?mediaId=$mediaId">
+													<a href="detailMedia.php?mediaId=$mediaId">
 														<div class="inner">
 															$image
 														</div>
@@ -197,10 +202,10 @@ $result4 = mysqli_fetch_all($data4);
 												</div>
 												<div class="details">
 													<ul class="meta list-inline mb-0">
-														<li class="list-inline-item"><a href="detailmedia.php?mediaId=$mediaId">$editorUsername</a></li>
+														<li class="list-inline-item"><a href="detailMedia.php?mediaId=$mediaId">$editorUsername</a></li>
 														<li class="list-inline-item">$dateRelease</li>
 													</ul>
-													<h5 class="post-title mb-3 mt-3"><a href="detailmedia.php?mediaId=$mediaId">$mediaTitle</a></h5>
+													<h5 class="post-title mb-3 mt-3"><a href="detailMedia.php?mediaId=$mediaId">$mediaTitle</a></h5>
 												</div>
 												<div class="post-bottom clearfix d-flex align-items-center">
 													<div class="social-share me-auto">
@@ -215,7 +220,7 @@ $result4 = mysqli_fetch_all($data4);
 														</ul>
 													</div>
 													<div class="more-button float-end">
-														<a href="detailmedia.php?mediaId=$mediaId"><span class="icon-options"></span></a>
+														<a href="detailMedia.php?mediaId=$mediaId"><span class="icon-options"></span></a>
 													</div>
 												</div>
 											</div>
@@ -261,14 +266,14 @@ $result4 = mysqli_fetch_all($data4);
 											<div class="post post-list-sm circle">
 											<div class="thumb circle">
 												<span class="number">$number</span>
-												<a href="detailmedia.php?mediaId=$popularmediaId">
+												<a href="detailMedia.php?mediaId=$popularmediaId">
 													<div class="inner">
 														<img src="images/posts/tabs-1.jpg" alt="post-title" />
 													</div>
 												</a>
 											</div>
 											<div class="details clearfix">
-												<h6 class="post-title my-0"><a href="detailmedia.php?mediaId=$popularmediaId">$popularmediaTitle</a></h6>
+												<h6 class="post-title my-0"><a href="detailMedia.php?mediaId=$popularmediaId">$popularmediaTitle</a></h6>
 												<ul class="meta list-inline mt-1 mb-0">
 													<li class="list-inline-item">$popularmediaDate</li>
 												</ul>
@@ -319,11 +324,11 @@ $result4 = mysqli_fetch_all($data4);
 									<img src="images/wave.svg" class="wave" alt="wave" />
 								</div>
 								<div class="widget-content">
-									<a href="#" class="tag">#Trending</a>
-									<a href="#" class="tag">#Video</a>
-									<a href="#" class="tag">#Featured</a>
-									<a href="#" class="tag">#Gallery</a>
-									<a href="#" class="tag">#Celebrities</a>
+									<?php
+									foreach ($resultExploreTag as $data) {
+										echo "<a href='listTag.php?tagId={$data[1]}' class='tag'>#{$data[0]}</a>";
+									}
+									?>
 								</div>
 							</div>
 
@@ -430,7 +435,7 @@ $result4 = mysqli_fetch_all($data4);
 
 		<!-- logo -->
 		<div class="logo">
-			<img src="images/logo.svg" alt="Katen" />
+			<img src="images/logo-text.png" alt="Nguliah.id" />
 		</div>
 
 		<!-- menu -->

@@ -29,6 +29,11 @@ $queryTag = "SELECT tb_blog_tag.tag_id, tb_tag.tag_name FROM tb_blog_tag INNER J
 $dataTag = mysqli_query($conn, $queryTag);
 $resultTag = mysqli_fetch_all($dataTag);
 
+//Get all tag on tb_blog_tag
+$queryExploreTag = "SELECT DISTINCT tb_tag.tag_name, tb_tag.tag_id FROM tb_blog_tag INNER JOIN tb_tag ON tb_blog_tag.tag_id = tb_tag.tag_id";
+$reqTag = mysqli_query($conn, $queryExploreTag);
+$resultExploreTag = mysqli_fetch_all($reqTag);
+
 //Get Editor Profile Photo
 if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 	$editorProfilePhoto = getImageProfile(decryptPhotoProfile($editorPhotoUrl), 35);
@@ -104,7 +109,9 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 			<nav class="navbar navbar-expand-lg">
 				<div class="container-xl">
 					<!-- site logo -->
-					<a class="navbar-brand" href="index.php"><img src="images/logo.svg" alt="logo" /></a>
+					<a class="navbar-brand" href="index.php">
+						<img src="images/logo-text.png" alt="logo" width="160" />
+					</a>
 
 					<div class="collapse navbar-collapse">
 						<!-- menus -->
@@ -182,7 +189,10 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 							</div>
 							<!-- featured image -->
 							<div class="featured-image">
-								<img src="images/posts/featured-lg.jpg" alt="post-title" />
+								<?php
+								$image = getImageNews(decryptPhotoProfile($request['image_url']));
+								echo $image;
+								?>
 							</div>
 							<!-- post content -->
 							<div class="post-content clearfix">
@@ -197,7 +207,7 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 										<!-- tags -->
 										<?php
 										foreach ($resultTag as $data) {
-											echo "<a href='listTag?tagId={$data[0]}' class='tag'>#{$data[1]}</a>";
+											echo "<a href='listTag.php?tagId={$data[0]}' class='tag'>#{$data[1]}</a>";
 										}
 										?>
 									</div>
@@ -414,11 +424,11 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 									<img src="images/wave.svg" class="wave" alt="wave" />
 								</div>
 								<div class="widget-content">
-									<a href="#" class="tag">#Trending</a>
-									<a href="#" class="tag">#Video</a>
-									<a href="#" class="tag">#Featured</a>
-									<a href="#" class="tag">#Gallery</a>
-									<a href="#" class="tag">#Celebrities</a>
+									<?php
+									foreach ($resultExploreTag as $data) {
+										echo "<a href='listTag.php?tagId={$data[1]}' class='tag'>#{$data[0]}</a>";
+									}
+									?>
 								</div>
 							</div>
 
@@ -525,7 +535,7 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 
 		<!-- logo -->
 		<div class="logo">
-			<img src="images/logo.svg" alt="Katen" />
+			<img src="images/logo-text.png" alt="Nguliah.id" />
 		</div>
 
 		<!-- menu -->

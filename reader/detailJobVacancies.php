@@ -9,32 +9,42 @@ increaseJobVacancies($jobId);
 
 $conn = getConnectionMysqli();
 
-$query = "SELECT tb_job_vacancies.vacancy_id, tb_job_vacancies.vacancy_title, tb_job_vacancies.date_release, tb_job_vacancies.image_url, tb_job_vacancies.company_name, tb_editor.username, tb_job_vacancies.vacancy_content, tb_editor.profile_photo, tb_editor.description FROM tb_job_vacancies INNER JOIN tb_editor ON tb_job_vacancies.editor_id=tb_editor.editor_id WHERE tb_job_vacancies.vacancy_id='$jobId'";
+// Fetch content of the job vacancies
+$query = "SELECT tb_job_vacancies.vacancy_id, tb_job_vacancies.vacancy_title, tb_job_vacancies.date_release, tb_job_vacancies.image_url, tb_job_vacancies.company_name, tb_editor.username, tb_job_vacancies.vacancy_content, tb_editor.profile_photo, tb_editor.description, tb_job_vacancies.logo, tb_job_vacancies.vacancy_requirement FROM tb_job_vacancies INNER JOIN tb_editor ON tb_job_vacancies.editor_id=tb_editor.editor_id WHERE tb_job_vacancies.vacancy_id='$jobId'";
 $result = mysqli_query($conn, $query);
 $request = mysqli_fetch_array($result);
 
+// Fetch popular job vacancies
 $query2 = "SELECT vacancy_id, vacancy_title, date_release, views, logo FROM tb_job_vacancies ORDER BY views desc limit 3";
 $data = mysqli_query($conn, $query2);
 $result2 = mysqli_fetch_all($data);
 
+// Fetch category of job vacancies
 $query3 = "SELECT tb_job_vacancies.category_id, tb_category_job_vacancy.category_name, COUNT(tb_job_vacancies.category_id) AS jumlah_kategori FROM tb_category_job_vacancy INNER JOIN tb_job_vacancies ON tb_category_job_vacancy.category_id = tb_job_vacancies.category_id GROUP BY tb_job_vacancies.category_id";
-$query4 = "SELECT COUNT(vacancy_id) AS jumlah_event FROM tb_job_vacancies";
 $data2 = mysqli_query($conn, $query3);
 $result3 = mysqli_fetch_all($data2);
 
+// Fetch amount of each category on job vacancies
+$query4 = "SELECT COUNT(vacancy_id) AS jumlah_event FROM tb_job_vacancies";
 $data3 = mysqli_query($conn, $query4);
 $result4 = mysqli_fetch_all($data3);
 
+// Fetch tag
 $queryTag = "SELECT tb_job_tag.tag_id, tb_tag.tag_name FROM tb_job_tag INNER JOIN tb_tag ON tb_tag.tag_id = tb_job_tag.tag_id WHERE tb_job_tag.vacancy_id = '$jobId'";
 $dataTag = mysqli_query($conn, $queryTag);
 $resultTag = mysqli_fetch_all($dataTag);
 
+//Get all tag on tb_job_tag
+$queryExploreTag = "SELECT DISTINCT tb_tag.tag_name, tb_tag.tag_id FROM tb_job_tag INNER JOIN tb_tag ON tb_job_tag.tag_id = tb_tag.tag_id";
+$reqTag = mysqli_query($conn, $queryExploreTag);
+$resultExploreTag = mysqli_fetch_all($reqTag);
+
 //Get Editor Profile Photo
-if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
-	$editorProfilePhoto = getImageProfile(decryptPhotoProfile($editorPhotoUrl), 35);
-	$editorProfilePhoto =  substr_replace($editorProfilePhoto, " class='author'", 4, 0);
+if (!is_null($companyLogoUrl = $request['logo'])) {
+	$companyLogo = getImageProfile(decryptPhotoProfile($companyLogoUrl), 35);
+	$companyLogo =  substr_replace($companyLogo, " class='author'", 4, 0);
 } else {
-	$editorProfilePhoto = "<img src='../assets/images/profiles/profile-1.png' class='author' width='35' height='35' alt='author' />";
+	$companyLogo = "<img src='../assets/images/profiles/profile-1.png' class='author' width='35' height='35' alt='author' />";
 }
 ?>
 <!DOCTYPE html>
@@ -104,7 +114,10 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 			<nav class="navbar navbar-expand-lg">
 				<div class="container-xl">
 					<!-- site logo -->
-					<a class="navbar-brand" href="index.html"><img src="images/logo.svg" alt="logo" /></a>
+					<!-- site logo -->
+					<a class="navbar-brand" href="index.php">
+						<img src="images/logo-text.png" alt="logo" width="160" />
+					</a>
 
 					<div class="collapse navbar-collapse">
 						<!-- menus -->
@@ -159,7 +172,7 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 				<nav aria-label="breadcrumb">
 					<ol class="breadcrumb">
 						<li class="breadcrumb-item"><a href="#">Home</a></li>
-						<li class="breadcrumb-item"><a href="#">Inspiration</a></li>
+						<li class="breadcrumb-item"><a href="#">Loker/Magang</a></li>
 						<li class="breadcrumb-item active" aria-current="page"><?php echo $request["vacancy_title"] ?></li>
 					</ol>
 				</nav>
@@ -176,22 +189,29 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 									<li class="list-inline-item">
 										<a href="#">
 											<?php
-											echo $editorProfilePhoto;
-											echo $request["username"];
+											echo $companyLogo;
+											echo $request["company_name"];
 											?>
 										</a>
 									</li>
-									<li class="list-inline-item"><a href="#"><?php echo $request["company_name"] ?></a></li>
+									<li class="list-inline-item"><a href="#"><?php echo $request["username"] ?></a></li>
 									<li class="list-inline-item"><?php echo $request["date_release"] ?></li>
 								</ul>
 							</div>
 							<!-- featured image -->
 							<div class="featured-image">
-								<img src="images/posts/featured-lg.jpg" alt="post-title" />
+								<?php
+								$image = getImageNews(decryptPhotoProfile($request['image_url']));
+								echo $image;
+								?>
 							</div>
 							<!-- post content -->
 							<div class="post-content clearfix">
 								<?= $request['vacancy_content'] ?>
+
+								<blockquote>
+									<?= $request['vacancy_requirement'] ?>
+								</blockquote>
 							</div>
 							<!-- post bottom section -->
 							<div class="post-bottom">
@@ -344,22 +364,6 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 
 						<!-- sidebar -->
 						<div class="sidebar">
-							<!-- widget about -->
-							<div class="widget rounded">
-								<div class="widget-about data-bg-image text-center" data-bg-image="images/map-bg.png">
-									<img src="images/logo.svg" alt="logo" class="mb-4" />
-									<p class="mb-4">Hello, We’re content writer who is fascinated by content fashion, celebrity and lifestyle. We helps clients bring the right content to the right people.</p>
-									<ul class="social-icons list-unstyled list-inline mb-0">
-										<li class="list-inline-item"><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-										<li class="list-inline-item"><a href="#"><i class="fab fa-twitter"></i></a></li>
-										<li class="list-inline-item"><a href="#"><i class="fab fa-instagram"></i></a></li>
-										<li class="list-inline-item"><a href="#"><i class="fab fa-pinterest"></i></a></li>
-										<li class="list-inline-item"><a href="#"><i class="fab fa-medium"></i></a></li>
-										<li class="list-inline-item"><a href="#"><i class="fab fa-youtube"></i></a></li>
-									</ul>
-								</div>
-							</div>
-
 							<!-- widget popular posts -->
 							<div class="widget rounded">
 								<div class="widget-header text-center">
@@ -408,7 +412,7 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 										<?php
 										$jumlah = $result4[0][0];
 										echo "<li><a href='listJobVacancies.php'>ALL</a><span>($jumlah)</span></li>";
-										foreach ($result2 as $isi) {
+										foreach ($result3 as $isi) {
 											$categoryName = $isi[1];
 											$jumlah = $isi[2];
 											echo "<li><a href='listJobVacancies.php?category=$categoryName'>$categoryName</a><span>($jumlah)</span></li>";
@@ -434,11 +438,11 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 									<img src="images/wave.svg" class="wave" alt="wave" />
 								</div>
 								<div class="widget-content">
-									<a href="#" class="tag">#Trending</a>
-									<a href="#" class="tag">#Video</a>
-									<a href="#" class="tag">#Featured</a>
-									<a href="#" class="tag">#Gallery</a>
-									<a href="#" class="tag">#Celebrities</a>
+									<?php
+									foreach ($resultExploreTag as $data) {
+										echo "<a href='listTag.php?tagId={$data[1]}' class='tag'>#{$data[0]}</a>";
+									}
+									?>
 								</div>
 							</div>
 
@@ -545,7 +549,7 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 
 		<!-- logo -->
 		<div class="logo">
-			<img src="images/logo.svg" alt="Katen" />
+			<img src="images/logo-text.png" alt="Nguliah.id" />
 		</div>
 
 		<!-- menu -->

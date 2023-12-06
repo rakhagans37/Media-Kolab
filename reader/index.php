@@ -615,14 +615,14 @@ $resultPopularCat = mysqli_fetch_all($reqPopularCat);
 											<div class="post post-list-sm circle">
 											<div class="thumb circle">
 												<span class="number">$number</span>
-												<a href="detailMedia?mediaId=$popularMediaId">
+												<a href="detailMedia.php?mediaId=$popularMediaId">
 													<div class="inner">
 														<img src="images/posts/tabs-1.jpg" alt="post-title" />
 													</div>
 												</a>
 											</div>
 											<div class="details clearfix">
-												<h6 class="post-title my-0"><a href="detailMedia?mediaId=$popularMediaId">$popularMediaTitle</a></h6>
+												<h6 class="post-title my-0"><a href="detailMedia.php?mediaId=$popularMediaId">$popularMediaTitle</a></h6>
 												<ul class="meta list-inline mt-1 mb-0">
 													<li class="list-inline-item">$popularMediaDate</li>
 												</ul>
@@ -815,7 +815,7 @@ $resultPopularCat = mysqli_fetch_all($reqPopularCat);
 
 		<!-- logo -->
 		<div class="logo">
-			<img src="images/logo.svg" alt="Katen" />
+			<img src="images/logo-text.png" alt="Nguliah.id" />
 		</div>
 
 		<!-- menu -->
