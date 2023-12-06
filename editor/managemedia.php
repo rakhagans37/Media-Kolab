@@ -176,9 +176,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 if (isset($_GET['search-media'])) {
 	$searchMedia = $_GET['searchorders'];
-	$sql = "SELECT * FROM tb_media WHERE media_title LIKE '%$searchMedia%'";
+	$sql = "SELECT * FROM tb_media WHERE editor_id = '$editorId' AND media_title LIKE '%$searchMedia%'";
 } else {
-	$sql = "SELECT * FROM tb_media";
+	$sql = "SELECT * FROM tb_media WHERE editor_id = '$editorId'";
 }
 
 // Setting Media Datasets

@@ -68,9 +68,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 if (isset($_GET['search-blog'])) {
 	$searchBlog = $_GET['searchorders'];
-	$sql = "SELECT * FROM tb_blog WHERE blog_title LIKE '%$searchBlog%'";
+	$sql = "SELECT * FROM tb_blog WHERE editor_id = '$editorId' AND blog_title LIKE '%$searchBlog%'";
 } else {
-	$sql = "SELECT * FROM tb_blog";
+	$sql = "SELECT * FROM tb_blog WHERE editor_id = '$editorId'";
 }
 
 // Setting Blog Datasets

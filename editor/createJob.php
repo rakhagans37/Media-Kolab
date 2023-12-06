@@ -8,6 +8,7 @@ require_once __DIR__ . "/../helper/tag.php";
 require "../vendor/autoload.php";
 
 $conn = getConnection();
+$createSuccess = null;
 
 if (isset($_POST['vacancy-submit'])) {
 
@@ -21,41 +22,52 @@ if (isset($_POST['vacancy-submit'])) {
 	$categoryId = $_POST['categoryid'];
 	$editorId = $editorId;
 
-	// Menyimpan data ke database
-	$sql = "INSERT INTO tb_job_vacancies (vacancy_id, vacancy_title, vacancy_content, company_name, vacancy_requirement, date_release, 
- 	category_id, editor_id) 
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-	$request = $conn->prepare($sql);
-	$request->bindParam(1, $vacancy_id);
-	$request->bindParam(2, $vacancyTitle);
-	$request->bindParam(3, $vacancyContent);
-	$request->bindParam(4, $company);
-	$request->bindParam(5, $requirement);
-	$request->bindParam(6, $dateRelease);
-	$request->bindParam(7, $categoryId);
-	$request->bindParam(8, $editorId);
-	$request->execute();
+	if (strlen($vacancyTitle) < 12) {
+		$createSuccess = false;
+		$createError = "title";
+	} else if ($_FILES['new-image']['size'] > 5000000) {
+		$createSuccess = false;
+		$createError = "imageSize";
+	} else if (strlen($vacancyContent) < 120) {
+		$createSuccess = false;
+		$createError = "contentLength";
+	} else {
+		// Menyimpan data ke database
+		$sql = "INSERT INTO tb_job_vacancies (vacancy_id, vacancy_title, vacancy_content, company_name, vacancy_requirement, date_release, 
+		category_id, editor_id) 
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+		$request = $conn->prepare($sql);
+		$request->bindParam(1, $vacancy_id);
+		$request->bindParam(2, $vacancyTitle);
+		$request->bindParam(3, $vacancyContent);
+		$request->bindParam(4, $company);
+		$request->bindParam(5, $requirement);
+		$request->bindParam(6, $dateRelease);
+		$request->bindParam(7, $categoryId);
+		$request->bindParam(8, $editorId);
+		$request->execute();
 
-	// Menyimpan image ke database dan cloudinary
-	$imageUrl = uploadImageNews($_FILES['new-image']['tmp_name']);
-	$sql2 = 'UPDATE tb_job_vacancies SET image_url = ? WHERE vacancy_id = ?';
-	$requestInsertImage = $conn->prepare($sql2);
-	$requestInsertImage->bindParam(1, $imageUrl);
-	$requestInsertImage->bindParam(2, $vacancy_id);
-	$requestInsertImage->execute();
+		// Menyimpan image ke database dan cloudinary
+		$imageUrl = uploadImageNews($_FILES['new-image']['tmp_name']);
+		$sql2 = 'UPDATE tb_job_vacancies SET image_url = ? WHERE vacancy_id = ?';
+		$requestInsertImage = $conn->prepare($sql2);
+		$requestInsertImage->bindParam(1, $imageUrl);
+		$requestInsertImage->bindParam(2, $vacancy_id);
+		$requestInsertImage->execute();
 
-	// Menyimpan logo ke database dan cloudinary
-	$companyLogo = uploadImageNews($_FILES['company-logo']['tmp_name']);
-	$sql2 = 'UPDATE tb_job_vacancies SET logo = ? WHERE vacancy_id = ?';
-	$requestInsertLogo = $conn->prepare($sql2);
-	$requestInsertLogo->bindParam(1, $companyLogo);
-	$requestInsertLogo->bindParam(2, $vacancy_id);
-	$requestInsertLogo->execute();
+		// Menyimpan logo ke database dan cloudinary
+		$companyLogo = uploadImageNews($_FILES['company-logo']['tmp_name']);
+		$sql2 = 'UPDATE tb_job_vacancies SET logo = ? WHERE vacancy_id = ?';
+		$requestInsertLogo = $conn->prepare($sql2);
+		$requestInsertLogo->bindParam(1, $companyLogo);
+		$requestInsertLogo->bindParam(2, $vacancy_id);
+		$requestInsertLogo->execute();
 
-	//Insert Tag
-	insertJobTag(separateTag($tagId), $vacancy_id);
-	header("Location:managejob.php");
-	exit;
+		//Insert Tag
+		insertJobTag(separateTag($tagId), $vacancy_id);
+		header("Location:managejob.php");
+		exit;
+	}
 }
 ?>
 
@@ -328,7 +340,25 @@ if (isset($_POST['vacancy-submit'])) {
 
 		<div class="app-content pt-3 p-md-3 p-lg-4">
 			<div class="container-xl">
-
+				<?php
+				if ($createSuccess === false) {
+					switch ($createError) {
+						case 'title':
+							$errorMsg = "Judul harus lebih dari 12 karakter";
+							break;
+						case 'imageSize':
+							$errorMsg = "Gambar yang di upload maximal memiliki ukuran 5 Mb";
+							break;
+						case 'contentLength':
+							$errorMsg = "Konten blog harus memiliki lebih dari 120 karakter";
+							break;
+						default:
+							break;
+					}
+					echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">';
+					echo "<strong>Mohon maaf, </strong>$errorMsg</div>";
+				}
+				?>
 				<div class="row g-3 mb-4 align-items-center justify-content-between">
 					<div class="col-auto">
 						<h1 class="app-page-title mb-0">Create Job</h1>

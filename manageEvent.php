@@ -8,7 +8,6 @@ $conn = getConnectionMysqli();
 if (isset($_GET['deleteButton'])) {
 	$eventId = $_GET['eventId'];
 
-	$eventId = $_POST['eventId'];
 	$sqlDelete = "DELETE FROM tb_event_tag WHERE event_id = ?";
 	$requestDelete = mysqli_prepare($conn, $sqlDelete);
 
@@ -149,7 +148,7 @@ if (isset($_GET['deleteButton'])) {
 									<!--//nav-link-->
 									<div id="submenu-1" class="collapse submenu submenu-1" data-bs-parent="#menu-accordion">
 										<ul class="submenu-list list-unstyled">
-											<li class="submenu-item"><a class="submenu-link" href="manageuser.php">Users Account</a></li>
+											<li class="submenu-item"><a class="submenu-link" href="manageUser.php">Users Account</a></li>
 											<li class="submenu-item"><a class="submenu-link" href="manageRoles.php">Users Roles</a></li>
 										</ul>
 									</div>
@@ -314,7 +313,6 @@ if (isset($_GET['deleteButton'])) {
                                                                         <a class="btn-sm app-btn-secondary" href="#">View</a>
                                                                     </td>
                                                                     <td class="cell">
-
                                                                         <a class="btn-sm app-btn-danger" data-toggle="modal" href="#exampleModal" onclick="getEventId('$eventId')">Delete</a>
                                                                     </td>
                                                                 </tr>
@@ -357,7 +355,7 @@ if (isset($_GET['deleteButton'])) {
 					<div class="modal-dialog" role="document">
 						<div class="modal-content">
 							<div class="modal-header">
-								<h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+								<h5 class="modal-title" id="exampleModalLabel">Delete Event</h5>
 								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 									<span aria-hidden="true">&times;</span>
 								</button>
@@ -368,7 +366,7 @@ if (isset($_GET['deleteButton'])) {
 							<div class="modal-footer">
 								<button type="button" class="btn app-btn-secondary" data-dismiss="modal">Close</button>
 								<form action="manageEvent.php" method="GET" id="conDeleteEvent">
-									<input href="$hapus" id="submit" type="submit" name="deleteButton" class="btn app-btn-confirmation" value="Ya, Saya yakin"></input>
+									<input id="deleteButton" type="submit" name="deleteButton" class="btn app-btn-confirmation" value="Ya, Saya yakin"></input>
 								</form>
 							</div>
 						</div>

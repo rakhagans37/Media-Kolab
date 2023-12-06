@@ -4,12 +4,13 @@ require_once "../helper/validateLoginEditor.php";
 require_once "../helper/getConnectionMsqli.php";
 require_once "../helper/cloudinary.php";
 require_once "../helper/hash.php";
+require_once "../helper/validation.php";
 require_once __DIR__ . "/../helper/tag.php";
 require "../vendor/autoload.php";
 
 
 $conn = getConnection();
-
+$createSuccess = null;
 
 if (isset($_POST['event-submit'])) {
 
@@ -19,41 +20,52 @@ if (isset($_POST['event-submit'])) {
 	$eventUrl = $_POST['eventurl'];
 	$dateRelease = date("Y-m-d");
 	$dateEvent = $_POST['dateevent'];
-	$videoUrl = $_POST['videourl'];
+	$videoUrl = $_POST['videourl'] == null || $_POST['videourl'] = "" ? null : getYoutubeID($_POST['videourl']);
 	$tagId = $_POST['tagid'];
 	$categoryId = $_POST['categoryid'];
 	$linkGoogleMap = $_POST['linkgooglemap'];
 	$editorId = $editorId;
 
-	// Menyimpan data ke database
-	$sql = "INSERT INTO tb_event (event_id, event_title, event_content, event_url, date_release, date_event, 
-	 video_url, category_id, editor_id, link_google_map) 
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-	$request = $conn->prepare($sql);
-	// Bind the values to the placeholders
-	$request->bindParam(1, $eventId);
-	$request->bindParam(2, $eventTitle);
-	$request->bindParam(3, $eventContent);
-	$request->bindParam(4, $eventUrl);
-	$request->bindParam(5, $dateRelease);
-	$request->bindParam(6, $dateEvent);
-	$request->bindParam(7, $videoUrl);
-	$request->bindParam(8, $categoryId);
-	$request->bindParam(9, $editorId);
-	$request->bindParam(10, $linkGoogleMap);
-	// Execute the prepared statement
-	$request->execute();
+	if (strlen($eventTitle) < 12) {
+		$createSuccess = false;
+		$createError = "title";
+	} else if ($_FILES['new-image']['size'] > 5000000) {
+		$createSuccess = false;
+		$createError = "imageSize";
+	} else if (strlen($eventContent) < 120) {
+		$createSuccess = false;
+		$createError = "contentLength";
+	} else {
+		// Menyimpan data ke database
+		$sql = "INSERT INTO tb_event (event_id, event_title, event_content, event_url, date_release, date_event, 
+		 video_url, category_id, editor_id, link_google_map) 
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		$request = $conn->prepare($sql);
+		// Bind the values to the placeholders
+		$request->bindParam(1, $eventId);
+		$request->bindParam(2, $eventTitle);
+		$request->bindParam(3, $eventContent);
+		$request->bindParam(4, $eventUrl);
+		$request->bindParam(5, $dateRelease);
+		$request->bindParam(6, $dateEvent);
+		$request->bindParam(7, $videoUrl);
+		$request->bindParam(8, $categoryId);
+		$request->bindParam(9, $editorId);
+		$request->bindParam(10, $linkGoogleMap);
+		// Execute the prepared statement
+		$request->execute();
 
-	$imageUrl = uploadImageNews($_FILES['new-image']['tmp_name']);
-	$sql2 = 'UPDATE tb_event SET image_url = ? WHERE event_id = ?';
-	$request = $conn->prepare($sql2);
-	$request->bindParam(1, $imageUrl);
-	$request->bindParam(2, $eventId);
-	$request->execute();
+		$imageUrl = uploadImageNews($_FILES['new-image']['tmp_name']);
+		$sql2 = 'UPDATE tb_event SET image_url = ? WHERE event_id = ?';
+		$request = $conn->prepare($sql2);
+		$request->bindParam(1, $imageUrl);
+		$request->bindParam(2, $eventId);
+		$request->execute();
 
-	insertEventTag(separateTag($tagId), $eventId);
-	header("location:createEvent.php");
-	exit;
+		insertEventTag(separateTag($tagId), $eventId);
+		header("location:manageEvent.php");
+		exit;
+	}
 }
 
 ?>
@@ -329,7 +341,25 @@ if (isset($_POST['event-submit'])) {
 
 		<div class="app-content pt-3 p-md-3 p-lg-4">
 			<div class="container-xl">
-
+				<?php
+				if ($createSuccess === false) {
+					switch ($createError) {
+						case 'title':
+							$errorMsg = "Judul harus lebih dari 12 karakter";
+							break;
+						case 'imageSize':
+							$errorMsg = "Gambar yang di upload maximal memiliki ukuran 5 Mb";
+							break;
+						case 'contentLength':
+							$errorMsg = "Konten blog harus memiliki lebih dari 120 karakter";
+							break;
+						default:
+							break;
+					}
+					echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">';
+					echo "<strong>Mohon maaf, </strong>$errorMsg</div>";
+				}
+				?>
 				<div class="row g-3 mb-4 align-items-center justify-content-between">
 					<div class="col-auto">
 						<h1 class="app-page-title mb-0">Create Event</h1>
@@ -371,10 +401,10 @@ if (isset($_POST['event-submit'])) {
 							</div>
 
 
-							<label>Video URL</label>
+							<label>Youtube URL</label>
 
 							<div class="input-group ">
-								<input type="text" class="form-control" name="videourl" aria-label="EventID" aria-describedby="basic-addon1">
+								<input type="text" class="form-control" name="videourl" aria-label="EventID" aria-describedby="basic-addon1" placeholder="ex: https://www.youtube.com/watch?v=abcdefg">
 							</div>
 
 							<label>Tag</label>
@@ -383,7 +413,7 @@ if (isset($_POST['event-submit'])) {
 								<input type="text" class="form-control" name="tagid" aria-label="tagid" aria-describedby="basic-addon1" placeholder="tag1,tag2,tag3 (Separate by comma)">
 							</div>
 
-							<label>Categori ID</label>
+							<label>Category</label>
 
 							<div class="input-group ">
 

@@ -16,7 +16,7 @@ if (isset($_GET['ban-editor'])) {
     mysqli_stmt_close($requestBanEditor);
     mysqli_close($conn);
 
-    header("Location:manageuser.php");
+    header("Location:manageUser.php");
     exit;
 }
 
@@ -32,7 +32,7 @@ if (isset($_GET['activate-editor'])) {
     mysqli_stmt_close($requestActivateEditor);
     mysqli_close($conn);
 
-    header("Location:manageuser.php");
+    header("Location:manageUser.php");
     exit;
 }
 
@@ -59,14 +59,14 @@ $requestBannedUser = mysqli_query($conn, $sqlBannedUser);
 <html lang="en">
 
 <head>
-    <title>Ngampus.id - For Admin</title>
+    <title>Nguliah - For Admin</title>
 
     <!-- Meta -->
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="description" content="Ngampus.id - For Admin">
+    <meta name="description" content="Nguliah - For Admin">
     <meta name="author" content="Xiaoying Riley at 3rd Wave Media">
     <link rel="shortcut icon" href="favicon-image.ico">
 
@@ -135,7 +135,7 @@ $requestBannedUser = mysqli_query($conn, $sqlBannedUser);
             <div class="sidepanel-inner d-flex flex-column">
                 <a href="#" id="sidepanel-close" class="sidepanel-close d-xl-none">&times;</a>
                 <div class="app-branding">
-                    <a class="app-logo" href="index.php"><img class="logo-icon me-2" src="assets/images/app-logo.png" alt="logo"><span class="logo-text">Ngampus.id</span></a>
+                    <a class="app-logo" href="index.php"><img class="logo-icon me-2" src="assets/images/app-logo.png" alt="logo"><span class="logo-text">Nguliah</span></a>
 
                 </div><!--//app-branding-->
                 <nav id="app-nav-main" class="app-nav app-nav-main flex-grow-1">
@@ -173,7 +173,7 @@ $requestBannedUser = mysqli_query($conn, $sqlBannedUser);
                             <!--//nav-link-->
                             <div id="submenu-1" class="collapse submenu submenu-1 show" data-bs-parent="#menu-accordion">
                                 <ul class="submenu-list list-unstyled">
-                                    <li class="submenu-item"><a class="submenu-link active" href="manageuser.php">Users Account</a></li>
+                                    <li class="submenu-item"><a class="submenu-link active" href="manageUser.php">Users Account</a></li>
                                     <li class="submenu-item"><a class="submenu-link" href="manageRoles.php">Users Roles</a></li>
                                 </ul>
                             </div>
@@ -259,7 +259,7 @@ $requestBannedUser = mysqli_query($conn, $sqlBannedUser);
                         <div class="page-utilities">
                             <div class="row g-2 justify-content-start justify-content-md-end align-items-center">
                                 <div class="col-auto">
-                                    <form class="table-search-form row gx-1 align-items-center" action="manageuser.php" method="GET">
+                                    <form class="table-search-form row gx-1 align-items-center" action="manageUser.php" method="GET">
                                         <div class="col-auto">
                                             <input type="text" id="search-orders" name="search-orders" class="form-control search-orders" placeholder="Search">
                                         </div>
@@ -477,7 +477,7 @@ $requestBannedUser = mysqli_query($conn, $sqlBannedUser);
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn app-btn-secondary" data-dismiss="modal">Close</button>
-                        <form action="manageuser.php" method="GET" id="conBanEditor">
+                        <form action="manageUser.php" method="GET" id="conBanEditor">
                             <input type="submit" id="submit" name="ban-editor" class="btn app-btn-confirmation" value="Ya, saya yakin">
                         </form>
                     </div>
@@ -499,7 +499,7 @@ $requestBannedUser = mysqli_query($conn, $sqlBannedUser);
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn app-btn-secondary" data-dismiss="modal">Close</button>
-                        <form action="manageuser.php" method="GET" id="conActEditor">
+                        <form action="manageUser.php" method="GET" id="conActEditor">
                             <input type="submit" id="submit" name="activate-editor" class="btn app-btn-secondary" value="Ya, saya yakin">
                         </form>
                     </div>

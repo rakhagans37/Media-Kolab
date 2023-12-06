@@ -31,14 +31,14 @@ if (isset($_GET['add-roles'])) {
 <html lang="en">
 
 <head>
-    <title>Ngampus.id - For Admin</title>
+    <title>Nguliah.id - For Admin</title>
 
     <!-- Meta -->
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="description" content="Ngampus.id - For Admin">
+    <meta name="description" content="Nguliah.id - For Admin">
     <meta name="author" content="Xiaoying Riley at 3rd Wave Media">
     <link rel="shortcut icon" href="favicon-image.ico">
 
@@ -145,7 +145,7 @@ if (isset($_GET['add-roles'])) {
                             <!--//nav-link-->
                             <div id="submenu-1" class="collapse submenu submenu-1 show" data-bs-parent="#menu-accordion">
                                 <ul class="submenu-list list-unstyled">
-                                    <li class="submenu-item"><a class="submenu-link" href="manageuser.php">Users Account</a></li>
+                                    <li class="submenu-item"><a class="submenu-link" href="manageUser.php">Users Account</a></li>
                                     <li class="submenu-item"><a class="submenu-link active" href="manageRoles.php">Users Roles</a></li>
                                 </ul>
                             </div>

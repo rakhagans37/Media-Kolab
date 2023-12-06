@@ -50,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     // Script Delete event
     if (isset($_POST['deleteButton'])) {
         $eventId = $_POST['eventId'];
+
         $sqlDelete = "DELETE FROM tb_event_tag WHERE event_id = ?";
         $requestDelete = mysqli_prepare($conn, $sqlDelete);
 
@@ -71,9 +72,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 if (isset($_GET['search-event'])) {
     $searchEvent = $_GET['searchorders'];
-    $sql = "SELECT * FROM tb_event WHERE event_title LIKE '%$searchEvent%'";
+    $sql = "SELECT * FROM tb_event WHERE editor_id = $editorId AND event_title LIKE '%$searchEvent%'";
 } else {
-    $sql = "SELECT * FROM tb_event";
+    $sql = "SELECT * FROM tb_event WHERE editor_id = $editorId";
 }
 
 // Setting event Datasets

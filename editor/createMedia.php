@@ -5,56 +5,68 @@ require_once "../helper/getConnectionMsqli.php";
 require_once "../helper/cloudinary.php";
 require_once "../helper/hash.php";
 require_once "../helper/tag.php";
+require_once "../helper/validation.php";
 require "../vendor/autoload.php";
 
 
-$conn = getConnection();
 
+$conn = getConnection();
+$createSuccess = null;
 
 if (isset($_POST['media-submit'])) {
-
 	$mediaId = generateIdMedia();
 	$mediaTitle = $_POST['mediaTitle'];
 	$mediaContent = $_POST['mediaContent'];
 	$dateRelease = date('Y-m-d');
 	$tagId = $_POST['tagid'];
 	$categoryId = $_POST['categoryid'];
-	$videoUrl = $_POST['video-url'];
+	$videoUrl = getYoutubeID($_POST['video-url']);
 	$editorId = $editorId;
 
-	// Menyimpan data ke database
-	$sql = "INSERT INTO tb_media (media_id, media_title, media_content, date_release, category_id, editor_id, video_url) 
-	VALUES (?, ?, ?, ?, ?, ?, ?)";
-	$request = $conn->prepare($sql);
-	$request->bindParam(1, $mediaId);
-	$request->bindParam(2, $mediaTitle);
-	$request->bindParam(3, $mediaContent);
-	$request->bindParam(4, $dateRelease);
-	$request->bindParam(5, $categoryId);
-	$request->bindParam(6, $editorId);
-	$request->bindParam(7, $videoUrl);
-	$request->execute();
+	if (strlen($mediaTitle) < 12) {
+		$createSuccess = false;
+		$createError = "title";
+	} else if ($_FILES['new-image']['size'] > 5000000) {
+		$createSuccess = false;
+		$createError = "imageSize";
+	} else if (strlen($mediaContent) < 120) {
+		$createSuccess = false;
+		$createError = "contentLength";
+	} else {
+		// Menyimpan data ke database
+		$sql = "INSERT INTO tb_media (media_id, media_title, media_content, date_release, category_id, editor_id, video_url) 
+		VALUES (?, ?, ?, ?, ?, ?, ?)";
+		$request = $conn->prepare($sql);
+		$request->bindParam(1, $mediaId);
+		$request->bindParam(2, $mediaTitle);
+		$request->bindParam(3, $mediaContent);
+		$request->bindParam(4, $dateRelease);
+		$request->bindParam(5, $categoryId);
+		$request->bindParam(6, $editorId);
+		$request->bindParam(7, $videoUrl);
+		$request->execute();
 
-	// Menyimpan image ke database dan cloudinary
-	$imageUrl = uploadImageNews($_FILES['new-image']['tmp_name']);
-	$sql2 = 'UPDATE tb_media SET image_url = ? WHERE media_id = ?';
-	$request = $conn->prepare($sql2);
-	$request->bindParam(1, $imageUrl);
-	$request->bindParam(2, $mediaId);
-	$request->execute();
+		// Menyimpan image ke database dan cloudinary
+		$imageUrl = uploadImageNews($_FILES['new-image']['tmp_name']);
+		$sql2 = 'UPDATE tb_media SET image_url = ? WHERE media_id = ?';
+		$request = $conn->prepare($sql2);
+		$request->bindParam(1, $imageUrl);
+		$request->bindParam(2, $mediaId);
+		$request->execute();
 
-	// Menyimpan image ke database dan cloudinary
-	$imageUrl = uploadImageNews($_FILES['thumbnail']['tmp_name']);
-	$sql3 = 'UPDATE tb_media SET thumbnail = ? WHERE media_id = ?';
-	$request = $conn->prepare($sql3);
-	$request->bindParam(1, $imageUrl);
-	$request->bindParam(2, $mediaId);
-	$request->execute();
+		// Menyimpan image ke database dan cloudinary
+		$imageUrl = uploadImageNews($_FILES['thumbnail']['tmp_name']);
+		$sql3 = 'UPDATE tb_media SET thumbnail = ? WHERE media_id = ?';
+		$request = $conn->prepare($sql3);
+		$request->bindParam(1, $imageUrl);
+		$request->bindParam(2, $mediaId);
+		$request->execute();
 
-	insertMediaTag(separateTag($tagId), $mediaId);
+		insertMediaTag(separateTag($tagId), $mediaId);
 
-	header("location:managemedia.php");
-	exit;
+		header("location:managemedia.php");
+		exit;
+	}
 }
 
 ?>
@@ -331,7 +343,25 @@ if (isset($_POST['media-submit'])) {
 
 		<div class="app-content pt-3 p-md-3 p-lg-4">
 			<div class="container-xl">
-
+				<?php
+				if ($createSuccess === false) {
+					switch ($createError) {
+						case 'title':
+							$errorMsg = "Judul harus lebih dari 12 karakter";
+							break;
+						case 'imageSize':
+							$errorMsg = "Gambar yang di upload maximal memiliki ukuran 5 Mb";
+							break;
+						case 'contentLength':
+							$errorMsg = "Konten blog harus memiliki lebih dari 120 karakter";
+							break;
+						default:
+							break;
+					}
+					echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">';
+					echo "<strong>Mohon maaf, </strong>$errorMsg</div>";
+				}
+				?>
 				<div class="row g-3 mb-4 align-items-center justify-content-between">
 					<div class="col-auto">
 						<h1 class="app-page-title mb-0">Create Media</h1>

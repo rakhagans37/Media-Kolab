@@ -82,9 +82,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 if (isset($_GET['search-job'])) {
 	$searchJob = $_GET['searchorders'];
-	$sql = "SELECT * FROM tb_job_vacancies WHERE vacancy_title LIKE '%$searchJob%'";
+	$sql = "SELECT * FROM tb_job_vacancies WHERE editor_id = '$editorId' AND vacancy_title LIKE '%$searchJob%'";
 } else {
-	$sql = "SELECT * FROM tb_job_vacancies";
+	$sql = "SELECT * FROM tb_job_vacancies WHERE editor_id = '$editorId'";
 }
 
 // Setting Job Datasets

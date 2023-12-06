@@ -9,10 +9,9 @@ require "../vendor/autoload.php";
 
 
 $conn = getConnection();
-
+$createSuccess = null;
 
 if (isset($_POST['blog-submit'])) {
-
 	$blogId = generateIdBlog();
 	$blogTitle = $_POST['blogTitle'];
 	$blogContent = $_POST['blogContent'];
@@ -21,31 +20,42 @@ if (isset($_POST['blog-submit'])) {
 	$categoryId = $_POST['categoryid'];
 	$editorId = $editorId;
 
-	// Menyimpan data ke database
-	$sql = "INSERT INTO tb_blog (blog_id, blog_title, blog_content, date_release, 
-	category_id, editor_id) 
-	VALUES (?, ?, ?, ?, ?, ?)";
-	$request = $conn->prepare($sql);
-	// Bind the values to the placeholders
-	$request->bindParam(1, $blogId);
-	$request->bindParam(2, $blogTitle);
-	$request->bindParam(3, $blogContent);
-	$request->bindParam(4, $dateRelease);
-	$request->bindParam(5, $categoryId);
-	$request->bindParam(6, $editorId);
-	// Execute the prepared statement
-	$request->execute();
+	if (strlen($blogTitle) < 12) {
+		$createSuccess = false;
+		$createError = "title";
+	} else if ($_FILES['new-image']['size'] > 5000000) {
+		$createSuccess = false;
+		$createError = "imageSize";
+	} else if (strlen($blogContent) < 120) {
+		$createSuccess = false;
+		$createError = "contentLength";
+	} else {
+		// Menyimpan data ke database
+		$sql = "INSERT INTO tb_blog (blog_id, blog_title, blog_content, date_release, 
+		category_id, editor_id) 
+		VALUES (?, ?, ?, ?, ?, ?)";
+		$request = $conn->prepare($sql);
+		// Bind the values to the placeholders
+		$request->bindParam(1, $blogId);
+		$request->bindParam(2, $blogTitle);
+		$request->bindParam(3, $blogContent);
+		$request->bindParam(4, $dateRelease);
+		$request->bindParam(5, $categoryId);
+		$request->bindParam(6, $editorId);
+		// Execute the prepared statement
+		$request->execute();
 
-	$imageUrl = uploadImageNews($_FILES['new-image']['tmp_name']);
-	$sql2 = 'UPDATE tb_blog SET image_url = ? WHERE blog_id = ?';
-	$request = $conn->prepare($sql2);
-	$request->bindParam(1, $imageUrl);
-	$request->bindParam(2, $blogId);
-	$request->execute();
+		$imageUrl = uploadImageNews($_FILES['new-image']['tmp_name']);
+		$sql2 = 'UPDATE tb_blog SET image_url = ? WHERE blog_id = ?';
+		$request = $conn->prepare($sql2);
+		$request->bindParam(1, $imageUrl);
+		$request->bindParam(2, $blogId);
+		$request->execute();
 
-	insertBlogTag(separateTag($tagId), $blogId);
-	header("location:manageBlog.php");
-	exit;
+		insertBlogTag(separateTag($tagId), $blogId);
+		header("location:manageBlog.php");
+		exit;
+	}
 }
 
 ?>
@@ -322,13 +332,32 @@ if (isset($_POST['blog-submit'])) {
 
 		<div class="app-content pt-3 p-md-3 p-lg-4">
 			<div class="container-xl">
-
-				<div class="row g-3 mb-4 align-items-center justify-content-between">
-					<div class="col-auto">
-						<h1 class="app-page-title mb-0">Create Blog</h1>
-					</div>
-				</div><!--//row-->
 				<div class="container mt-4 mb-4">
+					<?php
+					if ($createSuccess === false) {
+						switch ($createError) {
+							case 'title':
+								$errorMsg = "Judul harus lebih dari 12 karakter";
+								break;
+							case 'imageSize':
+								$errorMsg = "Gambar yang di upload maximal memiliki ukuran 5 Mb";
+								break;
+							case 'contentLength':
+								$errorMsg = "Konten blog harus memiliki lebih dari 120 karakter";
+								break;
+							default:
+								break;
+						}
+						echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">';
+						echo "<strong>Mohon maaf, </strong>$errorMsg</div>";
+					}
+					?>
+					<div class="row g-3 mb-4 align-items-center justify-content-between">
+						<div class="col-auto">
+							<h1 class="app-page-title mb-0">Create Blog</h1>
+						</div>
+					</div><!--//row-->
+
 					<div class="row justify-content-md-center">
 						<form class="col-md-20 col-lg-10" enctype="multipart/form-data" id="blog-submit" action="createBlog.php" method="post">
 							<label>Blog Title</label>

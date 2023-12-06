@@ -2,6 +2,7 @@
 require_once  __DIR__ .  "/../helper/getConnection.php";
 require_once  __DIR__ . "/../helper/getConnectionMsqli.php";
 require_once  __DIR__ . "/../helper/hash.php";
+require_once  __DIR__ . "/../helper/validation.php";
 
 $conn = getConnection();
 $signupSuccess = null;
@@ -24,7 +25,14 @@ if (isset($_POST['signup-submit'])) {
 	$request->execute();
 
 	if ($result = $request->fetchAll()) {
-		$signupSuccess = False;
+		$signupSuccess = false;
+		$signUpError = "usernameNotAvailable";
+	} else if (!isAlphanumeric($password) || (strlen($password) < 8 && strlen($password) > 20)) {
+		$signupSuccess = false;
+		$signUpError = "password";
+	} else if (strlen($phoneNumber) > 13) {
+		$signupSuccess = false;
+		$signUpError = "phoneNumber";
 	} else {
 		if ($password != $confirmPassword) {
 			echo "Password tidak matching";
@@ -85,8 +93,21 @@ if (isset($_POST['signup-submit'])) {
 				</script>;
 				Javascript;
 			} else if ($signupSuccess === False) {
+				switch ($signUpError) {
+					case 'usernameNotAvailable':
+						$errorMsg = "Username atau Email sudah digunakan.";
+						break;
+					case 'password':
+						$errorMsg = "Password harus memiliki 8-20 Karakter berupa kombinasi angka dan huruf.";
+						break;
+					case 'phoneNumber':
+						$errorMsg = "Nomor HP yang dimasukkan harus kurang dari 13 Karakter.";
+						break;
+					default:
+						break;
+				}
 				echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">';
-				echo "<strong>Mohon maaf, </strong>sepertinya username/nomor hp/email yang anda masukkan telah digunakan.</div>";
+				echo "<strong>Mohon maaf, </strong>$errorMsg</div>";
 			}
 			?>
 			<div class="d-flex flex-column align-content-end">

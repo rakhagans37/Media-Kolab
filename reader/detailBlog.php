@@ -200,9 +200,6 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 											echo "<a href='listTag?tagId={$data[0]}' class='tag'>#{$data[1]}</a>";
 										}
 										?>
-										<a href="#" class="tag">#Trending</a>
-										<a href="#" class="tag">#Video</a>
-										<a href="#" class="tag">#Featured</a>
 									</div>
 									<div class="col-md-6 col-12">
 										<!-- social icons -->
@@ -390,11 +387,11 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 									<ul class="list">
 										<?php
 										$jumlah = $result4[0][0];
-										echo "<li><a href='listEvent.php'>ALL</a><span>($jumlah)</span></li>";
+										echo "<li><a href='listBlog.php'>ALL</a><span>($jumlah)</span></li>";
 										foreach ($result3 as $isi) {
 											$categoryName = $isi[1];
 											$jumlah = $isi[2];
-											echo "<li><a href='listEvent.php?category=$categoryName'>$categoryName</a><span>($jumlah)</span></li>";
+											echo "<li><a href='listBlog.php?category=$categoryName'>$categoryName</a><span>($jumlah)</span></li>";
 										}
 										?>
 

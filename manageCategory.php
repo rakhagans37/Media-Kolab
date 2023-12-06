@@ -55,14 +55,14 @@ if (isset($_GET['add-category'])) {
 <html lang="en">
 
 <head>
-    <title>Ngampus.id - For Admin</title>
+    <title>Nguliah.id - For Admin</title>
 
     <!-- Meta -->
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="description" content="Ngampus.id - For Admin">
+    <meta name="description" content="Nguliah.id - For Admin">
     <meta name="author" content="Xiaoying Riley at 3rd Wave Media">
     <link rel="shortcut icon" href="favicon-image.ico">
 
@@ -131,7 +131,7 @@ if (isset($_GET['add-category'])) {
             <div class="sidepanel-inner d-flex flex-column">
                 <a href="#" id="sidepanel-close" class="sidepanel-close d-xl-none">&times;</a>
                 <div class="app-branding">
-                    <a class="app-logo" href="index.php"><img class="logo-icon me-2" src="assets/images/app-logo.png" alt="logo"><span class="logo-text">Ngampus.id</span></a>
+                    <a class="app-logo" href="index.php"><img class="logo-icon me-2" src="assets/images/app-logo.png" alt="logo"><span class="logo-text">Nguliah.id</span></a>
 
                 </div><!--//app-branding-->
                 <nav id="app-nav-main" class="app-nav app-nav-main flex-grow-1">
@@ -169,7 +169,7 @@ if (isset($_GET['add-category'])) {
                             <!--//nav-link-->
                             <div id="submenu-1" class="collapse submenu submenu-1" data-bs-parent="#menu-accordion">
                                 <ul class="submenu-list list-unstyled">
-                                    <li class="submenu-item"><a class="submenu-link" href="manageuser.php">Users Account</a></li>
+                                    <li class="submenu-item"><a class="submenu-link" href="manageUser.php">Users Account</a></li>
                                     <li class="submenu-item"><a class="submenu-link" href="manageRoles.php">Users Roles</a></li>
                                 </ul>
                             </div>
@@ -282,7 +282,7 @@ if (isset($_GET['add-category'])) {
                 </div><!--//row-->
 
                 <nav id="orders-table-tab" class="orders-table-tab app-nav-tabs nav shadow-sm flex-column flex-sm-row mb-4">
-                    <a class="flex-sm-fill text-sm-center nav-link active" id="orders-all-tab" data-bs-toggle="tab" href="#orders-all" role="tab" aria-controls="orders-all" aria-selected="true">Active</a>
+                    <a class="flex-sm-fill text-sm-center nav-link active" id="orders-all-tab" data-bs-toggle="tab" href="#orders-all" role="tab" aria-controls="orders-all" aria-selected="true">Blog</a>
                     <a class="flex-sm-fill text-sm-center nav-link" id="media-tab" data-bs-toggle="tab" href="#mediaCategory" role="tab" aria-controls="media" aria-selected="false">Media</a>
                     <a class="flex-sm-fill text-sm-center nav-link" id="event-tab" data-bs-toggle="tab" href="#eventCategory" role="tab" aria-controls="event" aria-selected="false">Event</a>
                     <a class="flex-sm-fill text-sm-center nav-link" id="job-tab" data-bs-toggle="tab" href="#jobCategory" role="tab" aria-controls="job" aria-selected="false">Job Vacancies</a>
