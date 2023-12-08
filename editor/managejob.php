@@ -71,13 +71,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 			$request->bindParam('vacancyId', $vacancyId);
 			$request->execute();
 
-			header("Location:manageevent.php");
+			header("Location:manageJob.php");
 		} catch (PDOException $e) {
 			echo "<script>alert('Error! $e');</script>";
 		}
 	}
 
-	header("location:managejob.php");
+	header("location:manageJob.php");
+	exit;
 }
 
 if (isset($_GET['search-job'])) {
@@ -101,6 +102,7 @@ if ($jobs) {
 
 // Closing connections;
 mysqli_close($conn);
+$conn = null;
 ?>
 
 <!DOCTYPE html>
@@ -359,7 +361,7 @@ mysqli_close($conn);
 						<div class="page-utilities">
 							<div class="row g-2 justify-content-start justify-content-md-end align-items-center">
 								<div class="col-auto">
-									<form class="table-search-form row gx-1 align-items-center" action="managejob.php" method="GET">
+									<form class="table-search-form row gx-1 align-items-center" action="manageJob.php" method="GET">
 										<div class="col-auto">
 											<input type="text" id="search-orders" name="searchorders" class="form-control search-orders" placeholder="Search">
 										</div>
@@ -411,7 +413,7 @@ mysqli_close($conn);
 															<td class="cell">{$job['views']}</td>
 															<td class="cell">{$categname}</td>
 															<td class="cell">
-																<a class="btn btn-light" href="../reader/detailJobVacancies.php?jobId={$job['vacancy_id']}">View</a>
+																<a class="btn btn-light" href="../detailJobVacancies.php?jobId={$job['vacancy_id']}">View</a>
 																<a class="btn btn-secondary" data-toggle="modal" href="#update-job-{$job['vacancy_id']}">Edit</a>
 																<a class="btn btn-danger" data-toggle="modal" href="#delete-job" onclick="getDeleteJobId('$vacancy_id')">Delete</a>
 															</td>

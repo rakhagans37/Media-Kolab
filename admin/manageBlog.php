@@ -310,7 +310,7 @@ $request = mysqli_query($conn, $sql);
 																<td class="cell">$publisher</td>
 																<td class="cell">$views Person</td>
 																<td class="cell">
-																	<a class="btn-sm app-btn-secondary" href="#">View</a>
+																	<a class="btn-sm app-btn-secondary" href="../detailBlog.php?blogId=$blogId">View</a>
 																</td>
 																<td class="cell">
 																	<a class="btn-sm app-btn-danger" data-toggle="modal" href="#delete-blog" onclick="getBlogId('$blogId')">Delete</a>

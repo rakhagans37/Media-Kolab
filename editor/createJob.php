@@ -4,6 +4,7 @@ require_once "../helper/validateLoginEditor.php";
 require_once "../helper/getConnectionMsqli.php";
 require_once "../helper/cloudinary.php";
 require_once "../helper/hash.php";
+require_once "../helper/increasePopularity.php";
 require_once __DIR__ . "/../helper/tag.php";
 require "../vendor/autoload.php";
 
@@ -63,9 +64,14 @@ if (isset($_POST['vacancy-submit'])) {
 		$requestInsertLogo->bindParam(2, $vacancy_id);
 		$requestInsertLogo->execute();
 
+		//Increase the popularity of category
+		increaseBlogCategory($categoryId);
+
 		//Insert Tag
 		insertJobTag(separateTag($tagId), $vacancy_id);
-		header("Location:managejob.php");
+
+		$conn = null;
+		header("Location:manageJob.php");
 		exit;
 	}
 }

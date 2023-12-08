@@ -1,5 +1,5 @@
 <?php
-include('../helper/getConnectionMsqli.php');
+include('helper/getConnectionMsqli.php');
 require_once __DIR__ . '/helper/cloudinary.php';
 require_once __DIR__ . '/helper/hash.php';
 
@@ -21,7 +21,6 @@ $data2 = mysqli_query($conn, $query2);
 $result2 = mysqli_fetch_all($data2);
 $data3 = mysqli_query($conn, $query3);
 $result3 = mysqli_fetch_array($data3);
-
 $query4 = "SELECT media_id, media_title, date_release, views, thumbnail FROM tb_media ORDER BY views desc limit 3";
 $data4 = mysqli_query($conn, $query4);
 $result4 = mysqli_fetch_all($data4);

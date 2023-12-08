@@ -2,6 +2,7 @@
 require_once __DIR__ . "/helper/getConnectionMsqli.php";
 require_once __DIR__ . "/helper/cloudinary.php";
 require_once __DIR__ . "/helper/hash.php";
+require_once __DIR__ . "/helper/category.php";
 
 $conn = getConnectionMysqli();
 $sql = "SELECT tb_blog.blog_title,tb_blog.date_release,tb_editor.username,tb_category_blog.category_name, tb_blog.blog_id, tb_blog.image_url FROM tb_blog inner join tb_editor on tb_blog.editor_id = tb_editor.editor_id inner join tb_category_blog on tb_blog.category_id = tb_category_blog.category_id";
@@ -34,6 +35,14 @@ $result7 = mysqli_fetch_all($req7);
 $sqlPopularCat = "SELECT tb_blog.blog_id, tb_category_blog.category_name, tb_blog.blog_title, tb_editor.username, tb_blog.date_release, tb_blog.image_url FROM tb_blog INNER JOIN tb_category_blog ON tb_blog.category_id = tb_category_blog.category_id INNER JOIN tb_editor ON tb_blog.editor_id = tb_editor.editor_id WHERE tb_blog.category_id = (SELECT category_id FROM tb_category_blog where popularity = (SELECT MAX(popularity) FROM tb_category_blog) LIMIT 1) ORDER BY RAND() LIMIT 5";
 $reqPopularCat = mysqli_query($conn, $sqlPopularCat);
 $resultPopularCat = mysqli_fetch_all($reqPopularCat);
+
+//Select category
+$category = getRandomCat();
+
+//Select Tag
+$queryGetTag = "SELECT * FROM tb_tag ORDER BY popularity desc LIMIT 5";
+$reqGetTag = mysqli_query($conn, $queryGetTag);
+$resultPopularTag = mysqli_fetch_all($reqGetTag);
 ?>
 
 
@@ -524,8 +533,6 @@ $resultPopularCat = mysqli_fetch_all($reqPopularCat);
 							<div class="padding-30 rounded bordered">
 
 								<div class="row">
-
-
 									<?php
 									$indexMedia = 0;
 									$indexBlog = 0;
@@ -643,12 +650,39 @@ $resultPopularCat = mysqli_fetch_all($reqPopularCat);
 								</div>
 								<div class="widget-content">
 									<ul class="list">
-										<li><a href="#">Lifestyle</a><span>(5)</span></li>
-										<li><a href="#">Inspiration</a><span>(2)</span></li>
-										<li><a href="#">Fashion</a><span>(4)</span></li>
-										<li><a href="#">Politic</a><span>(1)</span></li>
-										<li><a href="#">Trending</a><span>(7)</span></li>
-										<li><a href="#">Culture</a><span>(3)</span></li>
+										<?php
+										//Get category base on the number
+										switch ($category) {
+											case 1:
+												$getCategory =  getBlogCategory();
+												foreach ($getCategory as $data) {
+													echo "<li><a href='listBlog.php?category={$data[1]}'>{$data[1]}</a><span>({$data[2]})</span></li>";
+												}
+												break;
+											case 2:
+												$getCategory =  getMediaCategory();
+												foreach ($getCategory as $data) {
+													echo "<li><a href='listMedia.php?category={$data[1]}'>{$data[1]}</a><span>({$data[2]})</span></li>";
+												}
+												break;
+											case 3:
+												$getCategory =  getEventCategory();
+												foreach ($getCategory as $data) {
+													echo "<li><a href='listEvent.php?category={$data[1]}'>{$data[1]}</a><span>({$data[2]})</span></li>";
+												}
+												break;
+											case 4:
+												$getCategory =  getJobCategory();
+												foreach ($getCategory as $data) {
+													echo "<li><a href='listJobVacancies.php?category={$data[1]}'>{$data[1]}</a><span>({$data[2]})</span></li>";
+												}
+												break;
+											default:
+												break;
+										}
+
+
+										?>
 									</ul>
 								</div>
 
@@ -708,11 +742,11 @@ $resultPopularCat = mysqli_fetch_all($reqPopularCat);
 									<img src="images/wave.svg" class="wave" alt="wave" />
 								</div>
 								<div class="widget-content">
-									<a href="#" class="tag">#Trending</a>
-									<a href="#" class="tag">#Video</a>
-									<a href="#" class="tag">#Featured</a>
-									<a href="#" class="tag">#Gallery</a>
-									<a href="#" class="tag">#Celebrities</a>
+									<?php
+									foreach ($resultPopularTag as $data) {
+										echo "<a href='listTag.php?tagId={$data[0]}' class='tag'>#{$data[1]}</a>";
+									}
+									?>
 								</div>
 							</div>
 						</div>

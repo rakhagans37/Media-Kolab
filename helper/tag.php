@@ -24,7 +24,7 @@ function insertBlogTag(array $arrayTag, $blogId)
             $requestInsert->execute();
         } else {
             $newIdTag = generateIdTag();
-            $popularity = 0;
+            $popularity = 1;
 
             $sqlInsert  = "INSERT INTO tb_tag VALUES(?,?,?)";
             $requestInsertTag = $conn->prepare($sqlInsert);
@@ -64,7 +64,7 @@ function insertMediaTag(array $arrayTag, $mediaId)
             $requestInsert->execute();
         } else {
             $newIdTag = generateIdTag();
-            $popularity = 0;
+            $popularity = 1;
 
             $sqlInsert  = "INSERT INTO tb_tag VALUES(?,?,?)";
             $requestInsertTag = $conn->prepare($sqlInsert);
@@ -103,7 +103,7 @@ function insertEventTag(array $arrayTag, $eventId)
             $requestInsert->execute();
         } else {
             $newIdTag = generateIdTag();
-            $popularity = 0;
+            $popularity = 1;
 
             $sqlInsert  = "INSERT INTO tb_tag VALUES(?,?,?)";
             $requestInsertTag = $conn->prepare($sqlInsert);
@@ -142,7 +142,7 @@ function insertJobTag(array $arrayTag, $jobId)
             $requestInsert->execute();
         } else {
             $newIdTag = generateIdTag();
-            $popularity = 0;
+            $popularity = 1;
 
             $sqlInsert  = "INSERT INTO tb_tag VALUES(?,?,?)";
             $requestInsertTag = $conn->prepare($sqlInsert);

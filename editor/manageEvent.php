@@ -2,7 +2,7 @@
 require_once __DIR__ . "/../helper/hash.php";
 require_once __DIR__ . "/../helper/getConnection.php";
 require_once __DIR__ . "/../helper/getConnectionMsqli.php";
-require_once __DIR__ . "/../helper/eventfunctions.php";
+require_once __DIR__ . "/../helper/eventFunctions.php";
 require_once __DIR__ . "/../helper/tag.php";
 require_once __DIR__ . "/../helper/validateLoginEditor.php";
 require_once __DIR__ . "/../helper/cloudinary.php";
@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             $request->bindParam('eventId', $eventId);
             $request->execute();
 
-            header("Location:manageevent.php");
+            header("Location:manageEvent.php");
         } catch (PDOException $e) {
             echo "<script>alert('Error! $e');</script>";
         }
@@ -91,6 +91,7 @@ if ($events) {
 
 // Closing connections;
 mysqli_close($conn);
+$conn = null;
 ?>
 
 <!DOCTYPE html>
@@ -298,7 +299,7 @@ mysqli_close($conn);
                         <div class="page-utilities">
                             <div class="row g-2 justify-content-start justify-content-md-end align-items-center">
                                 <div class="col-auto">
-                                    <form class="table-search-form row gx-1 align-items-center" action="manageevent.php" method="GET">
+                                    <form class="table-search-form row gx-1 align-items-center" action="manageEvent.php" method="GET">
                                         <div class="col-auto">
                                             <input type="text" id="search-orders" name="searchorders" class="form-control search-orders" placeholder="Search">
                                         </div>
@@ -308,7 +309,7 @@ mysqli_close($conn);
                                     </form>
                                 </div>
                                 <div class="col-auto">
-                                    <a class="btn app-btn-secondary" href="createevent.php">
+                                    <a class="btn app-btn-secondary" href="createEvent.php">
                                         <svg xmlns=" http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
                                             <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z" />
                                         </svg>

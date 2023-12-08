@@ -311,7 +311,7 @@ $request = mysqli_query($conn, $sql);
 																<td class="cell">$publisher</td><td class="cell">$companyName</td>
 																<td class="cell">$views Person</td>
 																<td class="cell">
-																	<a class="btn-sm app-btn-secondary" href="#">View</a>
+																	<a class="btn-sm app-btn-secondary" href="detailJobVacancies.php?jobId=$jobId">View</a>
 																</td>
 																<td class="cell">
 																	<a class="btn-sm app-btn-danger" data-toggle="modal" href="#delete-blog" onclick="getJobId('$jobId')">Delete</a>

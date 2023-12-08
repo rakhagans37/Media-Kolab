@@ -5,6 +5,7 @@ require_once "../helper/getConnectionMsqli.php";
 require_once "../helper/cloudinary.php";
 require_once "../helper/hash.php";
 require_once "../helper/tag.php";
+require_once "../helper/increasePopularity.php";
 require "../vendor/autoload.php";
 
 
@@ -52,7 +53,12 @@ if (isset($_POST['blog-submit'])) {
 		$request->bindParam(2, $blogId);
 		$request->execute();
 
+		//Increase the popularity of category
+		increaseBlogCategory($categoryId);
+
 		insertBlogTag(separateTag($tagId), $blogId);
+
+		$conn = null;
 		header("location:manageBlog.php");
 		exit;
 	}

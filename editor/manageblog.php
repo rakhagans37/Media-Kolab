@@ -39,8 +39,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 			$request->bindParam('categoryId', $categoryId);
 			$request->bindParam('blogId', $blogId);
 			$request->execute();
-
-			header("Location:manageblog.php");
 		} catch (PDOException $e) {
 			echo "<script>alert('Error! $e');</script>";
 		}
@@ -64,6 +62,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 		mysqli_stmt_execute($requestDelete);
 		mysqli_stmt_close($requestDelete);
 	}
+
+	header("Location:manageBlog.php");
+	exit;
 }
 
 if (isset($_GET['search-blog'])) {
@@ -87,6 +88,7 @@ if ($blogs) {
 
 // Closing connections;
 mysqli_close($conn);
+$conn = null;
 ?>
 
 <!DOCTYPE html>
@@ -294,7 +296,7 @@ mysqli_close($conn);
 						<div class="page-utilities">
 							<div class="row g-2 justify-content-start justify-content-md-end align-items-center">
 								<div class="col-auto">
-									<form class="table-search-form row gx-1 align-items-center" action="manageblog.php" method="GET">
+									<form class="table-search-form row gx-1 align-items-center" action="manageBlog.php" method="GET">
 										<div class="col-auto">
 											<input type="text" id="search-orders" name="searchorders" class="form-control search-orders" placeholder="Search">
 										</div>
@@ -344,7 +346,7 @@ mysqli_close($conn);
 															<td class="cell">{$blog['views']}</td>
 															<td class="cell">{$categname}</td>
 															<td class="cell">
-																<a class="btn btn-light" href="../reader/detailBlog.php?blogId={$blog['blog_id']}">View</a>
+																<a class="btn btn-light" href="../detailBlog.php?blogId={$blog['blog_id']}">View</a>
 																<a class="btn btn-secondary" data-toggle="modal" href="#update-blog-{$blog['blog_id']}">Edit</a>
 																<a class="btn btn-danger" data-toggle="modal" href="#delete-blog" onclick="getDeleteBlogId('$blogId')">Delete</a>
 															</td>

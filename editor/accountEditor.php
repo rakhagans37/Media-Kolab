@@ -56,6 +56,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         mysqli_query($connMyqli,   $sqlUpdatePassword);
         mysqli_close($connMyqli);
     }
+
+    header("location:accountEditor.php");
 }
 
 

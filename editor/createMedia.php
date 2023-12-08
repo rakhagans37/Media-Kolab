@@ -5,6 +5,7 @@ require_once "../helper/getConnectionMsqli.php";
 require_once "../helper/cloudinary.php";
 require_once "../helper/hash.php";
 require_once "../helper/tag.php";
+require_once "../helper/increasePopularity.php";
 require_once "../helper/validation.php";
 require "../vendor/autoload.php";
 
@@ -62,9 +63,13 @@ if (isset($_POST['media-submit'])) {
 		$request->bindParam(2, $mediaId);
 		$request->execute();
 
+		//Increase the popularity of category
+		increaseBlogCategory($categoryId);
+
 		insertMediaTag(separateTag($tagId), $mediaId);
 
-		header("location:managemedia.php");
+		$conn = null;
+		header("location:manageMedia.php");
 		exit;
 	}
 }

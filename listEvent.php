@@ -1,5 +1,5 @@
 <?php
-include('../helper/getConnectionMsqli.php');
+include('helper/getConnectionMsqli.php');
 require_once __DIR__ . '/helper/cloudinary.php';
 require_once __DIR__ . '/helper/hash.php';
 

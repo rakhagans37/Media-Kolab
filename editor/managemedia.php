@@ -65,7 +65,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 		} else {
 			echo '<script>alert("Data gagal ditambahkan!");</script>';
 		}
-		header("Location:managemedia.php");
 	}
 
 	// Script Update Media
@@ -114,26 +113,15 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 			$dbConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 			$sqlUpdate = "UPDATE tb_media SET 
 					media_title = :updateTitle,
-					media_content = :updateContent,
-					date_release = :currentDate,
-					image_url = :image_url,
-					video_url = :video_url,
 					category_id = :categoryId
 					WHERE media_id = :mediaId";
 
 			$request = $dbConnection->prepare($sqlUpdate);
 
 			$request->bindParam('updateTitle', $updateTitle);
-			$request->bindParam('updateContent', $updateContent);
-			$request->bindParam('currentDate', $currentDate);
-			$request->bindParam('image_url', $imageUpdateUrl);
-			$request->bindParam('video_url', $videoUpdateUrl);
-			$request->bindParam('tagId', $tagId);
 			$request->bindParam('categoryId', $categoryId);
 			$request->bindParam('mediaId', $mediaId);
 			$request->execute();
-
-			header("Location:managemedia.php");
 		} catch (PDOException $e) {
 			echo "<script>alert('Error! $e');</script>";
 		}
@@ -170,7 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 		mysqli_stmt_close($requestDelete);
 	}
 
-	header("location:managemedia.php");
+	header("location:manageMedia.php");
 	exit;
 }
 
@@ -195,6 +183,7 @@ if ($medias) {
 
 // Closing connections;
 mysqli_close($conn);
+$conn = null;
 ?>
 
 <!DOCTYPE html>
@@ -402,7 +391,7 @@ mysqli_close($conn);
 						<div class="page-utilities">
 							<div class="row g-2 justify-content-start justify-content-md-end align-items-center">
 								<div class="col-auto">
-									<form class="table-search-form row gx-1 align-items-center" action="managemedia.php" method="GET">
+									<form class="table-search-form row gx-1 align-items-center" action="manageMedia.php" method="GET">
 										<div class="col-auto">
 											<input type="text" id="search-orders" name="searchorders" class="form-control search-orders" placeholder="Search">
 										</div>
@@ -452,7 +441,7 @@ mysqli_close($conn);
 															<td class="cell">{$media['views']}</td>
 															<td class="cell">{$categname}</td>
 															<td class="cell">
-																<a class="btn btn-light" href="../reader/detailMedia.php?mediaId={$media['media_id']}">View</a>
+																<a class="btn btn-light" href="../detailMedia.php?mediaId={$media['media_id']}">View</a>
 																<a class="btn btn-secondary" data-toggle="modal" href="#update-media-{$media['media_id']}">Edit</a>
 																<a class="btn btn-danger" data-toggle="modal" href="#delete-media" onclick="getDeleteMediaId('$mediaId')">Delete</a>
 															</td>

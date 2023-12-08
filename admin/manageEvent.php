@@ -310,7 +310,7 @@ if (isset($_GET['deleteButton'])) {
                                                                     <td class="cell"><span class="badge bg-success">Paid</span></td>
                                                                     <td class="cell">$publisher</td>
                                                                     <td class="cell">
-                                                                        <a class="btn-sm app-btn-secondary" href="#">View</a>
+                                                                        <a class="btn-sm app-btn-secondary" href="../detailEvent.php?eventId=$eventId">View</a>
                                                                     </td>
                                                                     <td class="cell">
                                                                         <a class="btn-sm app-btn-danger" data-toggle="modal" href="#exampleModal" onclick="getEventId('$eventId')">Delete</a>

@@ -5,6 +5,7 @@ require_once "../helper/getConnectionMsqli.php";
 require_once "../helper/cloudinary.php";
 require_once "../helper/hash.php";
 require_once "../helper/validation.php";
+require_once "../helper/increasePopularity.php";
 require_once __DIR__ . "/../helper/tag.php";
 require "../vendor/autoload.php";
 
@@ -62,7 +63,12 @@ if (isset($_POST['event-submit'])) {
 		$request->bindParam(2, $eventId);
 		$request->execute();
 
+		//Increase the popularity of category
+		increaseBlogCategory($categoryId);
+
 		insertEventTag(separateTag($tagId), $eventId);
+
+		$conn = null;
 		header("location:manageEvent.php");
 		exit;
 	}

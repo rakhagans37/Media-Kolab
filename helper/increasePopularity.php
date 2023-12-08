@@ -99,7 +99,7 @@ function increaseBlogCategory($blogCatId)
         $conn = getConnection();
         // set the PDO error mode to exception
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $sql = "UPDATE tb_category_blog SET popularity = popularity + 1 WHERE blogCat_id = :blogCatId";
+        $sql = "UPDATE tb_category_blog SET popularity = popularity + 1 WHERE category_id = :blogCatId";
 
         $stmt = $conn->prepare($sql);
         $stmt->bindParam("blogCatId", $blogCatId);
@@ -117,7 +117,7 @@ function increaseEventCategory($eventCatId)
         $conn = getConnection();
         // set the PDO error mode to exception
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $sql = "UPDATE tb_category_event SET popularity = popularity + 1 WHERE eventCat_id = :eventCatId";
+        $sql = "UPDATE tb_category_event SET popularity = popularity + 1 WHERE category_id = :eventCatId";
 
         $stmt = $conn->prepare($sql);
         $stmt->bindParam("eventCatId", $eventCatId);
@@ -135,7 +135,7 @@ function increaseJobCategory($jobCatId)
         $conn = getConnection();
         // set the PDO error mode to exception
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $sql = "UPDATE tb_category_job_vacancy SET popularity = popularity + 1 WHERE jobCat_id = :jobCatId";
+        $sql = "UPDATE tb_category_job_vacancy SET popularity = popularity + 1 WHERE category_id = :jobCatId";
 
         $stmt = $conn->prepare($sql);
         $stmt->bindParam("jobCatId", $jobCatId);
@@ -153,7 +153,7 @@ function increaseMediaCategory($mediaCatId)
         $conn = getConnection();
         // set the PDO error mode to exception
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $sql = "UPDATE tb_category_media SET popularity = popularity + 1 WHERE mediaCat_id = :mediaCatId";
+        $sql = "UPDATE tb_category_media SET popularity = popularity + 1 WHERE category_id = :mediaCatId";
 
         $stmt = $conn->prepare($sql);
         $stmt->bindParam("mediaCatId", $mediaCatId);

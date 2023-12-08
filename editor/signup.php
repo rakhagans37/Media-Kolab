@@ -7,6 +7,13 @@ require_once  __DIR__ . "/../helper/validation.php";
 $conn = getConnection();
 $signupSuccess = null;
 
+//Getting All Role
+$sqlRole = "SELECT * from tb_role";
+
+$request = $conn->prepare($sqlRole);
+$request->execute();
+
+
 if (isset($_POST['signup-submit'])) {
 	$username = $_POST['signup-username'];
 	$email = $_POST['signup-email'];
@@ -53,6 +60,8 @@ if (isset($_POST['signup-submit'])) {
 		}
 	}
 }
+
+$conn = null;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -141,11 +150,6 @@ if (isset($_POST['signup-submit'])) {
 								<select class="form-select" name="signup-role">
 									<option value="" disabled selected hidden>Pilih Role Anda</option>
 									<?php
-									$sqlRole = "SELECT * from tb_role";
-
-									$request = $conn->prepare($sqlRole);
-									$request->execute();
-
 									if ($result = $request->fetchAll()) {
 										foreach ($result as $index) {
 											$roleId = $index['role_id'];
