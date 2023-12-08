@@ -30,6 +30,9 @@ $result4 = mysqli_fetch_all($data4);
 $queryExploreTag = "SELECT DISTINCT tb_tag.tag_name, tb_tag.tag_id FROM tb_blog_tag INNER JOIN tb_tag ON tb_blog_tag.tag_id = tb_tag.tag_id";
 $reqTag = mysqli_query($conn, $queryExploreTag);
 $resultExploreTag = mysqli_fetch_all($reqTag);
+
+//Close Connection
+mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>
@@ -193,7 +196,7 @@ $resultExploreTag = mysqli_fetch_all($reqTag);
 											<!-- post -->
 											<div class="post post-grid rounded bordered">
 												<div class="thumb top-rounded">
-													<a href="category.html" class="category-badge position-absolute">$categoryName</a>
+													<a href="listBlog.php?category=$categoryName" class="category-badge position-absolute">$categoryName</a>
 													<a href="detailBlog.php?blogId=$blogId">
 														<div class="inner">
 															$image

@@ -30,6 +30,9 @@ $result4 = mysqli_fetch_all($data4);
 $queryExploreTag = "SELECT DISTINCT tb_tag.tag_name, tb_tag.tag_id FROM tb_event_tag INNER JOIN tb_tag ON tb_event_tag.tag_id = tb_tag.tag_id";
 $reqTag = mysqli_query($conn, $queryExploreTag);
 $resultExploreTag = mysqli_fetch_all($reqTag);
+
+//Close Connection
+mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>
@@ -40,7 +43,7 @@ $resultExploreTag = mysqli_fetch_all($reqTag);
 	<title>Nguliah.id - Media Campus</title>
 	<meta name="description" content="Nguliah.id - Media Campus">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-	<link rel="shortcut icon" type="image/x-icon" href="images/favicon.png">
+	<link rel="shortcut icon" type="image/x-icon" href="images/logoNgampus2.png">
 
 	<!-- STYLES -->
 	<link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" media="all">
@@ -193,7 +196,7 @@ $resultExploreTag = mysqli_fetch_all($reqTag);
 											<!-- post -->
 											<div class="post post-grid rounded bordered">
 												<div class="thumb top-rounded">
-													<a href="category.html" class="category-badge position-absolute">$categoryName</a>
+													<a href="listEvent.php?category=$categoryName" class="category-badge position-absolute">$categoryName</a>
 													<a href="detailEvent.php?eventId=$eventId">
 														<div class="inner">
 															$image

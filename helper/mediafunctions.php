@@ -51,6 +51,8 @@ function getTagNameFromId($idTag)
         if ($result = $request->fetchAll()) {
             return $result[0]['tag_name'];
         }
+
+        $conn = null;
     } catch (PDOException $errorMessage) {
         $error = $errorMessage->getMessage();
         echo $error;
@@ -72,6 +74,8 @@ function getCategoryMediaNameFromId($idcategory)
         if ($result = $request->fetchAll()) {
             return $result[0]['category_name'];
         }
+
+        $conn = null;
     } catch (PDOException $errorMessage) {
         $error = $errorMessage->getMessage();
         echo $error;

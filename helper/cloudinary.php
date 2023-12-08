@@ -67,6 +67,7 @@ function getAdminPhotoId($idAdmin)
                 $decryptPhotoName = decryptPhotoProfile($photoName);
             }
         }
+        $conn = null;
         return $decryptPhotoName;
     } catch (PDOException $errorMessage) {
         $error = $errorMessage->getMessage();
@@ -94,6 +95,7 @@ function getEditorPhotoId($editorId)
                 $decryptPhotoName = decryptPhotoProfile($photoName);
             }
         }
+        $conn = null;
         return $decryptPhotoName;
     } catch (PDOException $errorMessage) {
         $error = $errorMessage->getMessage();

@@ -4,6 +4,10 @@ require_once __DIR__ . "/helper/increasePopularity.php";
 require_once __DIR__ . "/helper/cloudinary.php";
 require_once __DIR__ . "/helper/hash.php";
 
+if (!isset($_GET['eventId'])) {
+	http_response_code(404);
+}
+
 $eventId = $_GET["eventId"];
 increaseEvent($eventId);
 
@@ -12,6 +16,15 @@ $conn = getConnectionMysqli();
 $query = "SELECT tb_event.event_id, tb_event.event_title, tb_event.date_release, tb_event.image_url, tb_editor.username, tb_event.event_content, tb_event.date_event, tb_event.link_google_map, tb_editor.profile_photo, tb_editor.description, tb_event.event_url FROM tb_event INNER JOIN tb_editor ON tb_event.editor_id=tb_editor.editor_id WHERE tb_event.event_id = '$eventId'";
 $result = mysqli_query($conn, $query);
 $request = mysqli_fetch_array($result);
+
+//Redirect If Not Found
+if (is_null($request)) {
+	mysqli_close($conn);
+	http_response_code(404);
+}
+if (http_response_code() === 404) {
+	header("location:notfound.php");
+}
 
 $query2 = "SELECT event_id, event_title, date_release, views, image_url FROM tb_event ORDER BY views desc limit 3";
 $data = mysqli_query($conn, $query2);
@@ -41,6 +54,9 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 } else {
 	$editorProfilePhoto = "<img src='../assets/images/profiles/profile-1.png' class='author' width='35' height='35' alt='author' />";
 }
+
+//Close Connection
+mysqli_close($conn);
 ?>
 <!DOCTYPE html>
 <html lang="en-US">
@@ -50,7 +66,7 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 	<title>Nguliah.id - Media Campus</title>
 	<meta name="description" content="Nguliah.id - Media Campus">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-	<link rel="shortcut icon" type="image/x-icon" href="images/favicon.png">
+	<link rel="shortcut icon" type="image/x-icon" href="images/logoNgampus2.png">
 
 	<!-- STYLES -->
 	<link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" media="all">

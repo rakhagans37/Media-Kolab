@@ -4,6 +4,13 @@ require_once __DIR__ . "/helper/increasePopularity.php";
 require_once __DIR__ . "/helper/cloudinary.php";
 require_once __DIR__ . "/helper/hash.php";
 
+if (!isset($_GET['jobId'])) {
+	http_response_code(404);
+}
+if (http_response_code() === 404) {
+	header("location:notfound.php");
+}
+
 $jobId = $_GET["jobId"];
 increaseJobVacancies($jobId);
 
@@ -13,6 +20,15 @@ $conn = getConnectionMysqli();
 $query = "SELECT tb_job_vacancies.vacancy_id, tb_job_vacancies.vacancy_title, tb_job_vacancies.date_release, tb_job_vacancies.image_url, tb_job_vacancies.company_name, tb_editor.username, tb_job_vacancies.vacancy_content, tb_editor.profile_photo, tb_editor.description, tb_job_vacancies.logo, tb_job_vacancies.vacancy_requirement FROM tb_job_vacancies INNER JOIN tb_editor ON tb_job_vacancies.editor_id=tb_editor.editor_id WHERE tb_job_vacancies.vacancy_id='$jobId'";
 $result = mysqli_query($conn, $query);
 $request = mysqli_fetch_array($result);
+
+//Redirect If Not Found
+if (is_null($request)) {
+	mysqli_close($conn);
+	http_response_code(404);
+}
+if (http_response_code() === 404) {
+	header("location:notfound.php");
+}
 
 // Fetch popular job vacancies
 $query2 = "SELECT vacancy_id, vacancy_title, date_release, views, logo FROM tb_job_vacancies ORDER BY views desc limit 3";
@@ -46,6 +62,9 @@ if (!is_null($companyLogoUrl = $request['logo'])) {
 } else {
 	$companyLogo = "<img src='../assets/images/profiles/profile-1.png' class='author' width='35' height='35' alt='author' />";
 }
+
+//Close Connection
+mysqli_close($conn);
 ?>
 <!DOCTYPE html>
 <html lang="en-US">
@@ -55,7 +74,7 @@ if (!is_null($companyLogoUrl = $request['logo'])) {
 	<title>Nguliah.id - Media Campus</title>
 	<meta name="description" content="Nguliah.id - Media Campus">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-	<link rel="shortcut icon" type="image/x-icon" href="images/favicon.png">
+	<link rel="shortcut icon" type="image/x-icon" href="images/logoNgampus2.png">
 
 	<!-- STYLES -->
 	<link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" media="all">

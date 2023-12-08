@@ -43,6 +43,9 @@ $category = getRandomCat();
 $queryGetTag = "SELECT * FROM tb_tag ORDER BY popularity desc LIMIT 5";
 $reqGetTag = mysqli_query($conn, $queryGetTag);
 $resultPopularTag = mysqli_fetch_all($reqGetTag);
+
+//Close Connection
+mysqli_close($conn);
 ?>
 
 
@@ -54,7 +57,7 @@ $resultPopularTag = mysqli_fetch_all($reqGetTag);
 	<title>Nguliah.id - Media Campus</title>
 	<meta name="description" content="Nguliah.id - Media Campus">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-	<link rel="shortcut icon" type="image/x-icon" href="images/favicon.png">
+	<link rel="shortcut icon" type="image/x-icon" href="images/logoNgampus2.png">
 
 	<!-- STYLES -->
 	<link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" media="all">
@@ -163,7 +166,7 @@ $resultPopularTag = mysqli_fetch_all($reqGetTag);
 						<!-- featured post large -->
 						<div class="post featured-post-lg">
 							<div class="details clearfix">
-								<a href="category.html" class="category-badge"><?php echo $result[0][3] ?></a>
+								<a href="listBlog.php?<?= $result[0][3] ?>" class="category-badge"><?php echo $result[0][3] ?></a>
 								<h2 class="post-title"><a href="detailBlog.php?blogId=<?php echo $result[0][4] ?>"><?php echo $result[0][0] ?></a></h2>
 								<ul class="meta list-inline mb-0">
 									<li class="list-inline-item"><a href="detailBlog.php?blogId=<?php echo $result[0][4] ?>"><?php echo $result[0][1] ?></a></li>
@@ -285,7 +288,7 @@ $resultPopularTag = mysqli_fetch_all($reqGetTag);
 											echo <<<Buat
 											<div class="post">
 											<div class="thumb rounded">
-												<a href="category.html" class="category-badge position-absolute">$file[3]</a>
+												<a href="listMedia.php?category=$file[3]" class="category-badge position-absolute">$file[3]</a>
 												<span class="post-format">
 													<i class="icon-picture"></i>
 												</span>
@@ -702,7 +705,7 @@ $resultPopularTag = mysqli_fetch_all($reqGetTag);
 											echo <<<Buat
 											<div class="post post-carousel">
 												<div class="thumb rounded">
-													<a href="category.html" class="category-badge position-absolute">$data[1]</a>
+													<a href="listBlog.php?$data[1]" class="category-badge position-absolute">$data[1]</a>
 													<a href="detailBlog.php?blogId=$data[0]">
 														<div class="inner">
 															$image

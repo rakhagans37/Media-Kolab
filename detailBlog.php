@@ -4,6 +4,10 @@ require_once __DIR__ . "/helper/increasePopularity.php";
 require_once __DIR__ . "/helper/cloudinary.php";
 require_once __DIR__ . "/helper/hash.php";
 
+if (!isset($_GET['blogId'])) {
+	http_response_code(404);
+}
+
 $blogId = $_GET["blogId"];
 increaseBlog($blogId);
 
@@ -12,6 +16,15 @@ $conn = getConnectionMysqli();
 $query = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_blog.date_release, tb_blog.image_url, tb_editor.username, tb_blog.blog_content, tb_editor.profile_photo, tb_editor.description FROM tb_blog INNER JOIN tb_editor ON tb_blog.editor_id = tb_editor.editor_id WHERE tb_blog.blog_id = '$blogId'";
 $result = mysqli_query($conn, $query);
 $request = mysqli_fetch_array($result);
+
+//Redirect If Not Found
+if (is_null($request)) {
+	mysqli_close($conn);
+	http_response_code(404);
+}
+if (http_response_code() === 404) {
+	header("location:notfound.php");
+}
 
 $query2 = "SELECT blog_id, blog_title, date_release, views FROM tb_blog ORDER BY views desc limit 3";
 $data = mysqli_query($conn, $query2);
@@ -41,6 +54,8 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 } else {
 	$editorProfilePhoto = "<img src='../assets/images/profiles/profile-1.png' class='author' width='35' height='35' alt='author' />";
 }
+//Close Connection
+mysqli_close($conn);
 ?>
 <!DOCTYPE html>
 <html lang="en-US">
@@ -50,7 +65,7 @@ if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
 	<title>Nguliah.id - Media Campus</title>
 	<meta name="description" content="Nguliah.id - Media Campus">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-	<link rel="shortcut icon" type="image/x-icon" href="images/favicon.png">
+	<link rel="shortcut icon" type="image/x-icon" href="images/logoNgampus2.png">
 
 	<!-- STYLES -->
 	<link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" media="all">

@@ -29,6 +29,9 @@ $result4 = mysqli_fetch_all($data4);
 $queryExploreTag = "SELECT DISTINCT tb_tag.tag_name, tb_tag.tag_id FROM tb_media_tag INNER JOIN tb_tag ON tb_media_tag.tag_id = tb_tag.tag_id";
 $reqTag = mysqli_query($conn, $queryExploreTag);
 $resultExploreTag = mysqli_fetch_all($reqTag);
+
+//Close Connection
+mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>
@@ -58,7 +61,7 @@ $resultExploreTag = mysqli_fetch_all($reqTag);
 <body>
 
 	<!-- preloader -->
-	<!-- <div id="preloader">
+	<div id="preloader">
 		<div class="book">
 			<div class="inner">
 				<div class="left"></div>
@@ -86,7 +89,7 @@ $resultExploreTag = mysqli_fetch_all($reqTag);
 				<li></li>
 			</ul>
 		</div>
-	</div> -->
+	</div>
 
 	<!-- site wrapper -->
 	<div class="site-wrapper">
@@ -157,11 +160,11 @@ $resultExploreTag = mysqli_fetch_all($reqTag);
 		<section class="page-header">
 			<div class="container-xl">
 				<div class="text-center">
-					<h1 class="mt-0 mb-2">media</h1>
+					<h1 class="mt-0 mb-2">Media</h1>
 					<nav aria-label="breadcrumb">
 						<ol class="breadcrumb justify-content-center mb-0">
 							<li class="breadcrumb-item"><a href="#">Home</a></li>
-							<li class="breadcrumb-item active" aria-current="page">media</li>
+							<li class="breadcrumb-item active" aria-current="page">Media</li>
 						</ol>
 					</nav>
 				</div>
@@ -192,7 +195,7 @@ $resultExploreTag = mysqli_fetch_all($reqTag);
 											<!-- post -->
 											<div class="post post-grid rounded bordered">
 												<div class="thumb top-rounded">
-													<a href="category.html" class="category-badge position-absolute">$categoryName</a>
+													<a href="listMedia.php?category=$categoryName" class="category-badge position-absolute">$categoryName</a>
 													<a href="detailMedia.php?mediaId=$mediaId">
 														<div class="inner">
 															$image
