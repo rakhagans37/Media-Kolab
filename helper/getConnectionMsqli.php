@@ -4,8 +4,8 @@ function getConnectionMysqli()
 {
     $server = 'localhost';
     $host = 3306;
-    $username = 'root';
-    $password = '';
+    $username = 'kolab';
+    $password = 'Kol@b123x';
     $dbName =  'db_medkolab';
 
     return mysqli_connect($server, $username, $password, $dbName);

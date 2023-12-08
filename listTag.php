@@ -47,23 +47,40 @@ function printPost($redirectToDetail, $redirectToList, $queryParameter, $valuePa
 }
 
 $conn = getConnectionMysqli();
+
 if (!isset($_GET['tagId'])) {
+    http_response_code(404);
+}
+
+$tagId = $_GET['tagId'];
+
+//Check availibility of tag id
+$queryCheckTag = "SELECT * FROM tb_tag WHERE tag_id = '$tagId'";
+$reqCheckTag = mysqli_query($conn, $queryCheckTag);
+$resultCheckTag = mysqli_fetch_all($reqCheckTag);
+
+//Redirect If Not Found
+if (count($resultCheckTag) < 1) {
+    mysqli_close($conn);
     http_response_code(404);
 }
 if (http_response_code() === 404) {
     header("location:notfound.php");
 }
 
-$tagId = $_GET['tagId'];
+
 $blogWithTag = getBlogWithTag($tagId);
 $eventWithTag = getEventWithTag($tagId);
 $mediaWithTag = getMediaWithTag($tagId);
 $jobWithTag = getJobWithTag($tagId);
 
+
 //Get all tag on tb_blog_tag
 $queryExploreTag = "SELECT DISTINCT tb_tag.tag_name, tb_tag.tag_id FROM tb_blog_tag INNER JOIN tb_tag ON tb_blog_tag.tag_id = tb_tag.tag_id";
 $reqTag = mysqli_query($conn, $queryExploreTag);
 $resultExploreTag = mysqli_fetch_all($reqTag);
+
+
 
 //Close Connection
 mysqli_close($conn);
