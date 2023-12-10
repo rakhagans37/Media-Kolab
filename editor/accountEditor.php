@@ -8,11 +8,16 @@ require '../vendor/autoload.php';
 
 // //require __DIR__ . '../vendor/autoload.php';
 
-
+$error = false;
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
-    if (isset($_POST['changePhotoButton'])) {
+
+    if (isset($_POST['changePhotoButton']) && $_FILES['new-photo']['size'] < 6000000) {
         $newPhoto = $_FILES['new-photo']['tmp_name'];
         uploadImageEditor($editorId, $newPhoto, "accountEditor.php");
+        header("location:accountEditor.php");
+    } else {
+        $error = true;
+        $errorCode = "photo";
     }
 
     if (isset($_POST['changeName'])) {
@@ -22,6 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         $sqlUpdateName = "UPDATE tb_editor SET username = '$newusername' WHERE editor_id = $editorId ";
         mysqli_query($connMyqli, $sqlUpdateName);
         mysqli_close($connMyqli);
+        header("location:accountEditor.php");
     }
     if (isset($_POST['changePhone'])) {
         $newnophone = $_POST['newPhonenumber'];
@@ -30,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         $sqlUpdateNoPhone = "UPDATE tb_editor SET phone_number = '$newnophone' WHERE editor_id = $editorId ";
         mysqli_query($connMyqli,  $sqlUpdateNoPhone);
         mysqli_close($connMyqli);
+        header("location:accountEditor.php");
     }
     if (isset($_POST['changeRole'])) {
         $newRole = $_POST['Newrole'];
@@ -38,6 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         $sqlUpdateNoPhone = "UPDATE tb_editor SET role_id = '$newRole' WHERE editor_id = $editorId ";
         mysqli_query($connMyqli,  $sqlUpdateNoPhone);
         mysqli_close($connMyqli);
+        header("location:accountEditor.php");
     }
     if (isset($_POST['changeEmail'])) {
         $newEmail = $_POST['NewEmail'];
@@ -46,18 +54,21 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         $sqlUpdateEmail = "UPDATE tb_editor SET email = '$newEmail' WHERE editor_id = $editorId ";
         mysqli_query($connMyqli,   $sqlUpdateEmail);
         mysqli_close($connMyqli);
+        header("location:accountEditor.php");
     }
-    if (isset($_POST['changePasswoard'])) {
-        $password = $_POST['NewPasswoard'];
+    if (isset($_POST['changePassword']) && isAlphanumeric($_POST['NewPassword']) || (strlen($_POST['NewPassword']) < 8 && strlen($_POST['NewPassword']) > 20)) {
+        $password = $_POST['NewPassword'];
 
         $connMyqli = getConnectionMysqli();
-        $newPassworUser = hashPassword($password);
-        $sqlUpdatePassword = "UPDATE tb_editor SET password = $newPassworUser WHERE editor_id = $editorId ";
+        $newPasswordUser = hashPassword($password);
+        $sqlUpdatePassword = "UPDATE tb_editor SET password = $newPasswordUser WHERE editor_id = $editorId ";
         mysqli_query($connMyqli,   $sqlUpdatePassword);
         mysqli_close($connMyqli);
+        header("location:accountEditor.php");
+    } else {
+        $error = true;
+        $errorCode = "password";
     }
-
-    header("location:accountEditor.php");
 }
 
 
@@ -285,6 +296,22 @@ try {
 
         <div class="app-content pt-3 p-md-3 p-lg-4">
             <div class="container-xl">
+                <?php
+                if ($error == true) {
+                    switch ($errorCode) {
+                        case 'photo':
+                            $errorMsg = "Maximal ukuran foto adalah 5 MB";
+                            break;
+                        case 'password':
+                            $errorMsg = "Password harus memiliki 8-20 Karakter berupa kombinasi angka dan huruf.";
+                            break;
+                        default:
+                            break;
+                    }
+                    echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">';
+                    echo "<strong>Mohon maaf, </strong>$errorMsg</div>";
+                }
+                ?>
                 <h1 class="app-page-title">My Account</h1>
                 <div class="row gy-4">
                     <div class="col-12 col-lg-6">
@@ -512,10 +539,10 @@ try {
                                 <p>Choose your password </p>
                                 <form action="accountEditor.php" method="POST" id="" class="d-flex flex-row align-items-center justify-content-between" enctype="multipart/form-data">
                                     <div class="form-group">
-                                        <input type="password" class="form-control" name="NewPasswoard" placeholder="change your password" required>
+                                        <input type="password" class="form-control" name="NewPassword" placeholder="change your password" required>
                                     </div>
                                     <div class="form-group">
-                                        <input type="submit" id="submit" name="changePasswoard" class="btn app-btn-primary" value="Change">
+                                        <input type="submit" id="submit" name="changePasswoao" class="btn app-btn-primary" value="Change">
                                     </div>
                                 </form>
                             </div>
