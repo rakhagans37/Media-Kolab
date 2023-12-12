@@ -5,6 +5,9 @@ ini_set('display_errors', 1);
 require_once __DIR__ . '/../helper/getConnection.php';
 require_once __DIR__ . '/../helper/cloudinary.php';
 require_once __DIR__ . '/../helper/hash.php';
+require_once __DIR__ . '/../helper/editor.php';
+require_once __DIR__ . '/../helper/editorValidation.php';
+require_once __DIR__ . '/../helper/validation.php';
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -24,46 +27,29 @@ if (isset($_POST['login'])) {
     $remember = isset($_POST['RememberPassword']);
 
     try {
-        $conn = getConnection();
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        $sql = "SELECT * FROM tb_editor where email = :email and banned = :unBanned";
-        $unBanned = false;
-        $request = $conn->prepare($sql);
-
-        $request->bindParam('email', $email);
-        $request->bindParam('unBanned', $unBanned);
-        $request->execute();
-
-        if ($result = $request->fetchAll()) {
-            $editorId = $result[0]['editor_id'];
-            $passwordHashed = $result[0]['password'];
-            $photoUrl = $result[0]['profile_photo'];
+        if ($editorId = editorLoginSuccess($email, $password)) {
+            $editorData = getEditorData($editorId);
+            $photoUrl = getEditorPhotoId($editorId);
             $loginStatus = true;
 
-            if (is_null($photoUrl)) {
+            if (is_null(getEditorPhotoId($editorId))) {
                 $imgtag = "<img class='profile-image' src='../assets/images/profiles/profile-1.png' alt='Profile Photo'>";
             } else {
                 //Saving profile photo into cookies
-                $decrypt = decryptPhotoProfile($photoUrl);
-                $imgtag = getImageProfile($decrypt);
+                $imgtag = getImageProfile($photoUrl);
             }
 
-            if (password_verify($password, $passwordHashed)) {
-                if ($remember) {
-                    setcookie('editorId', $editorId, time() + (86400 * 7));
-                    setcookie('editorLoginStatus', $loginStatus, time() + (86400 * 7));
-                    setcookie('editorProfilePhoto', $imgtag, time() + (80400 * 7));
-                } else {
-                    $_SESSION['editorLoginStatus'] = $loginStatus;
-                    $_SESSION['editorId'] = $editorId;
-                    $_SESSION['editorProfilePhoto'] = $imgtag;
-                }
-                header('Location:indexEditor.php');
-                exit;
+            if ($remember) {
+                setcookie('editorId', $editorId, time() + (86400 * 7));
+                setcookie('editorLoginStatus', $loginStatus, time() + (86400 * 7));
+                setcookie('editorProfilePhoto', $imgtag, time() + (80400 * 7));
             } else {
-                $loginFailByPassword = true;
+                $_SESSION['editorLoginStatus'] = $loginStatus;
+                $_SESSION['editorId'] = $editorId;
+                $_SESSION['editorProfilePhoto'] = $imgtag;
             }
+            header('Location:indexEditor.php');
+            exit;
         } else {
             $loginFail = true;
         }

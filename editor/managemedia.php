@@ -3,125 +3,30 @@ require_once __DIR__ . "/../helper/hash.php";
 require_once __DIR__ . "/../helper/getConnection.php";
 require_once __DIR__ . "/../helper/getConnectionMsqli.php";
 require_once __DIR__ . "/../helper/mediafunctions.php";
+require_once __DIR__ . "/../helper/category.php";
 require_once __DIR__ . '/../helper/validateLoginEditor.php';
 require_once __DIR__ . '/../helper/cloudinary.php';
+require_once __DIR__ . '/../helper/media.php';
 
 // Get connections
 $conn = getConnectionMysqli();
 $dbConnection = getConnection();
 
-// Fetching data from the tb_tag table
-$query = $dbConnection->query("SELECT * FROM tb_tag");
-$tags = $query->fetchAll(PDO::FETCH_ASSOC);
-
 // Fetching data from the tb_category table
-$query = $dbConnection->query("SELECT * FROM tb_category_media");
-$categories = $query->fetchAll(PDO::FETCH_ASSOC);
+$categories = getCategoryMedia();
 
 // Post Detection
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
-
-	// Script Create New Media
-	if (isset($_POST['createMedia'])) {
-		$mediaId = generateIdMedia();
-		$thumbName = random_int(0, PHP_INT_MAX) . date("dmYHis") . $mediaId;
-		$hashedThumbnail = hashPhotoProfile($thumbName);
-		$createTitle = $_POST['createTitle'];
-		$content = $_POST['createContent'];
-		$currentDate = date("Y-m-d");
-		if ($_POST['createImageUrl']) {
-			$imageCreateUrl = $_POST['createImageUrl'];
-		} else {
-			$imageCreateUrl = "";
-		}
-		if ($_POST['createVideoUrl']) {
-			$videoCreateUrl = $_POST['createVideoUrl'];
-		} else {
-			$videoCreateUrl = "";
-		}
-		$tagId = $_POST['taginput'];
-		$categoryId = $_POST['catinput'];
-
-		$dbConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$sqlCreate = "INSERT INTO tb_media (media_id, thumbnail, media_title, media_content, date_release, image_url, video_url, views, tag_id, category_id, editor_id)
-				VALUES (:mediaId, :thumbnail, :createTitle, :content, :currentDate, :image_url, :video_url, 0, :tagId, :categoryId, :editorId)";
-		$request = $dbConnection->prepare($sqlCreate);
-
-		$request->bindParam('mediaId', $mediaId);
-		$request->bindParam('thumbnail', $hashedThumbnail);
-		$request->bindParam('createTitle', $createTitle);
-		$request->bindParam('content', $content);
-		$request->bindParam('currentDate', $currentDate);
-		$request->bindParam('image_url', $imageCreateUrl);
-		$request->bindParam('video_url', $videoCreateUrl);
-		$request->bindParam('tagId', $tagId);
-		$request->bindParam('categoryId', $categoryId);
-		$request->bindParam('editorId', $editorId);
-		$request->execute();
-
-		$success = uploadImageMedia($thumbName, $_FILES['thumbnail']);
-		if ($success) {
-			echo '<script>alert("Data berhasil ditambahkan!");</script>';
-		} else {
-			echo '<script>alert("Data gagal ditambahkan!");</script>';
-		}
-	}
-
 	// Script Update Media
 	if (isset($_POST['updateButton'])) {
 		try {
 			$mediaId = $_POST['mediaId'];
-			if (isset($_FILES['thumbnailUpdate']) && $_FILES['thumbnailUpdate'] && !empty($_FILES['thumbnailUpdate']) && $_FILES['thumbnailUpdate']['error'] !== UPLOAD_ERR_NO_FILE) {
-				try {
-					$dbConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-					$fetchThumbnailName = $dbConnection->prepare("SELECT thumbnail FROM tb_media WHERE media_id = :mediaId");
-					$fetchThumbnailName->bindParam(':mediaId', $mediaId);
-					$fetchThumbnailName->execute();
-					$result = $fetchThumbnailName->fetch(PDO::FETCH_ASSOC);
-
-					if ($result) {
-						$thumbnailName = $result['thumbnail'];
-					} else {
-						echo '<script>alert("Tidak ada Thumbnail!");</script>';
-					}
-					$success = uploadImageMedia($thumbnailName, $_FILES['thumbnailUpdate']);
-					if ($success) {
-						echo '<script>alert("Data berhasil diupdate!");</script>';
-					} else {
-						echo '<script>alert("Data gagal diupdate!");</script>';
-					}
-				} catch (PDOException $e) {
-					echo '<script>alert("Tidak ada koneksi!");</script>';
-				}
-			}
 			$updateTitle = $_POST['updateTitle'];
-			$updateContent = $_POST['updateContent'];
-			$currentDate = date("Y-m-d");
-			if ($_POST['updateImageUrl']) {
-				$imageUpdateUrl = $_POST['updateImageUrl'];
-			} else {
-				$imageUpdateUrl = NULL;
-			}
-			if ($_POST['updateVideoUrl']) {
-				$videoUpdateUrl = $_POST['updateVideoUrl'];
-			} else {
-				$videoUpdateUrl = NULL;
-			}
 			$categoryId = $_POST['catinput'];
 
-			$dbConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-			$sqlUpdate = "UPDATE tb_media SET 
-					media_title = :updateTitle,
-					category_id = :categoryId
-					WHERE media_id = :mediaId";
-
-			$request = $dbConnection->prepare($sqlUpdate);
-
-			$request->bindParam('updateTitle', $updateTitle);
-			$request->bindParam('categoryId', $categoryId);
-			$request->bindParam('mediaId', $mediaId);
-			$request->execute();
+			//Update data into database
+			updateMediaTitle($mediaId, $updateTitle);
+			updateMediaCategory($mediaId, $categoryId);
 		} catch (PDOException $e) {
 			echo "<script>alert('Error! $e');</script>";
 		}
@@ -129,56 +34,28 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 	// Script Delete Media
 	if (isset($_POST['deleteButton'])) {
-		$mediaId = $_POST['mediaId'];
-		$dbConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		try {
+			$mediaId = $_POST['mediaId'];
 
-		$fetchThumbnailName = $dbConnection->prepare("SELECT thumbnail FROM tb_media WHERE media_id = :mediaId");
-		$fetchThumbnailName->bindParam('mediaId', $mediaId);
-		$fetchThumbnailName->execute();
-		$result = $fetchThumbnailName->fetch(PDO::FETCH_ASSOC);
-
-		if ($result) {
-			$thumbnailName = $result['thumbnail'];
-			deleteImageMedia($thumbnailName);
-		} else {
-			echo '<script>alert("Tidak ada Thumbnail!");</script>';
+			//Delete Media Dataset
+			deleteImageMedia($mediaId);
+			deleteMediaTag($mediaId);
+			deleteMedia($mediaId);
+		} catch (PDOException $e) {
+			echo "<script>alert('Error! $e');</script>";
 		}
-		$sqlDelete = "DELETE FROM tb_media_tag WHERE media_id = ?";
-		$requestDelete = mysqli_prepare($conn, $sqlDelete);
-
-		mysqli_stmt_bind_param($requestDelete, "s", $mediaId);
-		mysqli_stmt_execute($requestDelete);
-		mysqli_stmt_close($requestDelete);
-
-		$sqlDelete = "DELETE FROM tb_media WHERE media_id = ?";
-		$requestDelete = mysqli_prepare($conn, $sqlDelete);
-
-		mysqli_stmt_bind_param($requestDelete, "s", $mediaId);
-		mysqli_stmt_execute($requestDelete);
-		mysqli_stmt_close($requestDelete);
 	}
 
 	header("location:manageMedia.php");
 	exit;
 }
 
+// Get media dataset
 if (isset($_GET['search-media'])) {
 	$searchMedia = $_GET['searchorders'];
-	$sql = "SELECT * FROM tb_media WHERE editor_id = '$editorId' AND media_title LIKE '%$searchMedia%'";
+	$mediaArray = getSearchMediaByEditor($editorId, $searchMedia);
 } else {
-	$sql = "SELECT * FROM tb_media WHERE editor_id = '$editorId'";
-}
-
-// Setting Media Datasets
-$medias = mysqli_query($conn, $sql);
-
-if ($medias) {
-	$mediaArray = [];
-	while ($media = mysqli_fetch_assoc($medias)) {
-		$mediaArray[] = $media;
-	}
-} else {
-	echo "Error executing the query: " . mysqli_error($conn);
+	$mediaArray = getMediaByEditor($editorId);
 }
 
 // Closing connections;

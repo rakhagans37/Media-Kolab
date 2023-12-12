@@ -4,91 +4,94 @@ require_once "../helper/getConnectionMsqli.php";
 require_once '../helper/validateLoginEditor.php';
 require_once "../helper/hash.php";
 require_once "../helper/cloudinary.php";
+require_once "../helper/editor.php";
+require_once "../helper/editorValidation.php";
 require '../vendor/autoload.php';
 
 // //require __DIR__ . '../vendor/autoload.php';
 
 $error = false;
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
-
+    //Set New Photo
     if (isset($_POST['changePhotoButton']) && $_FILES['new-photo']['size'] < 6000000) {
         $newPhoto = $_FILES['new-photo']['tmp_name'];
-        uploadImageEditor($editorId, $newPhoto, "accountEditor.php");
+
+        //Set Photo & Redirect
+        editorSetPhoto($editorId, $newPhoto);
         header("location:accountEditor.php");
     } else {
         $error = true;
         $errorCode = "photo";
     }
-
+    //Set New Username
     if (isset($_POST['changeName'])) {
         $newusername = $_POST['newusername'];
 
-        $connMyqli = getConnectionMysqli();
-        $sqlUpdateName = "UPDATE tb_editor SET username = '$newusername' WHERE editor_id = $editorId ";
-        mysqli_query($connMyqli, $sqlUpdateName);
-        mysqli_close($connMyqli);
-        header("location:accountEditor.php");
+        //Set Username & Redirect
+        if (!editorUsernameExist($newusername)) {
+            editorSetUsername($editorId, $newusername);
+            header("location:accountEditor.php");
+        } else {
+            $error = true;
+            $errorCode = "username";
+        }
     }
+    //Set New Phone Number
     if (isset($_POST['changePhone'])) {
         $newnophone = $_POST['newPhonenumber'];
 
-        $connMyqli = getConnectionMysqli();
-        $sqlUpdateNoPhone = "UPDATE tb_editor SET phone_number = '$newnophone' WHERE editor_id = $editorId ";
-        mysqli_query($connMyqli,  $sqlUpdateNoPhone);
-        mysqli_close($connMyqli);
-        header("location:accountEditor.php");
+        if (!editorPhoneNumberExist($newnophone)) {
+            //Set New Phone Number
+            editorSetPhone($editorId, $newnophone);
+            header("location:accountEditor.php");
+        } else {
+            $error = true;
+            $errorCode = "phoneNumber";
+        }
     }
+    //Set New Role
     if (isset($_POST['changeRole'])) {
         $newRole = $_POST['Newrole'];
 
-        $connMyqli = getConnectionMysqli();
-        $sqlUpdateNoPhone = "UPDATE tb_editor SET role_id = '$newRole' WHERE editor_id = $editorId ";
-        mysqli_query($connMyqli,  $sqlUpdateNoPhone);
-        mysqli_close($connMyqli);
+        //Set New Role
+        editorSetRole($editorId, $newRole);
         header("location:accountEditor.php");
     }
+    //Set New Email
     if (isset($_POST['changeEmail'])) {
         $newEmail = $_POST['NewEmail'];
 
-        $connMyqli = getConnectionMysqli();
-        $sqlUpdateEmail = "UPDATE tb_editor SET email = '$newEmail' WHERE editor_id = $editorId ";
-        mysqli_query($connMyqli,   $sqlUpdateEmail);
-        mysqli_close($connMyqli);
-        header("location:accountEditor.php");
+        if (!editorEmailExist($newEmail)) {
+            //Set New Email
+            editorSetEmail($editorId, $newEmail);
+            header("location:accountEditor.php");
+        } else {
+            $error = true;
+            $errorCode = "email";
+        }
     }
-    if (isset($_POST['changePassword']) && isAlphanumeric($_POST['NewPassword']) || (strlen($_POST['NewPassword']) < 8 && strlen($_POST['NewPassword']) > 20)) {
-        $password = $_POST['NewPassword'];
+    //Set New Password
+    if (isset($_POST['changePassword'])) {
+        $newPassword = $_POST['NewPassword'];
 
-        $connMyqli = getConnectionMysqli();
-        $newPasswordUser = hashPassword($password);
-        $sqlUpdatePassword = "UPDATE tb_editor SET password = $newPasswordUser WHERE editor_id = $editorId ";
-        mysqli_query($connMyqli,   $sqlUpdatePassword);
-        mysqli_close($connMyqli);
-        header("location:accountEditor.php");
-    } else {
-        $error = true;
-        $errorCode = "password";
+        if (passwordReqSuccess($newPassword)) {
+            //Set New Password
+            editorSetPassword($editorId, $newPassword);
+            header("location:accountEditor.php");
+        } else {
+            $error = true;
+            $errorCode = "password";
+        }
     }
 }
 
-
-
 try {
-    $conn = getConnection();
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-    $sql = "SELECT tb_editor.username, tb_editor.email, tb_editor.phone_number, tb_role.role_name FROM tb_editor INNER JOIN tb_role ON tb_editor.role_id = tb_role.role_id WHERE editor_id = :idEditor";
-    $request = $conn->prepare($sql);
-    $request->bindParam(':idEditor', $editorId);
-    $request->execute();
-    if ($result = $request->fetch()) {
+    if ($result = getEditorData($editorId)) {
         $name = $result['username'];
         $email = $result['email'];
         $NumberPhone = $result['phone_number'];
         $Role = $result['role_name'];
     }
-
-    $conn = null;
 } catch (PDOException $errorMessage) {
     $error = $errorMessage->getMessage();
 }
@@ -304,6 +307,15 @@ try {
                             break;
                         case 'password':
                             $errorMsg = "Password harus memiliki 8-20 Karakter berupa kombinasi angka dan huruf.";
+                            break;
+                        case 'username':
+                            $errorMsg = "Username telah dipakai.";
+                            break;
+                        case 'phoneNumber':
+                            $errorMsg = "Nomor hp telah dipakai.";
+                            break;
+                        case 'email':
+                            $errorMsg = "Email telah dipakai.";
                             break;
                         default:
                             break;

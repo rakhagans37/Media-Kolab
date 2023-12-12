@@ -3,6 +3,8 @@ require_once __DIR__ . "/../helper/hash.php";
 require_once __DIR__ . "/../helper/getConnection.php";
 require_once __DIR__ . "/../helper/getConnectionMsqli.php";
 require_once __DIR__ . "/../helper/eventFunctions.php";
+require_once __DIR__ . "/../helper/event.php";
+require_once __DIR__ . "/../helper/category.php";
 require_once __DIR__ . "/../helper/tag.php";
 require_once __DIR__ . "/../helper/validateLoginEditor.php";
 require_once __DIR__ . "/../helper/cloudinary.php";
@@ -11,13 +13,8 @@ require_once __DIR__ . "/../helper/cloudinary.php";
 $conn = getConnectionMysqli();
 $dbConnection = getConnection();
 
-// Fetching data from the tb_tag table
-$query = $dbConnection->query("SELECT * FROM tb_tag");
-$tags = $query->fetchAll(PDO::FETCH_ASSOC);
-
 // Fetching data from the tb_category table
-$query = $dbConnection->query("SELECT * FROM tb_category_event");
-$categories = $query->fetchAll(PDO::FETCH_ASSOC);
+$categories = getCategoryEvent();
 
 // Post Detection
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
@@ -28,20 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             $updateTitle = $_POST['updateTitle'];
             $categoryId = $_POST['catinput'];
 
-            $dbConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $sqlUpdate = "UPDATE tb_event SET 
-					event_title = :updateTitle,
-					category_id = :categoryId
-					WHERE event_id = :eventId";
-
-            $request = $dbConnection->prepare($sqlUpdate);
-
-            $request->bindParam('updateTitle', $updateTitle);
-            $request->bindParam('categoryId', $categoryId);
-            $request->bindParam('eventId', $eventId);
-            $request->execute();
-
-            header("Location:manageEvent.php");
+            //Update event title & event category
+            updateEventTitle($eventId, $updateTitle);
+            updateEventCategory($eventId, $categoryId);
         } catch (PDOException $e) {
             echo "<script>alert('Error! $e');</script>";
         }
@@ -49,44 +35,28 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     // Script Delete event
     if (isset($_POST['deleteButton'])) {
-        $eventId = $_POST['eventId'];
+        try {
+            $eventId = $_POST['eventId'];
 
-        $sqlDelete = "DELETE FROM tb_event_tag WHERE event_id = ?";
-        $requestDelete = mysqli_prepare($conn, $sqlDelete);
-
-        mysqli_stmt_bind_param($requestDelete, "s", $eventId);
-        mysqli_stmt_execute($requestDelete);
-        mysqli_stmt_close($requestDelete);
-
-        $sqlDelete = "DELETE FROM tb_event WHERE event_id = ?";
-        $requestDelete = mysqli_prepare($conn, $sqlDelete);
-
-        mysqli_stmt_bind_param($requestDelete, "s", $eventId);
-        mysqli_stmt_execute($requestDelete);
-        mysqli_stmt_close($requestDelete);
+            //Delete event tag & event dataset
+            deleteEventImage($eventId);
+            deleteEventTag($eventId);
+            deleteEvent($eventId);
+        } catch (PDOException $e) {
+            echo "<script>alert('Error! $e');</script>";
+        }
     }
 
     header("location:manageEvent.php");
     exit;
 }
 
+//Get Event Dataset
 if (isset($_GET['search-event'])) {
     $searchEvent = $_GET['searchorders'];
-    $sql = "SELECT * FROM tb_event WHERE editor_id = $editorId AND event_title LIKE '%$searchEvent%'";
+    $eventArray = getSearchEventByEditor($editorId, $searchEvent);
 } else {
-    $sql = "SELECT * FROM tb_event WHERE editor_id = $editorId";
-}
-
-// Setting event Datasets
-$events = mysqli_query($conn, $sql);
-
-if ($events) {
-    $eventArray = [];
-    while ($event = mysqli_fetch_assoc($events)) {
-        $eventArray[] = $event;
-    }
-} else {
-    echo "Error executing the query: " . mysqli_error($conn);
+    $eventArray = getEventByEditor($editorId);
 }
 
 // Closing connections;
@@ -373,66 +343,6 @@ $conn = null;
             </div>
         </footer>
     </div>
-
-    <!-- View event Modal Pop Up -->
-    <?php foreach ($eventArray as $event) {
-        $categname = getCategoryeventNameFromId($event['category_id']);
-        $formattedDate = dateFormatter($event['date_release']);
-        if ($event['image_url'] != "") {
-            $imageurl = "<div class='form-outline mb-4'><h3>Image</h3><p><a href='{$event['image_url']}' target='_blank'><img src='{$event['image_url']}' alt='Image'></a></div>";
-        } else {
-            $imageurl = "";
-        }
-        echo <<<TULIS
-			<div class="modal fade" id="view-event-{$event['event_id']}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h3>View event</h3>
-							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-								<span aria-hidden="true">&times;</span>
-							</button>
-						</div>
-						<div class="modal-body">
-							<div class="row d-flex justify-content-center align-items-center">
-								<div class="card-body p-4">
-									<div class="form-outline mb-4">
-										<h3>event ID</h3>
-										<p>{$event['event_id']}</p>
-									</div>
-									<div class="form-outline mb-4">
-										<h3>Title</h3>
-										<p>{$event['event_title']}</p>
-									</div>
-									<div class="form-outline mb-4">
-										<h3>Content</h3>
-										<p>{$event['event_content']}</p>
-									</div>
-									<div class="form-outline mb-4">
-										<h3>Date Release</h3>
-										<p>{$formattedDate}</p>
-									</div>
-									{$imageurl}
-									<div class="form-outline mb-4">
-										<h3>Views</h3>
-										<p>{$event['views']}</p>
-									</div>
-									<div class="form-outline mb-4">
-										<h3>Category</h3>
-										<p>{$categname}</p>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="modal-footer">
-							<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-						</div>
-					</div>
-				</div>
-			</div>
-
-		TULIS;
-    } ?>
 
     <!-- Update event Modal Pop Up -->
     <?php foreach ($eventArray as $event) {

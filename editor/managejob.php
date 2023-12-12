@@ -3,6 +3,8 @@ require_once __DIR__ . "/../helper/hash.php";
 require_once __DIR__ . "/../helper/getConnection.php";
 require_once __DIR__ . "/../helper/getConnectionMsqli.php";
 require_once __DIR__ . "/../helper/jobfunctions.php";
+require_once __DIR__ . "/../helper/jobVacancies.php";
+require_once __DIR__ . "/../helper/category.php";
 require_once __DIR__ . "/../helper/validateLoginEditor.php";
 require_once __DIR__ . "/../helper/cloudinary.php";
 
@@ -10,45 +12,19 @@ require_once __DIR__ . "/../helper/cloudinary.php";
 $conn = getConnectionMysqli();
 $dbConnection = getConnection();
 
-// Fetching data from the tb_tag table
-$query = $dbConnection->query("SELECT * FROM tb_tag");
-$tags = $query->fetchAll(PDO::FETCH_ASSOC);
-
 // Fetching data from the tb_category table
-$query = $dbConnection->query("SELECT * FROM tb_category_job_vacancy");
-$categories = $query->fetchAll(PDO::FETCH_ASSOC);
+$categories = getCategoryJob();
 
 // Post Detection
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	// Script Delete Job
 	if (isset($_POST['deleteButton'])) {
-		$vacancy_id = $_POST['jobId'];
-		$dbConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		$vacancyId = $_POST['jobId'];
 
-		$fetchLogoName = $dbConnection->prepare("SELECT logo FROM tb_job_vacancies WHERE vacancy_id = :vacancy_id");
-		$fetchLogoName->bindParam('vacancy_id', $vacancy_id);
-		$fetchLogoName->execute();
-		$result = $fetchLogoName->fetch(PDO::FETCH_ASSOC);
-
-		if ($result) {
-			$companyLogoName = $result['logo'];
-			deleteImageJob($companyLogoName);
-		} else {
-			echo '<script>alert("Tidak ada Logo!");</script>';
-		}
-		$sqlDelete = "DELETE FROM tb_job_tag WHERE vacancy_id = ?";
-		$requestDelete = mysqli_prepare($conn, $sqlDelete);
-
-		mysqli_stmt_bind_param($requestDelete, "s", $vacancy_id);
-		mysqli_stmt_execute($requestDelete);
-		mysqli_stmt_close($requestDelete);
-
-		$sqlDelete = "DELETE FROM tb_job_vacancies WHERE vacancy_id = ?";
-		$requestDelete = mysqli_prepare($conn, $sqlDelete);
-
-		mysqli_stmt_bind_param($requestDelete, "s", $vacancy_id);
-		mysqli_stmt_execute($requestDelete);
-		mysqli_stmt_close($requestDelete);
+		//Delete job dataset
+		deleteJobImage($vacancyId);
+		deleteJobTag($vacancyId);
+		deleteJobVacancies($vacancyId);
 	}
 
 	// Script Update event
@@ -58,20 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 			$updateTitle = $_POST['updateTitle'];
 			$categoryId = $_POST['catinput'];
 
-			$dbConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-			$sqlUpdate = "UPDATE tb_job_vacancies SET 
-					vacancy_title = :updateTitle,
-					category_id = :categoryId
-					WHERE vacancy_id = :vacancyId";
-
-			$request = $dbConnection->prepare($sqlUpdate);
-
-			$request->bindParam('updateTitle', $updateTitle);
-			$request->bindParam('categoryId', $categoryId);
-			$request->bindParam('vacancyId', $vacancyId);
-			$request->execute();
-
-			header("Location:manageJob.php");
+			updateJobTitle($vacancyId, $updateTitle);
+			updateJobCategory($vacancyId, $categoryId);
 		} catch (PDOException $e) {
 			echo "<script>alert('Error! $e');</script>";
 		}
@@ -81,23 +45,12 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	exit;
 }
 
+// Get job dataset
 if (isset($_GET['search-job'])) {
 	$searchJob = $_GET['searchorders'];
-	$sql = "SELECT * FROM tb_job_vacancies WHERE editor_id = '$editorId' AND vacancy_title LIKE '%$searchJob%'";
+	$jobArray = getSearchJobByEditor($editorId, $searchJob);
 } else {
-	$sql = "SELECT * FROM tb_job_vacancies WHERE editor_id = '$editorId'";
-}
-
-// Setting Job Datasets
-$jobs = mysqli_query($conn, $sql);
-
-if ($jobs) {
-	$jobArray = [];
-	while ($job = mysqli_fetch_assoc($jobs)) {
-		$jobArray[] = $job;
-	}
-} else {
-	echo "Error executing the query: " . mysqli_error($conn);
+	$jobArray = getJobByEditor($editorId);
 }
 
 // Closing connections;

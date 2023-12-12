@@ -5,6 +5,7 @@ require_once "../helper/getConnectionMsqli.php";
 require_once "../helper/cloudinary.php";
 require_once "../helper/hash.php";
 require_once "../helper/tag.php";
+require_once "../helper/media.php";
 require_once "../helper/increasePopularity.php";
 require_once "../helper/validation.php";
 require "../vendor/autoload.php";
@@ -23,6 +24,8 @@ if (isset($_POST['media-submit'])) {
 	$categoryId = $_POST['categoryid'];
 	$videoUrl = getYoutubeID($_POST['video-url']);
 	$editorId = $editorId;
+	$imageUrl = uploadImageNews($_FILES['new-image']['tmp_name']);
+	$thumbnail = uploadImageNews($_FILES['thumbnail']['tmp_name']);
 
 	if (strlen($mediaTitle) < 12) {
 		$createSuccess = false;
@@ -34,38 +37,13 @@ if (isset($_POST['media-submit'])) {
 		$createSuccess = false;
 		$createError = "contentLength";
 	} else {
-		// Menyimpan data ke database
-		$sql = "INSERT INTO tb_media (media_id, media_title, media_content, date_release, category_id, editor_id, video_url) 
-		VALUES (?, ?, ?, ?, ?, ?, ?)";
-		$request = $conn->prepare($sql);
-		$request->bindParam(1, $mediaId);
-		$request->bindParam(2, $mediaTitle);
-		$request->bindParam(3, $mediaContent);
-		$request->bindParam(4, $dateRelease);
-		$request->bindParam(5, $categoryId);
-		$request->bindParam(6, $editorId);
-		$request->bindParam(7, $videoUrl);
-		$request->execute();
-
-		// Menyimpan image ke database dan cloudinary
-		$imageUrl = uploadImageNews($_FILES['new-image']['tmp_name']);
-		$sql2 = 'UPDATE tb_media SET image_url = ? WHERE media_id = ?';
-		$request = $conn->prepare($sql2);
-		$request->bindParam(1, $imageUrl);
-		$request->bindParam(2, $mediaId);
-		$request->execute();
-
-		// Menyimpan image ke database dan cloudinary
-		$imageUrl = uploadImageNews($_FILES['thumbnail']['tmp_name']);
-		$sql3 = 'UPDATE tb_media SET thumbnail = ? WHERE media_id = ?';
-		$request = $conn->prepare($sql3);
-		$request->bindParam(1, $imageUrl);
-		$request->bindParam(2, $mediaId);
-		$request->execute();
+		// Insert new media into database
+		setNewMedia($mediaId, $mediaTitle, $mediaContent, $dateRelease, $tagId, $categoryId, $videoUrl, $editorId, $imageUrl, $thumbnail);
 
 		//Increase the popularity of category
 		increaseBlogCategory($categoryId);
 
+		//Insert media tag
 		insertMediaTag(separateTag($tagId), $mediaId);
 
 		$conn = null;

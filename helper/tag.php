@@ -233,3 +233,20 @@ function getJobWithTag($tagId)
     $result = $request->fetchAll();
     return $result;
 }
+
+function getAllTag()
+{
+    $conn = getConnection();
+
+    $sql = "SELECT * FROM tb_tag";
+    $request = $conn->prepare($sql);
+    $request->execute();
+
+    if ($result = $request->fetchAll()) {
+        $conn = null;
+        return $result;
+    } else {
+        $conn = null;
+        return array();
+    }
+}

@@ -4,6 +4,7 @@ require_once "../helper/validateLoginEditor.php";
 require_once "../helper/getConnectionMsqli.php";
 require_once "../helper/cloudinary.php";
 require_once "../helper/hash.php";
+require_once "../helper/jobVacancies.php";
 require_once "../helper/increasePopularity.php";
 require_once __DIR__ . "/../helper/tag.php";
 require "../vendor/autoload.php";
@@ -22,47 +23,21 @@ if (isset($_POST['vacancy-submit'])) {
 	$tagId = $_POST['tagid'];
 	$categoryId = $_POST['categoryid'];
 	$editorId = $editorId;
+	$imageUrl = uploadImageNews($_FILES['new-image']['tmp_name']);
+	$companyLogo = uploadImageNews($_FILES['company-logo']['tmp_name']);
 
 	if (strlen($vacancyTitle) < 12) {
 		$createSuccess = false;
 		$createError = "title";
-	} else if ($_FILES['new-image']['size'] > 5000000) {
+	} else if (!$imageUrl || !$companyLogo) {
 		$createSuccess = false;
-		$createError = "imageSize";
+		$createError = "image";
 	} else if (strlen($vacancyContent) < 120) {
 		$createSuccess = false;
 		$createError = "contentLength";
 	} else {
-		// Menyimpan data ke database
-		$sql = "INSERT INTO tb_job_vacancies (vacancy_id, vacancy_title, vacancy_content, company_name, vacancy_requirement, date_release, 
-		category_id, editor_id) 
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-		$request = $conn->prepare($sql);
-		$request->bindParam(1, $vacancy_id);
-		$request->bindParam(2, $vacancyTitle);
-		$request->bindParam(3, $vacancyContent);
-		$request->bindParam(4, $company);
-		$request->bindParam(5, $requirement);
-		$request->bindParam(6, $dateRelease);
-		$request->bindParam(7, $categoryId);
-		$request->bindParam(8, $editorId);
-		$request->execute();
-
-		// Menyimpan image ke database dan cloudinary
-		$imageUrl = uploadImageNews($_FILES['new-image']['tmp_name']);
-		$sql2 = 'UPDATE tb_job_vacancies SET image_url = ? WHERE vacancy_id = ?';
-		$requestInsertImage = $conn->prepare($sql2);
-		$requestInsertImage->bindParam(1, $imageUrl);
-		$requestInsertImage->bindParam(2, $vacancy_id);
-		$requestInsertImage->execute();
-
-		// Menyimpan logo ke database dan cloudinary
-		$companyLogo = uploadImageNews($_FILES['company-logo']['tmp_name']);
-		$sql2 = 'UPDATE tb_job_vacancies SET logo = ? WHERE vacancy_id = ?';
-		$requestInsertLogo = $conn->prepare($sql2);
-		$requestInsertLogo->bindParam(1, $companyLogo);
-		$requestInsertLogo->bindParam(2, $vacancy_id);
-		$requestInsertLogo->execute();
+		//Insert New Job Vacancies Into Database
+		setNewJob($vacancy_id, $vacancyTitle, $vacancyContent, $company, $requirement, $dateRelease, $tagId, $categoryId, $editorId, $imageUrl, $companyLogo);
 
 		//Increase the popularity of category
 		increaseBlogCategory($categoryId);
@@ -352,7 +327,7 @@ if (isset($_POST['vacancy-submit'])) {
 						case 'title':
 							$errorMsg = "Judul harus lebih dari 12 karakter";
 							break;
-						case 'imageSize':
+						case 'image':
 							$errorMsg = "Gambar yang di upload maximal memiliki ukuran 5 Mb";
 							break;
 						case 'contentLength':

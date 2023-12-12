@@ -50,3 +50,67 @@ function getEventCategory()
 
     return $resultEventCat;
 }
+
+function getCategoryBlog()
+{
+    $conn = getConnection();
+
+    $sqlGet = "SELECT * FROM tb_category_blog";
+    $request = $conn->query($sqlGet);
+
+    if ($result = $request->fetchAll(PDO::FETCH_ASSOC)) {
+        $conn = null;
+        return $result;
+    } else {
+        $conn = null;
+        return array();
+    }
+}
+
+function getCategoryEvent()
+{
+    $conn = getConnection();
+
+    $sqlGet = "SELECT * FROM tb_category_event";
+    $request = $conn->query($sqlGet);
+
+    if ($result = $request->fetchAll(PDO::FETCH_ASSOC)) {
+        $conn = null;
+        return $result;
+    } else {
+        $conn = null;
+        return array();
+    }
+}
+
+function getCategoryMedia()
+{
+    $conn = getConnection();
+
+    $sqlGet = "SELECT * FROM tb_category_media";
+    $request = $conn->query($sqlGet);
+
+    if ($result = $request->fetchAll(PDO::FETCH_ASSOC)) {
+        $conn = null;
+        return $result;
+    } else {
+        $conn = null;
+        return array();
+    }
+}
+
+function getCategoryJob()
+{
+    $conn = getConnection();
+
+    $sqlGet = "SELECT * FROM tb_category_job_vacancy";
+    $request = $conn->query($sqlGet);
+
+    if ($result = $request->fetchAll(PDO::FETCH_ASSOC)) {
+        $conn = null;
+        return $result;
+    } else {
+        $conn = null;
+        return array();
+    }
+}

@@ -5,6 +5,7 @@ require_once "../helper/getConnectionMsqli.php";
 require_once "../helper/cloudinary.php";
 require_once "../helper/hash.php";
 require_once "../helper/tag.php";
+require_once "../helper/blog.php";
 require_once "../helper/increasePopularity.php";
 require "../vendor/autoload.php";
 
@@ -20,42 +21,25 @@ if (isset($_POST['blog-submit'])) {
 	$tagId = $_POST['tagid'];
 	$categoryId = $_POST['categoryid'];
 	$editorId = $editorId;
+	$imageUrl = uploadImageNews($_FILES['new-image']['tmp_name']);
 
 	if (strlen($blogTitle) < 12) {
 		$createSuccess = false;
 		$createError = "title";
-	} else if ($_FILES['new-image']['size'] > 5000000) {
-		$createSuccess = false;
-		$createError = "imageSize";
 	} else if (strlen($blogContent) < 120) {
 		$createSuccess = false;
 		$createError = "contentLength";
+	} else if (!$imageUrl) {
+		$createSuccess = false;
+		$createError = "image";
 	} else {
-		// Menyimpan data ke database
-		$sql = "INSERT INTO tb_blog (blog_id, blog_title, blog_content, date_release, 
-		category_id, editor_id) 
-		VALUES (?, ?, ?, ?, ?, ?)";
-		$request = $conn->prepare($sql);
-		// Bind the values to the placeholders
-		$request->bindParam(1, $blogId);
-		$request->bindParam(2, $blogTitle);
-		$request->bindParam(3, $blogContent);
-		$request->bindParam(4, $dateRelease);
-		$request->bindParam(5, $categoryId);
-		$request->bindParam(6, $editorId);
-		// Execute the prepared statement
-		$request->execute();
-
-		$imageUrl = uploadImageNews($_FILES['new-image']['tmp_name']);
-		$sql2 = 'UPDATE tb_blog SET image_url = ? WHERE blog_id = ?';
-		$request = $conn->prepare($sql2);
-		$request->bindParam(1, $imageUrl);
-		$request->bindParam(2, $blogId);
-		$request->execute();
+		// Create New Blog Into Database
+		setNewBlog($blogId, $blogTitle, $blogContent, $dateRelease, $categoryId, $editorId, $imageUrl);
 
 		//Increase the popularity of category
 		increaseBlogCategory($categoryId);
 
+		//Insert tag
 		insertBlogTag(separateTag($tagId), $blogId);
 
 		$conn = null;
@@ -345,7 +329,7 @@ if (isset($_POST['blog-submit'])) {
 							case 'title':
 								$errorMsg = "Judul harus lebih dari 12 karakter";
 								break;
-							case 'imageSize':
+							case 'image':
 								$errorMsg = "Gambar yang di upload maximal memiliki ukuran 5 Mb";
 								break;
 							case 'contentLength':
@@ -387,9 +371,9 @@ if (isset($_POST['blog-submit'])) {
 								<select class="form-select" name="categoryid" aria-label="Default select example" required>
 									<option value="" disabled selected hidden>Pilih Kategori Anda</option>
 									<?php
-									$sqlRole = "SELECT * from tb_category_blog";
+									$sqlCat = "SELECT * from tb_category_blog";
 
-									$request = $conn->prepare($sqlRole);
+									$request = $conn->prepare($sqlCat);
 									$request->execute();
 
 									if ($result = $request->fetchAll()) {

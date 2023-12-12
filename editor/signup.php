@@ -3,6 +3,7 @@ require_once  __DIR__ .  "/../helper/getConnection.php";
 require_once  __DIR__ . "/../helper/getConnectionMsqli.php";
 require_once  __DIR__ . "/../helper/hash.php";
 require_once  __DIR__ . "/../helper/validation.php";
+require_once  __DIR__ . "/../helper/editorValidation.php";
 
 $conn = getConnection();
 $signupSuccess = null;
@@ -22,42 +23,20 @@ if (isset($_POST['signup-submit'])) {
 	$phoneNumber = $_POST['signup-phone-number'];
 	$roleId = $_POST['signup-role'];
 
-	// Cek Ketersediaan Username
-	$sql = "SELECT * FROM tb_editor WHERE username = :username or email = :email or phone_number = :phoneNumber";
-	$request = $conn->prepare($sql);
-	$request->bindParam('username', $username);
-	$request->bindParam('email', $email);
-	$request->bindParam('phoneNumber', $phoneNumber);
-
-	$request->execute();
-
-	if ($result = $request->fetchAll()) {
+	if (editorUsernameExist($username) || editorEmailExist($email) || editorPhoneNumberExist($phoneNumber)) {
 		$signupSuccess = false;
 		$signUpError = "usernameNotAvailable";
-	} else if (!isAlphanumeric($password) || (strlen($password) < 8 && strlen($password) > 20)) {
+	} else if (passwordReqSuccess($password)) {
 		$signupSuccess = false;
 		$signUpError = "password";
-	} else if (strlen($phoneNumber) > 13) {
+	} else if (phoneNumberReqSuccess($phoneNumber)) {
 		$signupSuccess = false;
 		$signUpError = "phoneNumber";
+	} else if ($password != $confirmPassword) {
+		$signupSuccess = false;
+		$signUpError = "passwordNotMatch";
 	} else {
-		if ($password != $confirmPassword) {
-			echo "Password tidak matching";
-		} else {
-			$id = generateIdEditor();
-			$passwordHashed = hashPassword($confirmPassword);
-			$sqlInsert = "INSERT INTO tb_editor(editor_id, username, password, email, phone_number, role_id) values(?, ?, ?, ?, ?, ?)";
-			$requestInsert = $conn->prepare($sqlInsert);
-			$requestInsert->bindParam(1, $id);
-			$requestInsert->bindParam(2, $username);
-			$requestInsert->bindParam(3, $passwordHashed);
-			$requestInsert->bindParam(4, $email);
-			$requestInsert->bindParam(5, $phoneNumber);
-			$requestInsert->bindParam(6, $roleId);
-
-			$requestInsert->execute();
-			$signupSuccess = True;
-		}
+		$signupSuccess = setNewEditor($username, $confirmPassword, $email, $phoneNumber, $roleId);
 	}
 }
 
@@ -111,6 +90,9 @@ $conn = null;
 						break;
 					case 'phoneNumber':
 						$errorMsg = "Nomor HP yang dimasukkan harus kurang dari 13 Karakter.";
+						break;
+					case 'passwordNotMatch':
+						$errorMsg = "Password yang anda masukkan tidak sama";
 						break;
 					default:
 						break;

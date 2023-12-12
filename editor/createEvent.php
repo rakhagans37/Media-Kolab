@@ -4,6 +4,7 @@ require_once "../helper/validateLoginEditor.php";
 require_once "../helper/getConnectionMsqli.php";
 require_once "../helper/cloudinary.php";
 require_once "../helper/hash.php";
+require_once "../helper/event.php";
 require_once "../helper/validation.php";
 require_once "../helper/increasePopularity.php";
 require_once __DIR__ . "/../helper/tag.php";
@@ -11,7 +12,7 @@ require "../vendor/autoload.php";
 
 
 $conn = getConnection();
-$createSuccess = null;
+$createSuccess = true;
 
 if (isset($_POST['event-submit'])) {
 
@@ -26,46 +27,25 @@ if (isset($_POST['event-submit'])) {
 	$categoryId = $_POST['categoryid'];
 	$linkGoogleMap = $_POST['linkgooglemap'];
 	$editorId = $editorId;
+	$imageUrl = uploadImageNews($_FILES['new-image']['tmp_name']);
 
 	if (strlen($eventTitle) < 12) {
 		$createSuccess = false;
 		$createError = "title";
-	} else if ($_FILES['new-image']['size'] > 5000000) {
+	} else if (!$imageUrl) {
 		$createSuccess = false;
-		$createError = "imageSize";
+		$createError = "image";
 	} else if (strlen($eventContent) < 120) {
 		$createSuccess = false;
 		$createError = "contentLength";
 	} else {
 		// Menyimpan data ke database
-		$sql = "INSERT INTO tb_event (event_id, event_title, event_content, event_url, date_release, date_event, 
-		 video_url, category_id, editor_id, link_google_map) 
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-		$request = $conn->prepare($sql);
-		// Bind the values to the placeholders
-		$request->bindParam(1, $eventId);
-		$request->bindParam(2, $eventTitle);
-		$request->bindParam(3, $eventContent);
-		$request->bindParam(4, $eventUrl);
-		$request->bindParam(5, $dateRelease);
-		$request->bindParam(6, $dateEvent);
-		$request->bindParam(7, $videoUrl);
-		$request->bindParam(8, $categoryId);
-		$request->bindParam(9, $editorId);
-		$request->bindParam(10, $linkGoogleMap);
-		// Execute the prepared statement
-		$request->execute();
-
-		$imageUrl = uploadImageNews($_FILES['new-image']['tmp_name']);
-		$sql2 = 'UPDATE tb_event SET image_url = ? WHERE event_id = ?';
-		$request = $conn->prepare($sql2);
-		$request->bindParam(1, $imageUrl);
-		$request->bindParam(2, $eventId);
-		$request->execute();
+		setNewEvent($eventId, $eventTitle, $eventContent, $eventUrl, $dateRelease, $dateEvent, $videoUrl, $categoryId, $linkGoogleMap, $editorId, $imageUrl);
 
 		//Increase the popularity of category
 		increaseBlogCategory($categoryId);
 
+		//Insert event tag
 		insertEventTag(separateTag($tagId), $eventId);
 
 		$conn = null;
@@ -353,7 +333,7 @@ if (isset($_POST['event-submit'])) {
 						case 'title':
 							$errorMsg = "Judul harus lebih dari 12 karakter";
 							break;
-						case 'imageSize':
+						case 'image':
 							$errorMsg = "Gambar yang di upload maximal memiliki ukuran 5 Mb";
 							break;
 						case 'contentLength':

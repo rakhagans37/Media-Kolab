@@ -3,6 +3,8 @@ require_once __DIR__ . "/../helper/hash.php";
 require_once __DIR__ . "/../helper/getConnection.php";
 require_once __DIR__ . "/../helper/getConnectionMsqli.php";
 require_once __DIR__ . "/../helper/blogfunctions.php";
+require_once __DIR__ . "/../helper/blog.php";
+require_once __DIR__ . "/../helper/category.php";
 require_once __DIR__ . "/../helper/validateLoginEditor.php";
 require_once __DIR__ . "/../helper/cloudinary.php";
 
@@ -10,13 +12,8 @@ require_once __DIR__ . "/../helper/cloudinary.php";
 $conn = getConnectionMysqli();
 $dbConnection = getConnection();
 
-// Fetching data from the tb_tag table
-$query = $dbConnection->query("SELECT * FROM tb_tag");
-$tags = $query->fetchAll(PDO::FETCH_ASSOC);
-
 // Fetching data from the tb_category table
-$query = $dbConnection->query("SELECT * FROM tb_category_blog");
-$categories = $query->fetchAll(PDO::FETCH_ASSOC);
+$categories = getCategoryBlog();
 
 // Post Detection
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
@@ -27,18 +24,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 			$updateTitle = $_POST['updateTitle'];
 			$categoryId = $_POST['catinput'];
 
-			$dbConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-			$sqlUpdate = "UPDATE tb_blog SET 
-					blog_title = :updateTitle,
-					category_id = :categoryId
-					WHERE blog_id = :blogId";
-
-			$request = $dbConnection->prepare($sqlUpdate);
-
-			$request->bindParam('updateTitle', $updateTitle);
-			$request->bindParam('categoryId', $categoryId);
-			$request->bindParam('blogId', $blogId);
-			$request->execute();
+			//Updating title and category in database
+			updateBlogTitle($blogId, $updateTitle);
+			updateBlogCategory($blogId, $categoryId);
 		} catch (PDOException $e) {
 			echo "<script>alert('Error! $e');</script>";
 		}
@@ -46,21 +34,16 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 	// Script Delete Blog
 	if (isset($_POST['deleteButton'])) {
-		$blogId = $_POST['blogId'];
+		try {
+			$blogId = $_POST['blogId'];
 
-		$sqlDelete = "DELETE FROM tb_blog_tag WHERE blog_id = ?";
-		$requestDelete = mysqli_prepare($conn, $sqlDelete);
-
-		mysqli_stmt_bind_param($requestDelete, "s", $blogId);
-		mysqli_stmt_execute($requestDelete);
-		mysqli_stmt_close($requestDelete);
-
-		$sqlDelete = "DELETE FROM tb_blog WHERE blog_id = ?";
-		$requestDelete = mysqli_prepare($conn, $sqlDelete);
-
-		mysqli_stmt_bind_param($requestDelete, "s", $blogId);
-		mysqli_stmt_execute($requestDelete);
-		mysqli_stmt_close($requestDelete);
+			//Deleting Blog from database
+			deleteBlogImage($blogId);
+			deleteBlogTag($blogId);
+			deleteBlog($blogId);
+		} catch (PDOException $th) {
+			echo "<script>alert('Error! $e');</script>";
+		}
 	}
 
 	header("Location:manageBlog.php");
@@ -69,21 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 if (isset($_GET['search-blog'])) {
 	$searchBlog = $_GET['searchorders'];
-	$sql = "SELECT * FROM tb_blog WHERE editor_id = '$editorId' AND blog_title LIKE '%$searchBlog%'";
+	$blogArray = getSearchBlogByEditor($editorId, $searchBlog);
 } else {
-	$sql = "SELECT * FROM tb_blog WHERE editor_id = '$editorId'";
-}
-
-// Setting Blog Datasets
-$blogs = mysqli_query($conn, $sql);
-
-if ($blogs) {
-	$blogArray = [];
-	while ($blog = mysqli_fetch_assoc($blogs)) {
-		$blogArray[] = $blog;
-	}
-} else {
-	echo "Error executing the query: " . mysqli_error($conn);
+	$blogArray = getBlogByEditor($editorId);
 }
 
 // Closing connections;
@@ -370,57 +341,6 @@ $conn = null;
 			</div>
 		</footer>
 	</div>
-
-	<!-- Create New Blog Modal Pop Up -->
-	<form action="" method="POST" id="createBlog" enctype="multipart/form-data">
-		<div class="modal fade" id="createnew" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="createnew" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h3>New Blog</h3>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-					</div>
-					<div class="modal-body">
-						<div class="row d-flex justify-content-center align-items-center">
-							<div class="card-body p-4">
-								<div class="form-outline mb-4">
-									<label class="form-label">Judul Blog</label>
-									<input type="text" name="createTitle" class="form-control form-control-lg" required>
-								</div>
-								<div class="form-outline mb-4">
-									<label class="form-label">Isi Blog</label>
-									<input type="text" name="createContent" class="form-control form-control-lg" required>
-								</div>
-								<div class="form-outline mb-4">
-									<label class="form-label">Url Media</label>
-									<input type="file" name="createImageUrl" id="createImageUrl" class="form-control form-control-lg">
-								</div>
-								<div class="form-outline mb-4">
-									<label class="form-label">Tag</label>
-									<select name="taginput" id="taginput" class="form-control">
-										<?php foreach ($tags as $tag) { ?>
-											<option value="<?php echo $tag['tag_id']; ?>"><?php echo $tag['tag_name']; ?></option>
-										<?php } ?>
-									</select>
-								</div>
-								<div class="form-outline mb-4">
-									<label class="form-label">Categories</label>
-									<select name="catinput" id="catinput" class="form-control">
-										<?php foreach ($categories as $categ) { ?>
-											<option value="<?php echo $categ['category_id']; ?>"><?php echo $categ['category_name']; ?></option>
-										<?php } ?>
-									</select>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="modal-footer">
-						<button type="submit" class="btn btn-primary" name="createBlog" data-bs-dismiss="modal">Publish</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</form>
 
 	<!-- Update Blog Modal Pop Up -->
 	<?php foreach ($blogArray as $blog) {

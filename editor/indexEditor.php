@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . "/../helper/validateLoginEditor.php";
+require_once __DIR__ . "/../helper/editor.php";
 require_once "../helper/getConnection.php";
 require_once "../helper/validateLoginEditor.php";
 require_once "../helper/getConnectionMsqli.php";
@@ -81,21 +82,12 @@ try {
 }
 
 try {
-	$conn = getConnection();
-	$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-	$sql = "SELECT tb_editor.username, tb_editor.email, tb_editor.phone_number, tb_role.role_name FROM tb_editor INNER JOIN tb_role ON tb_editor.role_id = tb_role.role_id WHERE editor_id = :idEditor";
-	$request = $conn->prepare($sql);
-	$request->bindParam(':idEditor', $editorId);
-	$request->execute();
-	if ($result = $request->fetch()) {
+	if ($result = getEditorData($editorId)) {
 		$name = $result['username'];
 		$email = $result['email'];
 		$NumberPhone = $result['phone_number'];
 		$Role = $result['role_name'];
 	}
-
-	$conn = null;
 } catch (PDOException $errorMessage) {
 	$error = $errorMessage->getMessage();
 }

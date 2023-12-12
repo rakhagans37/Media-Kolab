@@ -220,7 +220,7 @@ function uploadImageAdmin($idAdmin, $photoTemp, $locationRedirect)
     }
 }
 
-function uploadImageEditor($editorId, $photoTemp, $locationRedirect)
+function uploadImageEditor($editorId, $photoTemp)
 {
     $newPhotoSize = filesize($photoTemp);
     $newPhotoType = mime_content_type($photoTemp);
@@ -263,8 +263,6 @@ function uploadImageEditor($editorId, $photoTemp, $locationRedirect)
             }
 
             $conn = null;
-            header("Location:$locationRedirect");
-            exit;
         } catch (PDOException $errorMessage) {
             $error = $errorMessage->getMessage();
             echo $error;
@@ -357,7 +355,7 @@ function uploadImageNews($newImageTemp)
     $newPhotoSize = filesize($newImageTemp);
     $newPhotoType = mime_content_type($newImageTemp);
 
-    if ($newPhotoSize <= 15000000 && ($newPhotoType == 'image/jpg' || $newPhotoType == 'image/png' || $newPhotoType == 'image/jpeg')) {
+    if ($newPhotoSize <= 6000000 && ($newPhotoType == 'image/jpg' || $newPhotoType == 'image/png' || $newPhotoType == 'image/jpeg')) {
         $photoName = random_int(0, PHP_INT_MAX) . date("dmYHis");
         $photoNameHashed = hashPhotoProfile($photoName);
 
@@ -371,6 +369,13 @@ function uploadImageNews($newImageTemp)
 
         return $photoNameHashed;
     } else {
-        echo "Gabisa cuy";
+        return false;
     }
+}
+
+function deleteImageNews($imageUrl)
+{
+    $imageUrlDecrypt = decryptPhotoProfile($imageUrl);
+    $api = new UploadApi();
+    $api->destroy($imageUrlDecrypt);
 }
