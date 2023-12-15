@@ -11,7 +11,7 @@ if (http_response_code() === 404) {
 	header("location:notfound.php");
 }
 $mediaId = $_GET["mediaId"];
-increasemedia($mediaId);
+increaseMedia($mediaId);
 
 $conn = getConnectionMysqli();
 

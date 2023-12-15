@@ -2,26 +2,17 @@
 require_once __DIR__ . "/../helper/getConnection.php";
 require_once __DIR__ . "/../helper/validateLogin.php";
 require_once __DIR__ . "/../helper/getConnectionMsqli.php";
+require_once __DIR__ . "/../helper/blog.php";
+require_once __DIR__ . "/../helper/tag.php";
 $conn = getConnectionMysqli();
 
 //Script php untuk delete blog
 if (isset($_GET['deleteButton'])) {
 	$blogId = $_GET['blogId'];
 
-	$sqlDelete = "DELETE FROM tb_blog_tag WHERE blog_id = ?";
-	$requestDelete = mysqli_prepare($conn, $sqlDelete);
-
-	mysqli_stmt_bind_param($requestDelete, "s", $blogId);
-	mysqli_stmt_execute($requestDelete);
-	mysqli_stmt_close($requestDelete);
-
-	$sqlDelete = "DELETE FROM tb_blog WHERE blog_id = ?";
-	$requestDelete = mysqli_prepare($conn, $sqlDelete);
-
-	mysqli_stmt_bind_param($requestDelete, "s", $blogId);
-	mysqli_stmt_execute($requestDelete);
-	mysqli_stmt_close($requestDelete);
-	mysqli_close($conn);
+	deleteBlogImage($blogId);
+	deleteBlogTag($blogId);
+	deleteBlog($blogId);
 
 	header("Location:manageBlog.php");
 	exit;
@@ -31,9 +22,9 @@ if (isset($_GET['deleteButton'])) {
 //Script Php untuk membuat request yuang mengambil detail data blog dari database
 if (isset($_GET['search-news'])) {
 	$searchNews = $_GET['searchorders'];
-	$sql = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_category_blog.category_name, tb_blog.date_release, tb_editor.username, tb_blog.views FROM ((tb_blog INNER JOIN tb_category_blog ON tb_blog.category_id = tb_category_blog.category_id) INNER JOIN tb_editor ON tb_blog.editor_id = tb_editor.editor_id) WHERE tb_blog.blog_title LIKE '%$searchNews%'";
+	$result = getAllSearchBlog($searchNews);
 } else {
-	$sql = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_category_blog.category_name, tb_blog.date_release, tb_editor.username, tb_blog.views FROM ((tb_blog INNER JOIN tb_category_blog ON tb_blog.category_id = tb_category_blog.category_id) INNER JOIN tb_editor ON tb_blog.editor_id = tb_editor.editor_id)";
+	$result = getAllBlog();
 }
 
 $request = mysqli_query($conn, $sql);
@@ -292,15 +283,14 @@ $request = mysqli_query($conn, $sql);
 										<tbody>
 											<?php
 											// Print data detail blog dari request yang telah dibuat sebelumnya
-											if (mysqli_num_rows($request) > 0) {
-												foreach ($result = mysqli_fetch_all($request) as $index) {
-													$blogId = $index[0];
-													$blogTitle = $index[1];
-													$category = $index[2];
-													$dateRelease = $index[3];
-													$publisher = $index[4];
-													$views = $index[5];
-													echo <<<TULIS
+											foreach ($result as $index) {
+												$blogId = $index['blog_id'];
+												$blogTitle = $index['blog_title'];
+												$category = $index['category_name'];
+												$dateRelease = $index['date_release'];
+												$publisher = $index['username'];
+												$views = $index['views'];
+												echo <<<TULIS
 															<tr>
 																<td class="cell">$blogId</td>
 																<td class="cell"><span class="truncate">$blogTitle</span></td>
@@ -317,8 +307,8 @@ $request = mysqli_query($conn, $sql);
 																</td>
 															</tr>
 														TULIS;
-												}
 											}
+
 
 											mysqli_close($conn);
 											?>

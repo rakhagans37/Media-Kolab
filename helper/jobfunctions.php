@@ -1,7 +1,7 @@
 <?php
 require_once 'getConnection.php';
 require_once 'hash.php';
-require __DIR__ . '\../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 // Use the Configuration class 
 use Cloudinary\Configuration\Configuration;

@@ -40,7 +40,7 @@ if (isset($_POST['vacancy-submit'])) {
 		setNewJob($vacancy_id, $vacancyTitle, $vacancyContent, $company, $requirement, $dateRelease, $tagId, $categoryId, $editorId, $imageUrl, $companyLogo);
 
 		//Increase the popularity of category
-		increaseBlogCategory($categoryId);
+		increaseJobCategory($categoryId);
 
 		//Insert Tag
 		insertJobTag(separateTag($tagId), $vacancy_id);

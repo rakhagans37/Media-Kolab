@@ -8,7 +8,7 @@ require_once __DIR__ . "/validation.php";
 // Check password req has been fulfilled
 function passwordReqSuccess($password)
 {
-    if (isAlphanumeric($password) && (strlen($password) >= 8 && strlen($password) <= 20)) {
+    if (isAlphanumeric($password) && strlen($password) >= 8 && strlen($password) <= 20) {
         return true;
     } else {
         return false;

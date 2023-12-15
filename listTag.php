@@ -419,7 +419,7 @@ mysqli_close($conn);
         <nav>
             <ul class="vertical-menu">
                 <li>
-                    <a href="index.html" class="active">Home</a>
+                    <a href="index.php" class="active">Home</a>
                 </li>
             </ul>
         </nav>

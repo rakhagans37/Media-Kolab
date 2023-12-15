@@ -429,9 +429,9 @@ if (isset($_GET['add-category'])) {
                                             <?php
                                             if (isset($_GET['search-news'])) {
                                                 $searchUser = $_GET['searchorders'];
-                                                $sql = "SELECT tb_category_event.category_id, tb_category_event.category_name, COUNT(tb_media.category_id) AS jumlah_member, tb_category_event.popularity FROM tb_category_event LEFT JOIN tb_media ON tb_media.category_id = tb_category_event.category_id GROUP BY tb_category_event.category_id HAVING tb_category_event.category_name LIKE '%$searchUser%'";
+                                                $sql = "SELECT tb_category_event.category_id, tb_category_event.category_name, COUNT(tb_event.category_id) AS jumlah_member, tb_category_event.popularity FROM tb_category_event LEFT JOIN tb_event ON tb_event.category_id = tb_category_event.category_id GROUP BY tb_category_event.category_id HAVING tb_category_event.category_name LIKE '%$searchUser%'";
                                             } else {
-                                                $sql = "SELECT tb_category_event.category_id, tb_category_event.category_name, COUNT(tb_media.category_id) AS jumlah_member, tb_category_event.popularity FROM tb_category_event LEFT JOIN tb_media ON tb_media.category_id = tb_category_event.category_id GROUP BY tb_category_event.category_id";
+                                                $sql = "SELECT tb_category_event.category_id, tb_category_event.category_name, COUNT(tb_event.category_id) AS jumlah_member, tb_category_event.popularity FROM tb_category_event LEFT JOIN tb_event ON tb_event.category_id = tb_category_event.category_id GROUP BY tb_category_event.category_id";
                                             }
 
                                             $request3 = mysqli_query($conn, $sql);

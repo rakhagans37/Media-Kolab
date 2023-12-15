@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     if (isset($_POST['changePassword'])) {
         $newPassword = $_POST['NewPassword'];
 
-        if (passwordReqSuccess($newPassword)) {
+        if (!passwordReqSuccess($newPassword)) {
             //Set New Password
             editorSetPassword($editorId, $newPassword);
             header("location:accountEditor.php");
@@ -461,7 +461,7 @@ try {
                             <div class="modal-body">
                                 <p>Choose your photo</p>
                                 <form action="accountEditor.php" method="POST" id="" class="d-flex flex-row align-items-center justify-content-between" enctype="multipart/form-data">
-                                    <input type="file" name="new-photo" id="new-photo" required>
+                                    <input type="file" class="form-control" name="new-photo" id="new-photo" required>
                                     <input type="submit" id="submit" name="changePhotoButton" class="btn app-btn-primary" value="Change">
                                 </form>
                             </div>

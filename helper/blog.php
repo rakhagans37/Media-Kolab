@@ -27,6 +27,38 @@ function setNewBlog($blogId, $blogTitle, $blogContent, $date_release, $categoryI
 
 function getAllBlog()
 {
+  $conn = getConnection();
+
+  $sql = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_category_blog.category_name, tb_blog.date_release, tb_editor.username, tb_blog.views FROM ((tb_blog INNER JOIN tb_category_blog ON tb_blog.category_id = tb_category_blog.category_id) INNER JOIN tb_editor ON tb_blog.editor_id = tb_editor.editor_id)";
+
+  $request = $conn->prepare($sql);
+  $request->execute();
+
+  if ($result = $request->fetchAll()) {
+    $conn = null;
+    return $result;
+  } else {
+    $conn = null;
+    return array();
+  }
+}
+
+function getAllSearchBlog($searchParam)
+{
+  $conn = getConnection();
+
+  $sql = "SELECT tb_blog.blog_id, tb_blog.blog_title, tb_category_blog.category_name, tb_blog.date_release, tb_editor.username, tb_blog.views FROM ((tb_blog INNER JOIN tb_category_blog ON tb_blog.category_id = tb_category_blog.category_id) INNER JOIN tb_editor ON tb_blog.editor_id = tb_editor.editor_id) WHERE tb_blog.blog_title LIKE '%$searchParam%'";
+
+  $request = $conn->prepare($sql);
+  $request->execute();
+
+  if ($result = $request->fetchAll()) {
+    $conn = null;
+    return $result;
+  } else {
+    $conn = null;
+    return array();
+  }
 }
 
 function getBlogById($blogId)

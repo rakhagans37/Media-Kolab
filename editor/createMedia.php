@@ -41,7 +41,7 @@ if (isset($_POST['media-submit'])) {
 		setNewMedia($mediaId, $mediaTitle, $mediaContent, $dateRelease, $tagId, $categoryId, $videoUrl, $editorId, $imageUrl, $thumbnail);
 
 		//Increase the popularity of category
-		increaseBlogCategory($categoryId);
+		increaseMediaCategory($categoryId);
 
 		//Insert media tag
 		insertMediaTag(separateTag($tagId), $mediaId);

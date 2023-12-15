@@ -2,7 +2,7 @@
 require_once __DIR__ . "/../helper/hash.php";
 require_once __DIR__ . "/../helper/getConnection.php";
 require_once __DIR__ . "/../helper/getConnectionMsqli.php";
-require_once __DIR__ . "/../helper/jobfunctions.php";
+require_once __DIR__ . "/../helper/jobFunctions.php";
 require_once __DIR__ . "/../helper/jobVacancies.php";
 require_once __DIR__ . "/../helper/category.php";
 require_once __DIR__ . "/../helper/validateLoginEditor.php";
@@ -81,52 +81,7 @@ $conn = null;
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/css/bootstrap-datepicker.css" rel="stylesheet" />
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-	<script src="https://cdn.tiny.cloud/1/nzng1kbb69fr6bk6p4r9k59igb52we1skltelld77fektcxi/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/js/bootstrap-datepicker.js"></script>
-
-
-	<script>
-		tinymce.init({
-			selector: 'textarea#editor',
-			paste_as_text: true,
-			font_formats: 'Roboto=Roboto',
-			content_style: "@import url('https://fonts.googleapis.com/css2?family=Lato:wght@900&family=Roboto&display=swap'); body { font-family: 'Roboto', sans-serif; } h1,h2,h3,h4,h5,h6 { font-family: 'Lato', sans-serif; }",
-		});
-	</script>
-
-	<script>
-		tinymce.init({
-			selector: 'textarea#editor',
-			plugins: 'lists, link',
-			toolbar: 'h1 h2 bold italic strikethrough blockquote bullist numlist backcolor | link | removeformat help',
-			menubar: false,
-			setup: (editor) => {
-				// Apply the focus effect
-				editor.on("init", () => {
-					editor.getContainer().style.transition = "border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out";
-				});
-				editor.on("focus", () => {
-					(editor.getContainer().style.boxShadow = "0 0 0 .2rem rgba(0, 123, 255, .25)"),
-					(editor.getContainer().style.borderColor = "#80bdff");
-				});
-				editor.on("blur", () => {
-					(editor.getContainer().style.boxShadow = ""),
-					(editor.getContainer().style.borderColor = "");
-				});
-			},
-		});
-	</script>
-
-	<script>
-		document.getElementById('myForm').addEventListener('submit', function(event) {
-			const content = tinyMCE.get('editor').getContent();
-
-			if (!content.trim()) { // Check if content is empty or contains only whitespace
-				event.preventDefault(); // Prevent form submission
-				alert('Content is required'); // Display an alert or handle validation error
-			}
-		});
-	</script>
 </head>
 
 <body class="app">

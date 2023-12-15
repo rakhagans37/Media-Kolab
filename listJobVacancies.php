@@ -442,14 +442,14 @@ mysqli_close($conn);
 		<nav>
 			<ul class="vertical-menu">
 				<li>
-					<a href="index.html">Home</a>
+					<a href="index.php">Home</a>
 				</li>
-				<li><a class="active" href="category.html">Event</a></li>
-				<li><a href="category.html">Blog</a></li>
+				<li><a href="listEvent.php">Event</a></li>
+				<li><a href="listBlog.php">Blog</a></li>
 				<li>
-					<a href="#">Media</a>
+					<a href="listMedia.php">Media</a>
 				</li>
-				<li><a href="contact.html">Loker/Magang</a></li>
+				<li><a class="active" href="listJobVacancies.php">Loker/Magang</a></li>
 			</ul>
 		</nav>
 

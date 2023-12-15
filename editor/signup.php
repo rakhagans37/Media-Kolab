@@ -4,6 +4,7 @@ require_once  __DIR__ . "/../helper/getConnectionMsqli.php";
 require_once  __DIR__ . "/../helper/hash.php";
 require_once  __DIR__ . "/../helper/validation.php";
 require_once  __DIR__ . "/../helper/editorValidation.php";
+require_once  __DIR__ . "/../helper/editor.php";
 
 $conn = getConnection();
 $signupSuccess = null;
@@ -26,10 +27,10 @@ if (isset($_POST['signup-submit'])) {
 	if (editorUsernameExist($username) || editorEmailExist($email) || editorPhoneNumberExist($phoneNumber)) {
 		$signupSuccess = false;
 		$signUpError = "usernameNotAvailable";
-	} else if (passwordReqSuccess($password)) {
+	} else if (!passwordReqSuccess($password)) {
 		$signupSuccess = false;
 		$signUpError = "password";
-	} else if (phoneNumberReqSuccess($phoneNumber)) {
+	} else if (!phoneNumberReqSuccess($phoneNumber)) {
 		$signupSuccess = false;
 		$signUpError = "phoneNumber";
 	} else if ($password != $confirmPassword) {

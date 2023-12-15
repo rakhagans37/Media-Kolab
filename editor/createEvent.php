@@ -43,7 +43,7 @@ if (isset($_POST['event-submit'])) {
 		setNewEvent($eventId, $eventTitle, $eventContent, $eventUrl, $dateRelease, $dateEvent, $videoUrl, $categoryId, $linkGoogleMap, $editorId, $imageUrl);
 
 		//Increase the popularity of category
-		increaseBlogCategory($categoryId);
+		increaseEventCategory($categoryId);
 
 		//Insert event tag
 		insertEventTag(separateTag($tagId), $eventId);
