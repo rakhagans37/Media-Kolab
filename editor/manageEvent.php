@@ -38,8 +38,10 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         try {
             $eventId = $_POST['eventId'];
 
-            //Delete event tag & event dataset
+            //Delete event image from cloud
             deleteEventImage($eventId);
+
+            //Delete event dataset from database
             deleteEventTag($eventId);
             deleteEvent($eventId);
         } catch (PDOException $e) {

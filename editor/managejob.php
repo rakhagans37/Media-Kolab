@@ -21,8 +21,10 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	if (isset($_POST['deleteButton'])) {
 		$vacancyId = $_POST['jobId'];
 
-		//Delete job dataset
+		//Delete job image from cloud
 		deleteJobImage($vacancyId);
+
+		//Delete job dataset from database
 		deleteJobTag($vacancyId);
 		deleteJobVacancies($vacancyId);
 	}

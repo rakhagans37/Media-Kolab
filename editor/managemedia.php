@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 			$mediaId = $_POST['mediaId'];
 
 			//Delete Media Dataset
-			deleteImageMedia($mediaId);
+			deleteMediaImage($mediaId);
 			deleteMediaTag($mediaId);
 			deleteMedia($mediaId);
 		} catch (PDOException $e) {

@@ -174,7 +174,7 @@ function updateBlogCategory($blogId, $newCategory)
   $conn = null;
 }
 
-function setBlogImageToNull($blogId)
+function updateBlogImageToNull($blogId)
 {
   $conn = getConnection();
   $newImage = null;
@@ -203,11 +203,13 @@ function deleteBlogImage($blogId)
   $result = $request->fetch();
 
   if (!is_null($result['image_url'])) {
-    deleteImageNews($result['image_url']);
-
-    // Set image to null
-    setBlogImageToNull($blogId);
+    //Delete image from cloud
+    deleteImage(decryptPhotoProfile($result['image_url']));
   }
 
   $conn = null;
+}
+
+function getEditorPhoto($editorId)
+{
 }

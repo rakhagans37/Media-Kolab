@@ -13,7 +13,7 @@ function insertBlogTag(array $arrayTag, $blogId)
         $request->bindParam(1, $value);
         $request->execute();
 
-        if ($result = $request->fetchAll()) {
+        if ($result = $request->fetch()) {
             $tagId = $result['tag_id'];
             increaseTag($tagId);
             $sqlInsert = "INSERT INTO tb_blog_tag VALUES(?,?)";
@@ -55,8 +55,8 @@ function insertMediaTag(array $arrayTag, $mediaId)
         $request->bindParam(1, $value);
         $request->execute();
 
-        if ($result = $request->fetchAll()) {
-            $tagId = $result[0]['tag_id'];
+        if ($result = $request->fetch()) {
+            $tagId = $result['tag_id'];
             increaseTag($tagId);
             $sqlInsert = "INSERT INTO tb_media_tag VALUES(?,?)";
 
@@ -96,8 +96,8 @@ function insertEventTag(array $arrayTag, $eventId)
         $request->bindParam(1, $value);
         $request->execute();
 
-        if ($result = $request->fetchAll()) {
-            $tagId = $result[0]['tag_id'];
+        if ($result = $request->fetch()) {
+            $tagId = $result['tag_id'];
             increaseTag($tagId);
             $sqlInsert = "INSERT INTO tb_event_tag VALUES(?,?)";
 
@@ -137,8 +137,8 @@ function insertJobTag(array $arrayTag, $jobId)
         $request->bindParam(1, $value);
         $request->execute();
 
-        if ($result = $request->fetchAll()) {
-            $tagId = $result[0]['tag_id'];
+        if ($result = $request->fetch()) {
+            $tagId = $result['tag_id'];
             increaseTag($tagId);
             $sqlInsert = "INSERT INTO tb_job_tag VALUES(?,?)";
 

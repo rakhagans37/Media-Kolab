@@ -4,7 +4,7 @@ require_once __DIR__ . "/getConnection.php";
 require_once __DIR__ . "/cloudinary.php";
 require_once __DIR__ . "/hash.php";
 
-function editorSetUsername($editorId, $newUsername)
+function setEditorUsername($editorId, $newUsername)
 {
     $connMyqli = getConnectionMysqli();
     $sqlUpdateName = "UPDATE tb_editor SET username = '$newUsername' WHERE editor_id = $editorId ";
@@ -12,12 +12,57 @@ function editorSetUsername($editorId, $newUsername)
     mysqli_close($connMyqli);
 }
 
-function editorSetPhoto($editorId, $newPhoto)
+function updateEditorPhoto($editorId, $newPhotoHashed)
 {
-    uploadImageEditor($editorId, $newPhoto);
+    $conn = getConnection();
+
+    $sqlInputPhoto = "UPDATE tb_editor SET profile_photo = :newPhotoHashed WHERE editor_id = :editorId";
+    $request = $conn->prepare($sqlInputPhoto);
+    $request->bindParam("newPhotoHashed", $newPhotoHashed);
+    $request->bindParam("editorId", $editorId);
+    $request->execute();
+
+    $conn = null;
 }
 
-function editorSetPhone($editorId, $newPhoneNumber)
+function setEditorImageToNull($editorId)
+{
+    $conn = getConnection();
+    $newImage = null;
+
+    $sqlUpdate = "UPDATE tb_editor SET 
+					profile_photo = :newImage
+					WHERE editor_id = :editorId";
+
+    $request = $conn->prepare($sqlUpdate);
+    $request->bindParam("newImage", $newImage);
+    $request->bindParam("editorId", $editorId);
+    $request->execute();
+
+    $conn = null;
+}
+
+function saveEditorPhoto($photoUrl)
+{
+    $imgtag = getImageProfile($photoUrl);
+    if (isset($_COOKIE['editorLoginStatus'])) {
+        setcookie('editorProfilePhoto', $imgtag, time() + (86400 * 7));
+    } else {
+        $_SESSION['editorProfilePhoto'] = $imgtag;
+    }
+}
+
+function deleteEditorPhoto($editorId)
+{
+    $editorData = getEditorData($editorId);
+    $photoEditor = $editorData['profile_photo'];
+    if (!is_null($photoEditor)) {
+        // Delete image from cloud
+        deleteImage(decryptPhotoProfile($photoEditor));
+    }
+}
+
+function setEditorPhone($editorId, $newPhoneNumber)
 {
     $connMyqli = getConnectionMysqli();
     $sqlUpdateNoPhone = "UPDATE tb_editor SET phone_number = '$newPhoneNumber' WHERE editor_id = $editorId ";
@@ -25,7 +70,7 @@ function editorSetPhone($editorId, $newPhoneNumber)
     mysqli_close($connMyqli);
 }
 
-function editorSetRole($editorId, $roleId)
+function setEditorRole($editorId, $roleId)
 {
     $connMyqli = getConnectionMysqli();
     $sqlUpdateNoPhone = "UPDATE tb_editor SET role_id = '$roleId' WHERE editor_id = $editorId ";
@@ -33,7 +78,7 @@ function editorSetRole($editorId, $roleId)
     mysqli_close($connMyqli);
 }
 
-function editorSetPassword($editorId, $newPassword)
+function setEditorPassword($editorId, $newPassword)
 {
     $connMyqli = getConnectionMysqli();
     $newPasswordUser = hashPassword($newPassword);
@@ -42,7 +87,7 @@ function editorSetPassword($editorId, $newPassword)
     mysqli_close($connMyqli);
 }
 
-function editorSetEmail($editorId, $newEmail)
+function setEditorEmail($editorId, $newEmail)
 {
     $connMyqli = getConnectionMysqli();
     $sqlUpdateEmail = "UPDATE tb_editor SET email = '$newEmail' WHERE editor_id = $editorId ";

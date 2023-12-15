@@ -37,8 +37,10 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 		try {
 			$blogId = $_POST['blogId'];
 
-			//Deleting Blog from database
+			//Delete Blog Image From Cloud
 			deleteBlogImage($blogId);
+
+			//Delete blog dataset from database
 			deleteBlogTag($blogId);
 			deleteBlog($blogId);
 		} catch (PDOException $th) {

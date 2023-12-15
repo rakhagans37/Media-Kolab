@@ -220,56 +220,15 @@ function uploadImageAdmin($idAdmin, $photoTemp, $locationRedirect)
     }
 }
 
-function uploadImageEditor($editorId, $photoTemp)
+function uploadImageEditor($photoTemp, $photoName)
 {
-    $newPhotoSize = filesize($photoTemp);
-    $newPhotoType = mime_content_type($photoTemp);
-
-    if ($newPhotoSize <= 6000000 && ($newPhotoType == 'image/jpg' || $newPhotoType == 'image/png' || $newPhotoType == 'image/jpeg')) {
-        $photoName = random_int(0, PHP_INT_MAX) . date("dmYHis") . $editorId;
-        $photoNameHashed = hashPhotoProfile($photoName);
-
-        //Delete exPhoto
-        deleteImageEditor($editorId);
-
-        //Upload into cloudinary process
-        $upload = new UploadApi();
-        $upload->upload($photoTemp, [
-            'public_id' => $photoName,
-            'use_filename' => TRUE,
-            'overwrite' => TRUE
-        ]);
-
-        try {
-            $conn = getConnection();
-            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            $sql = "UPDATE tb_editor SET profile_photo = :newPhoto WHERE editor_id = :editorId";
-            $request = $conn->prepare($sql);
-
-            $request->bindParam('editorId', $editorId);
-            $request->bindParam('newPhoto', $photoNameHashed);
-            $request->execute();
-
-            //Saving profile photo into cookies
-            $decrypt = decryptPhotoProfile($photoNameHashed);
-
-            //Automatically getting the Photo
-            $imgtag = getImageProfile($decrypt);
-            if (isset($_COOKIE['loginStatus'])) {
-                setcookie('editorProfilePhoto', $imgtag, time() + (86400 * 7));
-            } else {
-                $_SESSION['editorProfilePhoto'] = $imgtag;
-            }
-
-            $conn = null;
-        } catch (PDOException $errorMessage) {
-            $error = $errorMessage->getMessage();
-            echo $error;
-        }
-    } else {
-        echo "Gabisa cuy";
-    }
+    //Upload into cloudinary process
+    $upload = new UploadApi();
+    $upload->upload($photoTemp, [
+        'public_id' => $photoName,
+        'use_filename' => TRUE,
+        'overwrite' => TRUE
+    ]);
 }
 
 function deleteImageAdmin($idAdmin)
@@ -373,9 +332,12 @@ function uploadImageNews($newImageTemp)
     }
 }
 
-function deleteImageNews($imageUrl)
+function deleteImage($imageUrl)
 {
-    $imageUrlDecrypt = decryptPhotoProfile($imageUrl);
     $api = new UploadApi();
-    $api->destroy($imageUrlDecrypt);
+    try {
+        $api->destroy($imageUrl);
+    } catch (Exception $error) {
+        return $error->getMessage();
+    }
 }

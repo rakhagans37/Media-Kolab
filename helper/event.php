@@ -153,10 +153,8 @@ function deleteEventImage($eventId)
     $result = $request->fetch();
 
     if (!is_null($result['image_url'])) {
-        deleteImageNews($result['image_url']);
-
-        // Set image to null
-        setEventImageToNull($eventId);
+        //Deleting image from cloud
+        deleteImage(decryptPhotoProfile($result['image_url']));
     }
 
     $conn = null;

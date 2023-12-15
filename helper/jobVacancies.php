@@ -167,13 +167,8 @@ function deleteJobImage($vacancyId)
   $result = $request->fetch();
 
   if (!is_null($result['image_url']) && !is_null($result['logo'])) {
-    deleteImageNews($result['image_url']);
-    deleteImageNews($result['logo']);
-
-
-    // Set image to null
-    setJobImageToNull($vacancyId);
-    setJobCompanyLogoToNull($vacancyId);
+    deleteImage(decryptPhotoProfile($result['image_url']));
+    deleteImage(decryptPhotoProfile($result['logo']));
   }
 
   $conn = null;

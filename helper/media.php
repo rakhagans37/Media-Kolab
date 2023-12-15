@@ -185,12 +185,8 @@ function deleteMediaImage($mediaId)
   $result = $request->fetch();
 
   if (!is_null($result['image_url']) && !is_null($result['thumbnail'])) {
-    deleteImageNews($result['image_url']);
-    deleteImageNews($result['thumbnail']);
-
-    // Set image to null
-    setMediaImageToNull($mediaId);
-    setMediaThumbnailToNull($mediaId);
+    deleteImage(decryptPhotoProfile($result['image_url']));
+    deleteImage(decryptPhotoProfile($result['thumbnail']));
   }
 
   $conn = null;

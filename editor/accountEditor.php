@@ -15,10 +15,24 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     //Set New Photo
     if (isset($_POST['changePhotoButton']) && $_FILES['new-photo']['size'] < 6000000) {
         $newPhoto = $_FILES['new-photo']['tmp_name'];
+        $newPhotoType = mime_content_type($newPhoto);
 
-        //Set Photo & Redirect
-        editorSetPhoto($editorId, $newPhoto);
-        header("location:accountEditor.php");
+        if ($newPhotoType == 'image/jpg' || $newPhotoType == 'image/png' || $newPhotoType == 'image/jpeg') {
+            $photoName = generateEditorPhotoName($editorId);
+            $photoNameHashed = hashPhotoProfile($photoName);
+
+            //Delete Photo From Cloud
+            deleteEditorPhoto($editorId);
+
+            //Upload & set new photo into database
+            updateEditorPhoto($editorId, $photoNameHashed);
+            uploadImageEditor($newPhoto, $photoName);
+
+            //Automatically set the new photo
+            saveEditorPhoto($photoName);
+
+            header("location:accountEditor.php");
+        }
     } else {
         $error = true;
         $errorCode = "photo";
@@ -29,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
         //Set Username & Redirect
         if (!editorUsernameExist($newusername)) {
-            editorSetUsername($editorId, $newusername);
+            setEditorUsername($editorId, $newusername);
             header("location:accountEditor.php");
         } else {
             $error = true;
@@ -42,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
         if (!editorPhoneNumberExist($newnophone)) {
             //Set New Phone Number
-            editorSetPhone($editorId, $newnophone);
+            setEditorPhone($editorId, $newnophone);
             header("location:accountEditor.php");
         } else {
             $error = true;
@@ -54,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         $newRole = $_POST['Newrole'];
 
         //Set New Role
-        editorSetRole($editorId, $newRole);
+        setEditorRole($editorId, $newRole);
         header("location:accountEditor.php");
     }
     //Set New Email
@@ -63,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
         if (!editorEmailExist($newEmail)) {
             //Set New Email
-            editorSetEmail($editorId, $newEmail);
+            setEditorEmail($editorId, $newEmail);
             header("location:accountEditor.php");
         } else {
             $error = true;
@@ -76,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
         if (!passwordReqSuccess($newPassword)) {
             //Set New Password
-            editorSetPassword($editorId, $newPassword);
+            setEditorPassword($editorId, $newPassword);
             header("location:accountEditor.php");
         } else {
             $error = true;

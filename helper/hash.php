@@ -80,3 +80,9 @@ function generateIdTag()
     $newIdTag = generateRandomString(6) . date("dm");
     return $newIdTag;
 }
+
+function generateEditorPhotoName($editorId)
+{
+    $newEditorPhotoName = random_int(0, PHP_INT_MAX) . date("dmYHis") . $editorId;
+    return $newEditorPhotoName;
+}
