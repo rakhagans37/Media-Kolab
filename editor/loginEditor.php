@@ -1,16 +1,10 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 require_once __DIR__ . '/../helper/getConnection.php';
 require_once __DIR__ . '/../helper/cloudinary.php';
 require_once __DIR__ . '/../helper/hash.php';
 require_once __DIR__ . '/../helper/editor.php';
 require_once __DIR__ . '/../helper/editorValidation.php';
 require_once __DIR__ . '/../helper/validation.php';
-
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 
 if (isset($_COOKIE['editorLoginStatus']) || isset($_SESSION['editorLoginStatus'])) {
     header('Location:indexEditor.php');

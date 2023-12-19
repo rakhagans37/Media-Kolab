@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             deleteEditorPhoto($editorId);
 
             //Upload & set new photo into database
-            updateEditorPhoto($editorId, $photoNameHashed);
+            setEditorPhoto($editorId, $photoNameHashed);
             uploadImageEditor($newPhoto, $photoName);
 
             //Automatically set the new photo

@@ -56,7 +56,7 @@ mysqli_close($conn);
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>Nguliah.id - Media Campus</title>
 	<meta name="description" content="Nguliah.id - Media Campus">
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=6">
 	<link rel="shortcut icon" type="image/x-icon" href="images/logoNgampus2.png">
 
 	<!-- STYLES -->
@@ -142,10 +142,10 @@ mysqli_close($conn);
 						</ul>
 						<!-- header buttons -->
 						<div class="header-buttons">
-							<button class="search icon-button">
+							<button class="search icon-button" aria-label="search-button">
 								<i class="icon-magnifier"></i>
 							</button>
-							<button class="burger-menu icon-button">
+							<button class="burger-menu icon-button" aria-label="burger-menu-button">
 								<span class="burger-icon"></span>
 							</button>
 						</div>
@@ -576,7 +576,7 @@ mysqli_close($conn);
 														<p class="excerpt mb-0"><br><br></p>
 														<div class="post-bottom clearfix d-flex align-items-center">
 															<div class="social-share me-auto">
-																<button class="toggle-button icon-share"></button>
+																<button class="toggle-button icon-share" aria-label="share-button"></button>
 																<ul class="icons list-unstyled list-inline mb-0">
 																	<li class="list-inline-item"><a href="#"><i class="fab fa-facebook-f"></i></a></li>
 																	<li class="list-inline-item"><a href="#"><i class="fab fa-twitter"></i></a></li>

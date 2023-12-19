@@ -32,6 +32,18 @@ Configuration::instance([
     ]
 ]);
 
+function addAltAttributeToImg($htmlCode)
+{
+    // Check if the <img> tag is present in the HTML code
+    if (strpos($htmlCode, '<img') !== false) {
+        // Add alt attribute if <img> tag is found
+        $modifiedCode = str_replace('<img', '<img alt="News thumbnail"', $htmlCode);
+        return $modifiedCode;
+    } else {
+        // Return the original code if <img> tag is not found
+        return $htmlCode;
+    }
+}
 
 function imageTagToURL($imgtag)
 {
@@ -164,6 +176,7 @@ function getImageNews($urlPhoto)
             Format::auto()
         ))->delivery(Delivery::quality(60));
 
+    $imgtag = addAltAttributeToImg($imgtag);
     return (string)$imgtag;
 }
 

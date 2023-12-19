@@ -12,7 +12,7 @@ function setEditorUsername($editorId, $newUsername)
     mysqli_close($connMyqli);
 }
 
-function updateEditorPhoto($editorId, $newPhotoHashed)
+function setEditorPhoto($editorId, $newPhotoHashed)
 {
     $conn = getConnection();
 

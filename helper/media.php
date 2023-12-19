@@ -177,7 +177,7 @@ function deleteMediaImage($mediaId)
 {
   $conn = getConnection();
 
-  $sqlGetImage = "SELECT image_url FROM tb_media WHERE media_id = :mediaId";
+  $sqlGetImage = "SELECT thumbnail,image_url FROM tb_media WHERE media_id = :mediaId";
 
   $request = $conn->prepare($sqlGetImage);
   $request->bindParam("mediaId", $mediaId);
