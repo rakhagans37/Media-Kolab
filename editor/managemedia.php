@@ -348,6 +348,13 @@ $conn = null;
 		$categname = getCategoryMediaNameFromId($media['category_id']);
 		$formattedDate = dateFormatter($media['date_release']);
 		$categoryselections = "";
+		foreach ($categories as $category) {
+			if ($category['category_id'] == $blog['category_id']) {
+				$categoryselections .= "<option value='{$category['category_id']}' selected>{$category['category_name']}</option>";
+			} else {
+				$categoryselections .= "<option value='{$category['category_id']}'>{$category['category_name']}</option>";
+			}
+		}
 		echo <<<TULIS
 			<div class="modal fade" id="update-media-{$media['media_id']}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
 				<form action="" method="POST" id="formUpdateMedia" enctype="multipart/form-data">

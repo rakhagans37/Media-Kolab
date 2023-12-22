@@ -23,19 +23,21 @@ if (isset($_POST['vacancy-submit'])) {
 	$tagId = $_POST['tagid'];
 	$categoryId = $_POST['categoryid'];
 	$editorId = $editorId;
-	$imageUrl = uploadImageNews($_FILES['new-image']['tmp_name']);
-	$companyLogo = uploadImageNews($_FILES['company-logo']['tmp_name']);
 
 	if (strlen($vacancyTitle) < 12) {
 		$createSuccess = false;
 		$createError = "title";
-	} else if (!$imageUrl || !$companyLogo) {
+	} else if ($_FILES['new-image']['size'] > 5000000 || $_FILES['company-logo']['size'] > 5000000) {
 		$createSuccess = false;
 		$createError = "image";
 	} else if (strlen($vacancyContent) < 120) {
 		$createSuccess = false;
 		$createError = "contentLength";
 	} else {
+		//Upload Image Into Clouds
+		$imageUrl = uploadImageNews($_FILES['new-image']['tmp_name']);
+		$companyLogo = uploadImageNews($_FILES['company-logo']['tmp_name']);
+
 		//Insert New Job Vacancies Into Database
 		setNewJob($vacancy_id, $vacancyTitle, $vacancyContent, $company, $requirement, $dateRelease, $tagId, $categoryId, $editorId, $imageUrl, $companyLogo);
 

@@ -2,33 +2,37 @@
 require_once __DIR__ . '/../helper/validateLogin.php';
 require_once __DIR__ . '/../helper/getConnection.php';
 require_once __DIR__ . '/../helper/cloudinary.php';
+require_once __DIR__ . '/../helper/admin.php';
+require_once __DIR__ . '/../helper/adminValidation.php';
+require_once __DIR__ . '/../helper/hash.php';
 require __DIR__ . '/../vendor/autoload.php';
 
+
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
-    if (isset($_POST['changePhotoButton'])) {
-        $photoTemp = $_FILES['new-photo']['tmp_name'];
-        uploadImageAdmin($idAdmin, $photoTemp, "account.php");
+    if (isset($_POST['changePhotoButton']) && $_FILES['new-photo']['size'] < 3000000) {
+        $newPhotoTemp = $_FILES['new-photo']['tmp_name'];
+        $newPhotoType = mime_content_type($newPhotoTemp);
+
+        if ($newPhotoType == 'image/jpg' || $newPhotoType == 'image/png' || $newPhotoType == 'image/jpeg') {
+            $photoName = generateAdminPhotoName($idAdmin);
+            $photoNameHashed = hashPhotoProfile($photoName);
+
+            //Delete photo from cloud
+            deleteAdminPhoto($idAdmin);
+
+            //Set photo on database
+            setAdminPhoto($idAdmin, $photoNameHashed);
+            uploadImage($newPhotoTemp, $photoName);
+
+            //Save into cookies
+            saveAdminPhoto($photoName);
+
+            header("location:account.php");
+        }
     }
 }
 
-try {
-    $conn = getConnection();
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-    $sql = "SELECT * FROM TB_ADMIN WHERE admin_id = :idAdmin";
-    $request = $conn->prepare($sql);
-
-    $request->bindParam('idAdmin', $idAdmin);
-    $request->execute();
-    if ($result = $request->fetch()) {
-        $name = $result['username'];
-        $email = $result['email'];
-    }
-
-    $conn = null;
-} catch (PDOException $errorMessage) {
-    $error = $errorMessage->getMessage();
-}
+$adminData = getAdminData($idAdmin);
 ?>
 
 <!DOCTYPE html>
@@ -318,7 +322,7 @@ try {
                                     <div class="row justify-content-between align-items-center">
                                         <div class="col-auto">
                                             <div class="item-label"><strong>Name</strong></div>
-                                            <div class="item-data"><?= $name ?></div>
+                                            <div class="item-data"><?= $adminData['username'] ?></div>
                                         </div>
                                         <!--//col-->
                                     </div>
@@ -329,7 +333,7 @@ try {
                                     <div class="row justify-content-between align-items-center">
                                         <div class="col-auto">
                                             <div class="item-label"><strong>Email</strong></div>
-                                            <div class="item-data"><?= $email ?></div>
+                                            <div class="item-data"><?= $adminData['email'] ?></div>
                                         </div>
                                         <!--//col-->
                                     </div>
@@ -339,9 +343,9 @@ try {
                                 <div class="item border-bottom py-3">
                                     <div class="row justify-content-between align-items-center">
                                         <div class="col-auto">
-                                            <div class="item-label"><strong>Website</strong></div>
+                                            <div class="item-label"><strong>Phone Number</strong></div>
                                             <div class="item-data">
-                                                https://johndoewebsite.com
+                                                <?= $adminData['phone_number'] ?>
                                             </div>
                                         </div>
                                         <!--//col-->
@@ -354,7 +358,7 @@ try {
                                         <div class="col-auto">
                                             <div class="item-label"><strong>Location</strong></div>
                                             <div class="item-data">
-                                                New York
+                                                Indonesia
                                             </div>
                                         </div>
                                         <!--//col-->

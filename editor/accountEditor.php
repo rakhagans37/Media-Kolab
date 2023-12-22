@@ -13,7 +13,7 @@ require '../vendor/autoload.php';
 $error = false;
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     //Set New Photo
-    if (isset($_POST['changePhotoButton']) && $_FILES['new-photo']['size'] < 6000000) {
+    if (isset($_POST['changePhotoButton']) && $_FILES['new-photo']['size'] < 3000000) {
         $newPhoto = $_FILES['new-photo']['tmp_name'];
         $newPhotoType = mime_content_type($newPhoto);
 
@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
             //Upload & set new photo into database
             setEditorPhoto($editorId, $photoNameHashed);
-            uploadImageEditor($newPhoto, $photoName);
+            uploadImage($newPhoto, $photoName);
 
             //Automatically set the new photo
             saveEditorPhoto($photoName);
@@ -317,7 +317,7 @@ try {
                 if ($error == true) {
                     switch ($errorCode) {
                         case 'photo':
-                            $errorMsg = "Maximal ukuran foto adalah 5 MB";
+                            $errorMsg = "Maximal ukuran foto adalah 3 MB, Serta harus berformat JPEG/JPG/PNG";
                             break;
                         case 'password':
                             $errorMsg = "Password harus memiliki 8-20 Karakter berupa kombinasi angka dan huruf.";

@@ -21,7 +21,7 @@ if (isset($_POST['blog-submit'])) {
 	$tagId = $_POST['tagid'];
 	$categoryId = $_POST['categoryid'];
 	$editorId = $editorId;
-	$imageUrl = uploadImageNews($_FILES['new-image']['tmp_name']);
+
 
 	if (strlen($blogTitle) < 12) {
 		$createSuccess = false;
@@ -29,10 +29,13 @@ if (isset($_POST['blog-submit'])) {
 	} else if (strlen($blogContent) < 120) {
 		$createSuccess = false;
 		$createError = "contentLength";
-	} else if (!$imageUrl) {
+	} else if ($_FILES['new-image']['size'] > 5000000) {
 		$createSuccess = false;
 		$createError = "image";
 	} else {
+		//Upload to cloud
+		$imageUrl = uploadImageNews($_FILES['new-image']['tmp_name']);
+
 		// Create New Blog Into Database
 		setNewBlog($blogId, $blogTitle, $blogContent, $dateRelease, $categoryId, $editorId, $imageUrl);
 
@@ -362,7 +365,7 @@ if (isset($_POST['blog-submit'])) {
 
 							<label>Tag</label>
 							<div class="input-group ">
-								<input type="text" class="form-control" name="tagid" aria-label="tagid" aria-describedby="basic-addon2">
+								<input type="text" class="form-control" name="tagid" aria-label="tagid" aria-describedby="basic-addon2" placeholder="tag1,tag2,tag3 (Separate by comma)">
 							</div>
 
 							<label>Category</label>

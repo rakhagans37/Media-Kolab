@@ -87,34 +87,6 @@ function getAdminPhotoId($idAdmin)
     }
 }
 
-function getEditorPhotoId($editorId)
-{
-    try {
-        $conn = getConnection();
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        $sql = "SELECT profile_photo FROM tb_editor WHERE editor_id = :editorId";
-        $request = $conn->prepare($sql);
-
-        $request->bindParam('editorId', $editorId);
-        $request->execute();
-
-        if ($result = $request->fetchAll()) {
-            $photoName = $result[0]['profile_photo'];
-            if (is_null($photoName)) {
-                $decryptPhotoName = null;
-            } else {
-                $decryptPhotoName = decryptPhotoProfile($photoName);
-            }
-        }
-        $conn = null;
-        return $decryptPhotoName;
-    } catch (PDOException $errorMessage) {
-        $error = $errorMessage->getMessage();
-        echo $error;
-    }
-}
-
 function getImageProfile($urlPhoto, $width = 60)
 {
     $admin = new AdminApi();
@@ -233,7 +205,7 @@ function uploadImageAdmin($idAdmin, $photoTemp, $locationRedirect)
     }
 }
 
-function uploadImageEditor($photoTemp, $photoName)
+function uploadImage($photoTemp, $photoName)
 {
     //Upload into cloudinary process
     $upload = new UploadApi();
@@ -282,52 +254,12 @@ function deleteImageAdmin($idAdmin)
     }
 }
 
-function deleteImageEditor($editorId)
-{
-    $api = new UploadApi();
-    $photoId = getEditorPhotoId($editorId);
-
-    if (!is_null($photoId)) {
-        $api->destroy($photoId);
-
-        //Update table
-        try {
-            $conn = getConnection();
-            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            $sql = "UPDATE tb_editor SET profile_photo = :setToNull WHERE editor_id = :editorId";
-            $request = $conn->prepare($sql);
-            $setToNull = null;
-
-            //Set into null
-            $request->bindParam('editorId', $editorId);
-            $request->bindParam('setToNull', $setToNull);
-            $request->execute();
-
-            //Set cookie or session into default image
-            $imgtag = "<img class='profile-image' src='../assets/images/profiles/profile-1.png' alt='Profile Photo'>";
-            if (isset($_COOKIE['editorLoginStatus'])) {
-                setcookie('editorProfilePhoto', $imgtag, time() + (86400 * 7));
-            } else {
-                $_SESSION['editorProfilePhoto'] = $imgtag;
-            }
-
-            $conn = null;
-        } catch (PDOException $errorMessage) {
-            $error = $errorMessage->getMessage();
-            echo $error;
-        }
-    }
-}
-
-
 //Function for uploading image for blog, event, job-vacancies, and media
 function uploadImageNews($newImageTemp)
 {
-    $newPhotoSize = filesize($newImageTemp);
     $newPhotoType = mime_content_type($newImageTemp);
 
-    if ($newPhotoSize <= 6000000 && ($newPhotoType == 'image/jpg' || $newPhotoType == 'image/png' || $newPhotoType == 'image/jpeg')) {
+    if ($newPhotoType == 'image/jpg' || $newPhotoType == 'image/png' || $newPhotoType == 'image/jpeg') {
         $photoName = random_int(0, PHP_INT_MAX) . date("dmYHis");
         $photoNameHashed = hashPhotoProfile($photoName);
 

@@ -2,19 +2,14 @@
 require_once __DIR__ . "/../helper/getConnection.php";
 require_once __DIR__ . "/../helper/validateLogin.php";
 require_once __DIR__ . "/../helper/getConnectionMsqli.php";
+require_once __DIR__ . "/../helper/editor.php";
 
 $conn = getConnectionMysqli();
 //Script php untuk ban editor
 if (isset($_GET['ban-editor'])) {
     $editorId = $_GET['editorId'];
 
-    $sqlDelete = "UPDATE tb_editor SET banned = 1 WHERE editor_id = ?";
-    $requestBanEditor = mysqli_prepare($conn, $sqlDelete);
-
-    mysqli_stmt_bind_param($requestBanEditor, "s", $editorId);
-    mysqli_stmt_execute($requestBanEditor);
-    mysqli_stmt_close($requestBanEditor);
-    mysqli_close($conn);
+    banEditor($editorId);
 
     header("Location:manageUser.php");
     exit;
@@ -24,13 +19,7 @@ if (isset($_GET['ban-editor'])) {
 if (isset($_GET['activate-editor'])) {
     $editorId = $_GET['editorId'];
 
-    $sqlDelete = "UPDATE tb_editor SET banned = 0 WHERE editor_id = ?";
-    $requestActivateEditor = mysqli_prepare($conn, $sqlDelete);
-
-    mysqli_stmt_bind_param($requestActivateEditor, "s", $editorId);
-    mysqli_stmt_execute($requestActivateEditor);
-    mysqli_stmt_close($requestActivateEditor);
-    mysqli_close($conn);
+    activateEditor($editorId);
 
     header("Location:manageUser.php");
     exit;
@@ -40,19 +29,17 @@ if (isset($_GET['activate-editor'])) {
 //Script untuk mengambil data publisher dari database
 if (isset($_GET['search-user'])) {
     $searchUser = $_GET['search-orders'];
-    $sql = "SELECT tb_editor.editor_id, tb_editor.username, tb_editor.email, tb_editor.phone_number, COUNT(tb_blog.editor_id) + + COUNT(tb_media.editor_id) ,tb_role.role_name, tb_editor.banned FROM tb_media RIGHT JOIN tb_editor ON tb_media.editor_id = tb_editor.editor_id INNER JOIN tb_role ON tb_editor.role_id = tb_role.role_id LEFT JOIN tb_blog ON tb_blog.editor_id = tb_editor.editor_id GROUP BY tb_editor.editor_id HAVING tb_editor.username LIKE '%$searchUser%' and tb_editor.banned = 0";
+    $editorActive = getSearchEditor($searchUser);
 } else {
-    $sql = "SELECT tb_editor.editor_id, tb_editor.username, tb_editor.email, tb_editor.phone_number, COUNT(tb_blog.editor_id) + + COUNT(tb_media.editor_id) ,tb_role.role_name, tb_editor.banned FROM tb_media RIGHT JOIN tb_editor ON tb_media.editor_id = tb_editor.editor_id INNER JOIN tb_role ON tb_editor.role_id = tb_role.role_id LEFT JOIN tb_blog ON tb_blog.editor_id = tb_editor.editor_id GROUP BY tb_editor.editor_id HAVING tb_editor.banned = 0";
+    $editorActive = getAllEditor();
 }
 
 if (isset($_GET['search-user'])) {
     $searchUser = $_GET['search-orders'];
-    $sqlBannedUser = "SELECT tb_editor.editor_id, tb_editor.username, tb_editor.email, tb_editor.phone_number, COUNT(tb_blog.editor_id) + COUNT(tb_media.editor_id) ,tb_role.role_name, tb_editor.banned FROM tb_media RIGHT JOIN tb_editor ON tb_media.editor_id = tb_editor.editor_id INNER JOIN tb_role ON tb_editor.role_id = tb_role.role_id LEFT JOIN tb_blog ON tb_blog.editor_id = tb_editor.editor_id GROUP BY tb_editor.editor_id HAVING tb_editor.username LIKE '%$searchUser%' and tb_editor.banned = 1";
+    $editorBanned = getSearchEditor($searchUser, false);
 } else {
-    $sqlBannedUser = "SELECT tb_editor.editor_id, tb_editor.username, tb_editor.email, tb_editor.phone_number, COUNT(tb_blog.editor_id) + COUNT(tb_media.editor_id) ,tb_role.role_name, tb_editor.banned FROM tb_media RIGHT JOIN tb_editor ON tb_media.editor_id = tb_editor.editor_id INNER JOIN tb_role ON tb_editor.role_id = tb_role.role_id LEFT JOIN tb_blog ON tb_blog.editor_id = tb_editor.editor_id GROUP BY tb_editor.editor_id HAVING tb_editor.banned = 1";
+    $editorBanned = getAllEditor(false);
 }
-$request = mysqli_query($conn, $sql);
-$requestBannedUser = mysqli_query($conn, $sqlBannedUser);
 ?>
 
 <!DOCTYPE html>
@@ -298,15 +285,14 @@ $requestBannedUser = mysqli_query($conn, $sqlBannedUser);
                                         </thead>
                                         <tbody>
                                             <?php
-                                            if (mysqli_num_rows($request) > 0) {
-                                                foreach ($result = mysqli_fetch_all($request) as $index) {
-                                                    $editorId = $index[0];
-                                                    $username = $index[1];
-                                                    $email = $index[2];
-                                                    $phoneNumber = $index[3];
-                                                    $participation = $index[4];
-                                                    $role = $index[5];
-                                                    echo <<<TULIS
+                                            foreach ($editorActive as $index) {
+                                                $editorId = $index[0];
+                                                $username = $index[1];
+                                                $email = $index[2];
+                                                $phoneNumber = $index[3];
+                                                $participation = $index[4];
+                                                $role = $index[5];
+                                                echo <<<TULIS
 															<tr>
 																<td class="cell">$editorId</td>
 																<td class="cell"><span class="truncate">$username</span></td>
@@ -316,7 +302,6 @@ $requestBannedUser = mysqli_query($conn, $sqlBannedUser);
 																<td class="cell"><a class="btn-sm app-btn-danger" data-toggle="modal" href="#ban-editor-account" onclick="getEditorId($editorId)">Ban User</a></td>
 															</tr>
 														TULIS;
-                                                }
                                             }
                                             ?>
                                         </tbody>
@@ -360,15 +345,14 @@ $requestBannedUser = mysqli_query($conn, $sqlBannedUser);
                                         </thead>
                                         <tbody>
                                             <?php
-                                            if (mysqli_num_rows($requestBannedUser) > 0) {
-                                                foreach ($result = mysqli_fetch_all($requestBannedUser) as $index) {
-                                                    $editorId = $index[0];
-                                                    $username = $index[1];
-                                                    $email = $index[2];
-                                                    $phoneNumber = $index[3];
-                                                    $participation = $index[4];
-                                                    $role = $index[5];
-                                                    echo <<<TULIS
+                                            foreach ($editorBanned as $index) {
+                                                $editorId = $index[0];
+                                                $username = $index[1];
+                                                $email = $index[2];
+                                                $phoneNumber = $index[3];
+                                                $participation = $index[4];
+                                                $role = $index[5];
+                                                echo <<<TULIS
 															<tr>
 																<td class="cell">$editorId</td>
 																<td class="cell"><span class="truncate">$username</span></td>
@@ -378,10 +362,7 @@ $requestBannedUser = mysqli_query($conn, $sqlBannedUser);
 																<td class="cell"><a class="btn-sm app-btn-secondary" data-toggle="modal" href="#activate-editor-account" onclick="getEditorIdForActivate($editorId)">Activate User</a></td>
 															</tr>
 														TULIS;
-                                                }
                                             }
-
-                                            mysqli_close($conn);
                                             ?>
                                         </tbody>
                                     </table>

@@ -2,29 +2,27 @@
 require_once __DIR__ . "/../helper/getConnection.php";
 require_once __DIR__ . "/../helper/validateLogin.php";
 require_once __DIR__ . "/../helper/getConnectionMsqli.php";
-
-$conn = getConnectionMysqli();
+require_once __DIR__ . "/../helper/event.php";
+require_once __DIR__ . "/../helper/tag.php";
 
 if (isset($_GET['deleteButton'])) {
 	$eventId = $_GET['eventId'];
 
-	$sqlDelete = "DELETE FROM tb_event_tag WHERE event_id = ?";
-	$requestDelete = mysqli_prepare($conn, $sqlDelete);
+	//Delete event image from cloud
+	deleteEventImage($eventId);
 
-	mysqli_stmt_bind_param($requestDelete, "s", $eventId);
-	mysqli_stmt_execute($requestDelete);
-	mysqli_stmt_close($requestDelete);
+	//Delete event dataset from database
+	deleteEventTag($eventId);
+	deleteEvent($eventId);
 
-	$sqlDelete = "DELETE FROM tb_event WHERE event_id = ?";
-	$requestDelete = mysqli_prepare($conn, $sqlDelete);
+	header("location:manageEvent.php");
+}
 
-	mysqli_stmt_bind_param($requestDelete, "s", $eventId);
-	mysqli_stmt_execute($requestDelete);
-	mysqli_stmt_close($requestDelete);
-	mysqli_close($conn);
-
-	header("Location:manageEvent.php");
-	exit;
+if (isset($_GET['search-news'])) {
+	$searchEvent = $_GET['searchorders'];
+	$allEvent = getAllSearchEvent($searchEvent);
+} else {
+	$allEvent = getAllEvent();
 }
 ?>
 
@@ -32,14 +30,14 @@ if (isset($_GET['deleteButton'])) {
 <html lang="en">
 
 <head>
-	<title>Ngampus.id - For Admin</title>
+	<title>Nguliah.id - For Admin</title>
 
 	<!-- Meta -->
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<meta name="description" content="Ngampus.id - For Admin">
+	<meta name="description" content="Nguliah.id - For Admin">
 	<meta name="author" content="Xiaoying Riley at 3rd Wave Media">
 	<link rel="shortcut icon" href="favicon-image.ico">
 
@@ -282,49 +280,32 @@ if (isset($_GET['deleteButton'])) {
 										</thead>
 										<tbody>
 											<?php
-											$conn = getConnectionMysqli();
-											if (isset($_GET['search-news'])) {
-												$searchNews = $_GET['searchorders'];
-												$sql = "SELECT tb_event.event_id, tb_event.event_title, tb_category_event.category_name, tb_event.date_release, tb_editor.username FROM ((tb_event INNER JOIN tb_category_event ON tb_event.category_id = tb_category_event.category_id) INNER JOIN tb_editor ON tb_event.editor_id = tb_editor.editor_id) WHERE tb_event.event_title LIKE '%$searchNews%'";
-											} else {
-												$sql = "SELECT tb_event.event_id, tb_event.event_title, tb_category_event.category_name, tb_event.date_release, tb_editor.username FROM ((tb_event INNER JOIN tb_category_event ON tb_event.category_id = tb_category_event.category_id) INNER JOIN tb_editor ON tb_event.editor_id = tb_editor.editor_id)";
+											foreach ($allEvent as $index) {
+												$eventId = $index[0];
+												$eventTitle = $index[1];
+												$category = $index[2];
+												$dateRelease = $index[3];
+												$publisher = $index[4];
+
+												echo <<<TULIS
+                                                    <tr>
+                                                        <td class="cell">$eventId</td>
+                                                        <td class="cell"><span class="truncate">$eventTitle</span></td>
+                                                        <td class="cell">$category</td>
+                                                        <td class="cell"><span>$dateRelease</span><span class="note">2:16 PM</span></td>
+                                                        <td class="cell"><span class="badge bg-success">Paid</span></td>
+                                                        <td class="cell">$publisher</td>
+                                                        <td class="cell">
+                                                            <a class="btn-sm app-btn-secondary" href="../detailEvent.php?eventId=$eventId">View</a>
+                                                        </td>
+                                                        <td class="cell">
+                                                            <a class="btn-sm app-btn-danger" data-toggle="modal" href="#exampleModal" onclick="getEventId('$eventId')">Delete</a>
+                                                        </td>
+                                                    </tr>
+                                                    TULIS;
 											}
 
-											$request = mysqli_query($conn, $sql);
-
-											if (mysqli_num_rows($request) > 0) {
-												foreach ($result = mysqli_fetch_all($request) as $index) {
-													$eventId = $index[0];
-													$eventTitle = $index[1];
-													$category = $index[2];
-													$dateRelease = $index[3];
-													$publisher = $index[4];
-
-
-													echo <<<TULIS
-                                                                <tr>
-                                                                    <td class="cell">$eventId</td>
-                                                                    <td class="cell"><span class="truncate">$eventTitle</span></td>
-                                                                    <td class="cell">$category</td>
-                                                                    <td class="cell"><span>$dateRelease</span><span class="note">2:16 PM</span></td>
-                                                                    <td class="cell"><span class="badge bg-success">Paid</span></td>
-                                                                    <td class="cell">$publisher</td>
-                                                                    <td class="cell">
-                                                                        <a class="btn-sm app-btn-secondary" href="../detailEvent.php?eventId=$eventId">View</a>
-                                                                    </td>
-                                                                    <td class="cell">
-                                                                        <a class="btn-sm app-btn-danger" data-toggle="modal" href="#exampleModal" onclick="getEventId('$eventId')">Delete</a>
-                                                                    </td>
-                                                                </tr>
-                                                            TULIS;
-												}
-											}
-
-											mysqli_close($conn);
 											?>
-
-
-
 										</tbody>
 									</table>
 								</div><!--//table-responsive-->

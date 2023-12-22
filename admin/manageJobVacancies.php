@@ -2,42 +2,32 @@
 require_once __DIR__ . "/../helper/getConnection.php";
 require_once __DIR__ . "/../helper/validateLogin.php";
 require_once __DIR__ . "/../helper/getConnectionMsqli.php";
-$conn = getConnectionMysqli();
+require_once __DIR__ . "/../helper/jobVacancies.php";
+require_once __DIR__ . "/../helper/tag.php";
 
-//Script php untuk delete blog
+//Script php untuk delete job vacancies
 if (isset($_GET['deleteButton'])) {
     $jobId = $_GET['jobId'];
 
-    $sqlDelete = "DELETE FROM tb_job_tag WHERE vacancy_id = ?";
-    $requestDelete = mysqli_prepare($conn, $sqlDelete);
+    //Delete job image from cloud
+    deleteJobImage($vacancyId);
 
-    mysqli_stmt_bind_param($requestDelete, "s", $jobId);
-    mysqli_stmt_execute($requestDelete);
-    mysqli_stmt_close($requestDelete);
+    //Delete job dataset from database
+    deleteJobTag($vacancyId);
+    deleteJobVacancies($vacancyId);
 
-    $sqlDelete = "DELETE FROM tb_job_vacancies WHERE vacancy_id = ?";
-    $requestDelete = mysqli_prepare($conn, $sqlDelete);
-
-    mysqli_stmt_bind_param($requestDelete, "s", $jobId);
-    mysqli_stmt_execute($requestDelete);
-    mysqli_stmt_close($requestDelete);
-    mysqli_close($conn);
-
-    header("Location:manageJobVacancies.php");
-    exit;
+    header("location:manageJobVacancies.php");
 }
-//End script delete blog
+//End script delete job vacancies
 
-//Script Php untuk membuat request yuang mengambil detail data blog dari database
+//Script Php untuk membuat request yuang mengambil detail data job vacancies dari database
 if (isset($_GET['search-news'])) {
     $searchNews = $_GET['searchorders'];
-    $sql = "SELECT tb_job_vacancies.vacancy_id, tb_job_vacancies.vacancy_title, tb_category_job_vacancy.category_name, tb_job_vacancies.date_release, tb_editor.username, tb_job_vacancies.views, tb_job_vacancies.company_name FROM ((tb_job_vacancies INNER JOIN tb_category_job_vacancy ON tb_job_vacancies.category_id = tb_category_job_vacancy.category_id) INNER JOIN tb_editor ON tb_job_vacancies.editor_id = tb_editor.editor_id) WHERE tb_job_vacancies.vacancy_title LIKE '%$searchNews%'";
+    $result = getAllSearchJob($searchNews);
 } else {
-    $sql = "SELECT tb_job_vacancies.vacancy_id, tb_job_vacancies.vacancy_title, tb_category_job_vacancy.category_name, tb_job_vacancies.date_release, tb_editor.username, tb_job_vacancies.views, tb_job_vacancies.company_name FROM ((tb_job_vacancies INNER JOIN tb_category_job_vacancy ON tb_job_vacancies.category_id = tb_category_job_vacancy.category_id) INNER JOIN tb_editor ON tb_job_vacancies.editor_id = tb_editor.editor_id)";
+    $result = getAllJob();
 }
-
-$request = mysqli_query($conn, $sql);
-//End script mengambil data blog
+//End script mengambil data job vacancies
 ?>
 
 <!DOCTYPE html>
@@ -292,16 +282,15 @@ $request = mysqli_query($conn, $sql);
                                         <tbody>
                                             <?php
                                             // Print data detail blog dari request yang telah dibuat sebelumnya
-                                            if (mysqli_num_rows($request) > 0) {
-                                                foreach ($result = mysqli_fetch_all($request) as $index) {
-                                                    $jobId = $index[0];
-                                                    $blogTitle = $index[1];
-                                                    $category = $index[2];
-                                                    $dateRelease = $index[3];
-                                                    $publisher = $index[4];
-                                                    $views = $index[5];
-                                                    $companyName = $index[6];
-                                                    echo <<<TULIS
+                                            foreach ($result as $index) {
+                                                $jobId = $index[0];
+                                                $blogTitle = $index[1];
+                                                $category = $index[2];
+                                                $dateRelease = $index[3];
+                                                $publisher = $index[4];
+                                                $views = $index[5];
+                                                $companyName = $index[6];
+                                                echo <<<TULIS
 															<tr>
 																<td class="cell">$jobId</td>
 																<td class="cell"><span class="truncate">$blogTitle</span></td>
@@ -318,10 +307,7 @@ $request = mysqli_query($conn, $sql);
 																</td>
 															</tr>
 														TULIS;
-                                                }
                                             }
-
-                                            mysqli_close($conn);
                                             ?>
                                         </tbody>
                                     </table>

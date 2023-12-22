@@ -86,3 +86,9 @@ function generateEditorPhotoName($editorId)
     $newEditorPhotoName = random_int(0, PHP_INT_MAX) . date("dmYHis") . $editorId;
     return $newEditorPhotoName;
 }
+
+function generateAdminPhotoName($adminId)
+{
+    $newAdminPhotoName = random_int(0, PHP_INT_MAX) . date("dmYHis") . $adminId;
+    return $newAdminPhotoName;
+}

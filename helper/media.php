@@ -191,3 +191,39 @@ function deleteMediaImage($mediaId)
 
   $conn = null;
 }
+
+function getAllSearchMedia($searchMedia)
+{
+  $conn = getConnection();
+
+  $sql = $sql = "SELECT tb_media.media_id, tb_media.media_title, tb_category_media.category_name, tb_media.date_release, tb_editor.username, tb_media.views FROM ((tb_media INNER JOIN tb_category_media ON tb_media.category_id = tb_category_media.category_id) INNER JOIN tb_editor ON tb_media.editor_id = tb_editor.editor_id) WHERE tb_media.media_title LIKE '%$searchMedia%'";
+
+  $request = $conn->prepare($sql);
+  $request->execute();
+
+  if ($result = $request->fetchAll()) {
+    $conn = null;
+    return $result;
+  } else {
+    $conn = null;
+    return array();
+  }
+}
+
+function getAllMedia()
+{
+  $conn = getConnection();
+
+  $sql = $sql = "SELECT tb_media.media_id, tb_media.media_title, tb_category_media.category_name, tb_media.date_release, tb_editor.username, tb_media.views FROM ((tb_media INNER JOIN tb_category_media ON tb_media.category_id = tb_category_media.category_id) INNER JOIN tb_editor ON tb_media.editor_id = tb_editor.editor_id)";
+
+  $request = $conn->prepare($sql);
+  $request->execute();
+
+  if ($result = $request->fetchAll()) {
+    $conn = null;
+    return $result;
+  } else {
+    $conn = null;
+    return array();
+  }
+}

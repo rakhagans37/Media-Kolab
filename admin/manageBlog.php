@@ -4,7 +4,7 @@ require_once __DIR__ . "/../helper/validateLogin.php";
 require_once __DIR__ . "/../helper/getConnectionMsqli.php";
 require_once __DIR__ . "/../helper/blog.php";
 require_once __DIR__ . "/../helper/tag.php";
-$conn = getConnectionMysqli();
+
 
 //Script php untuk delete blog
 if (isset($_GET['deleteButton'])) {
@@ -22,12 +22,10 @@ if (isset($_GET['deleteButton'])) {
 //Script Php untuk membuat request yuang mengambil detail data blog dari database
 if (isset($_GET['search-news'])) {
 	$searchNews = $_GET['searchorders'];
-	$result = getAllSearchBlog($searchNews);
+	$blogData = getAllSearchBlog($searchNews);
 } else {
-	$result = getAllBlog();
+	$blogData = getAllBlog();
 }
-
-$request = mysqli_query($conn, $sql);
 //End script mengambil data blog
 ?>
 
@@ -283,7 +281,7 @@ $request = mysqli_query($conn, $sql);
 										<tbody>
 											<?php
 											// Print data detail blog dari request yang telah dibuat sebelumnya
-											foreach ($result as $index) {
+											foreach ($blogData as $index) {
 												$blogId = $index['blog_id'];
 												$blogTitle = $index['blog_title'];
 												$category = $index['category_name'];
@@ -308,9 +306,6 @@ $request = mysqli_query($conn, $sql);
 															</tr>
 														TULIS;
 											}
-
-
-											mysqli_close($conn);
 											?>
 										</tbody>
 									</table>

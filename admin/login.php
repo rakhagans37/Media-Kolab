@@ -2,6 +2,8 @@
 require_once __DIR__ . '/../helper/getConnection.php';
 require_once __DIR__ . '/../helper/cloudinary.php';
 require_once __DIR__ . '/../helper/hash.php';
+require_once __DIR__ . '/../helper/admin.php';
+require_once __DIR__ . '/../helper/adminValidation.php';
 
 if (isset($_COOKIE['loginStatus']) || isset($_SESSION['loginStatus'])) {
 	header('Location:index.php');
@@ -16,48 +18,33 @@ if (isset($_POST['login'])) {
 	$password = $_POST['signin-password'];
 	$remember = isset($_POST['RememberPassword']);
 
-	try {
-		$conn = getConnection();
-		$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	//Saving profile photo into cookies or session
+	if ($idAdmin = adminLoginSuccess($email, $password)) {
+		$photoUrl = getAdminPhotoUrl($idAdmin);
+		$loginStatus = true;
 
-		$sql = "SELECT * FROM tb_admin where email = :email and password = :password";
-		$request = $conn->prepare($sql);
-
-		$request->bindParam('email', $email);
-		$request->bindParam('password', $password);
-		$request->execute();
-
-		if ($result = $request->fetch()) {
-			$idAdmin = $result['admin_id'];
-			$photoUrl = $result['profile_photo'];
-			$loginStatus = true;
-
-			if (is_null($photoUrl)) {
-				$imgtag = "<img class='profile-image' src='../assets/images/profiles/profile-1.png' alt='Profile Photo'>";
-			} else {
-				//Saving profile photo into cookies
-				$decrypt = decryptPhotoProfile($photoUrl);
-				$imgtag = getImageProfile($decrypt);
-			}
-
-			if ($remember) {
-				setcookie('idAdmin', $idAdmin, time() + (86400 * 7));
-				setcookie('loginStatus', $loginStatus, time() + (86400 * 7));
-				setcookie('profilePhoto', $imgtag, time() + (86400 * 7));
-			} else {
-				$_SESSION['loginStatus'] = $loginStatus;
-				$_SESSION['idAdmin'] = $idAdmin;
-				$_SESSION['profilePhoto'] = $imgtag;
-			}
-
-			$conn = null;
-			header('Location:index.php');
-			exit;
+		if (is_null($photoUrl)) {
+			$imgtag = "<img class='profile-image' src='../assets/images/profiles/profile-1.png' alt='Profile Photo'>";
 		} else {
-			$loginFail = true;
+			//Saving profile photo into cookies
+			$imgtag = getImageProfile($photoUrl);
 		}
-	} catch (PDOException $error) {
-		$error = "Terjadi Error " . $error->getMessage();
+
+		if ($remember) {
+			setcookie('idAdmin', $idAdmin, time() + (86400 * 7));
+			setcookie('loginStatus', $loginStatus, time() + (86400 * 7));
+			setcookie('profilePhoto', $imgtag, time() + (86400 * 7));
+		} else {
+			$_SESSION['loginStatus'] = $loginStatus;
+			$_SESSION['idAdmin'] = $idAdmin;
+			$_SESSION['profilePhoto'] = $imgtag;
+		}
+
+		$conn = null;
+		header('Location:index.php');
+		exit;
+	} else {
+		$loginFail = true;
 	}
 }
 ?>

@@ -24,19 +24,21 @@ if (isset($_POST['media-submit'])) {
 	$categoryId = $_POST['categoryid'];
 	$videoUrl = getYoutubeID($_POST['video-url']);
 	$editorId = $editorId;
-	$imageUrl = uploadImageNews($_FILES['new-image']['tmp_name']);
-	$thumbnail = uploadImageNews($_FILES['thumbnail']['tmp_name']);
 
 	if (strlen($mediaTitle) < 12) {
 		$createSuccess = false;
 		$createError = "title";
-	} else if ($_FILES['new-image']['size'] > 5000000) {
+	} else if ($_FILES['new-image']['size'] > 5000000 || $_FILES['thumbnail']['size'] > 5000000) {
 		$createSuccess = false;
 		$createError = "imageSize";
 	} else if (strlen($mediaContent) < 120) {
 		$createSuccess = false;
 		$createError = "contentLength";
 	} else {
+		//Upload image into clouds
+		$imageUrl = uploadImageNews($_FILES['new-image']['tmp_name']);
+		$thumbnail = uploadImageNews($_FILES['thumbnail']['tmp_name']);
+
 		// Insert new media into database
 		setNewMedia($mediaId, $mediaTitle, $mediaContent, $dateRelease, $tagId, $categoryId, $videoUrl, $editorId, $imageUrl, $thumbnail);
 

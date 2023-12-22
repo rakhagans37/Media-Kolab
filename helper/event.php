@@ -159,3 +159,37 @@ function deleteEventImage($eventId)
 
     $conn = null;
 }
+
+function getAllEvent()
+{
+    $conn = getConnection();
+    $sql = "SELECT tb_event.event_id, tb_event.event_title, tb_category_event.category_name, tb_event.date_release, tb_editor.username FROM ((tb_event INNER JOIN tb_category_event ON tb_event.category_id = tb_category_event.category_id) INNER JOIN tb_editor ON tb_event.editor_id = tb_editor.editor_id)";
+
+    $request = $conn->prepare($sql);
+    $request->execute();
+
+    if ($result = $request->fetchAll()) {
+        $conn = null;
+        return $result;
+    } else {
+        $conn = null;
+        return array();
+    }
+}
+
+function getAllSearchEvent($searchEvent)
+{
+    $conn = getConnection();
+    $sql = "SELECT tb_event.event_id, tb_event.event_title, tb_category_event.category_name, tb_event.date_release, tb_editor.username FROM ((tb_event INNER JOIN tb_category_event ON tb_event.category_id = tb_category_event.category_id) INNER JOIN tb_editor ON tb_event.editor_id = tb_editor.editor_id) WHERE tb_event.event_title LIKE '%$searchEvent%'";
+
+    $request = $conn->prepare($sql);
+    $request->execute();
+
+    if ($result = $request->fetchAll()) {
+        $conn = null;
+        return $result;
+    } else {
+        $conn = null;
+        return array();
+    }
+}

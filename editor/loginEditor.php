@@ -23,10 +23,10 @@ if (isset($_POST['login'])) {
     try {
         if ($editorId = editorLoginSuccess($email, $password)) {
             $editorData = getEditorData($editorId);
-            $photoUrl = getEditorPhotoId($editorId);
+            $photoUrl = getEditorPhotoUrl($editorId);
             $loginStatus = true;
 
-            if (is_null(getEditorPhotoId($editorId))) {
+            if (is_null($photoUrl)) {
                 $imgtag = "<img class='profile-image' src='../assets/images/profiles/profile-1.png' alt='Profile Photo'>";
             } else {
                 //Saving profile photo into cookies

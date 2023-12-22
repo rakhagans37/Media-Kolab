@@ -173,3 +173,37 @@ function deleteJobImage($vacancyId)
 
   $conn = null;
 }
+
+function getAllSearchJob($jobSearch)
+{
+  $conn = getConnection();
+  $sql = "SELECT tb_job_vacancies.vacancy_id, tb_job_vacancies.vacancy_title, tb_category_job_vacancy.category_name, tb_job_vacancies.date_release, tb_editor.username, tb_job_vacancies.views, tb_job_vacancies.company_name FROM ((tb_job_vacancies INNER JOIN tb_category_job_vacancy ON tb_job_vacancies.category_id = tb_category_job_vacancy.category_id) INNER JOIN tb_editor ON tb_job_vacancies.editor_id = tb_editor.editor_id) WHERE tb_job_vacancies.vacancy_title LIKE '%$jobSearch%'";
+
+  $request = $conn->prepare($sql);
+  $request->execute();
+
+  if ($result = $request->fetchAll()) {
+    $conn = null;
+    return $result;
+  } else {
+    $conn = null;
+    return array();
+  }
+}
+
+function getAllJob()
+{
+  $conn = getConnection();
+  $sql = "SELECT tb_job_vacancies.vacancy_id, tb_job_vacancies.vacancy_title, tb_category_job_vacancy.category_name, tb_job_vacancies.date_release, tb_editor.username, tb_job_vacancies.views, tb_job_vacancies.company_name FROM ((tb_job_vacancies INNER JOIN tb_category_job_vacancy ON tb_job_vacancies.category_id = tb_category_job_vacancy.category_id) INNER JOIN tb_editor ON tb_job_vacancies.editor_id = tb_editor.editor_id)";
+
+  $request = $conn->prepare($sql);
+  $request->execute();
+
+  if ($result = $request->fetchAll()) {
+    $conn = null;
+    return $result;
+  } else {
+    $conn = null;
+    return array();
+  }
+}

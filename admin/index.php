@@ -1,14 +1,12 @@
 <?php
 require_once __DIR__ . "/../helper/validateLogin.php";
 require_once __DIR__ . "/../helper/getConnectionMsqli.php";
+require_once __DIR__ . "/../helper/admin.php";
 
 $connection = getConnectionMysqli();
-$idAdmin = $_SESSION['idAdmin'] ?? $_COOKIE['idAdmin'];
-$sqlDetailProfile = "SELECT * FROM tb_admin where admin_id = $idAdmin";
-$request = mysqli_query($connection, $sqlDetailProfile);
 
-if ($result = mysqli_fetch_all($request)) {
-	$username = $result[0][1];
+if ($adminData = getAdminData($idAdmin)) {
+	$username = $adminData['username'];
 }
 ?>
 

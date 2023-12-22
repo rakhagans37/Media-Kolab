@@ -2,40 +2,29 @@
 require_once __DIR__ . "/../helper/getConnection.php";
 require_once __DIR__ . "/../helper/validateLogin.php";
 require_once __DIR__ . "/../helper/getConnectionMsqli.php";
-$conn = getConnectionMysqli();
+require_once __DIR__ . "/../helper/media.php";
+require_once __DIR__ . "/../helper/tag.php";
 
 //Script php untuk delete media
 if (isset($_GET['deleteButton'])) {
 	$mediaId = $_GET['mediaId'];
-	$sqlDelete = "DELETE FROM tb_media_tag WHERE media_id = ?";
-	$requestDelete = mysqli_prepare($conn, $sqlDelete);
 
-	mysqli_stmt_bind_param($requestDelete, "s", $mediaId);
-	mysqli_stmt_execute($requestDelete);
-	mysqli_stmt_close($requestDelete);
+	//Delete media
+	deleteMediaImage($mediaId);
+	deleteMediaTag($mediaId);
+	deleteMedia($mediaId);
 
-	$sqlDelete = "DELETE FROM tb_media WHERE media_id = ?";
-	$requestDelete = mysqli_prepare($conn, $sqlDelete);
-
-	mysqli_stmt_bind_param($requestDelete, "s", $mediaId);
-	mysqli_stmt_execute($requestDelete);
-	mysqli_stmt_close($requestDelete);
-	mysqli_close($conn);
-
-	header("Location:managemedia.php");
-	exit;
+	header("location:managemedia.php");
 }
 //End script delete media
 
 //Script Php untuk membuat request yuang mengambil detail data media dari database
 if (isset($_GET['search-media'])) {
 	$searchMedia = $_GET['searchorders'];
-	$sql = "SELECT tb_media.media_id, tb_media.media_title, tb_category_media.category_name, tb_media.date_release, tb_editor.username, tb_media.views FROM ((tb_media INNER JOIN tb_category_media ON tb_media.category_id = tb_category_media.category_id) INNER JOIN tb_editor ON tb_media.editor_id = tb_editor.editor_id) WHERE tb_media.media_title LIKE '%$searchMedia%'";
+	$allMedia = getAllSearchMedia($searchMedia);
 } else {
-	$sql = "SELECT tb_media.media_id, tb_media.media_title, tb_category_media.category_name, tb_media.date_release, tb_editor.username, tb_media.views FROM ((tb_media INNER JOIN tb_category_media ON tb_media.category_id = tb_category_media.category_id) INNER JOIN tb_editor ON tb_media.editor_id = tb_editor.editor_id)";
+	$allMedia = getAllMedia();
 }
-
-$request = mysqli_query($conn, $sql);
 //End script mengambil data media
 ?>
 
@@ -290,15 +279,14 @@ $request = mysqli_query($conn, $sql);
 										<tbody>
 											<?php
 											// Print data detail media dari request yang telah dibuat sebelumnya
-											if (mysqli_num_rows($request) > 0) {
-												foreach ($result = mysqli_fetch_all($request) as $index) {
-													$mediaId = $index[0];
-													$mediaTitle = $index[1];
-													$category = $index[2];
-													$dateRelease = $index[3];
-													$publisher = $index[4];
-													$views = $index[5];
-													echo <<<TULIS
+											foreach ($allMedia as $index) {
+												$mediaId = $index[0];
+												$mediaTitle = $index[1];
+												$category = $index[2];
+												$dateRelease = $index[3];
+												$publisher = $index[4];
+												$views = $index[5];
+												echo <<<TULIS
 															<tr>
 																<td class="cell">$mediaId</td>
 																<td class="cell"><span class="truncate">$mediaTitle</span></td>
@@ -315,10 +303,7 @@ $request = mysqli_query($conn, $sql);
 																</td>
 															</tr>
 														TULIS;
-												}
 											}
-
-											mysqli_close($conn);
 											?>
 										</tbody>
 									</table>

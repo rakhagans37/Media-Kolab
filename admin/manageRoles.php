@@ -3,21 +3,18 @@ require_once __DIR__ . "/../helper/getConnection.php";
 require_once __DIR__ . "/../helper/validateLogin.php";
 require_once __DIR__ . "/../helper/getConnectionMsqli.php";
 require_once __DIR__ . "/../helper/hash.php";
+require_once __DIR__ . "/../helper/role.php";
+require_once __DIR__ . "/../helper/roleValidation.php";
 
 $conn = getConnectionMysqli();
 $duplicationData = false;
 if (isset($_GET['add-roles'])) {
     $id = generateIdRole();
     $rolesName = $_GET['new-roles'];
-    $sqlCheck = "SELECT * FROM tb_role WHERE role_name LIKE '$rolesName'";
-    $requestCheck = mysqli_query($conn, $sqlCheck);
-    if (mysqli_num_rows($requestCheck) < 1) {
-        $sqlAdd = "INSERT INTO tb_role VALUES(?,?)";
 
-        $requestAddCat = mysqli_prepare($conn, $sqlAdd);
-        mysqli_stmt_bind_param($requestAddCat, "ss", $id, $rolesName);
-        mysqli_stmt_execute($requestAddCat);
-        mysqli_stmt_close($requestAddCat);
+    if (!foundRole($rolesName)) {
+        //Set new role into database
+        setNewRole($id, $rolesName);
 
         header("Location:manageRoles.php");
         exit;

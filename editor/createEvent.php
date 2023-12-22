@@ -27,18 +27,21 @@ if (isset($_POST['event-submit'])) {
 	$categoryId = $_POST['categoryid'];
 	$linkGoogleMap = $_POST['linkgooglemap'];
 	$editorId = $editorId;
-	$imageUrl = uploadImageNews($_FILES['new-image']['tmp_name']);
+	$imageUrl = $_FILES['new-image']['tmp_name'];
 
 	if (strlen($eventTitle) < 12) {
 		$createSuccess = false;
 		$createError = "title";
-	} else if (!$imageUrl) {
+	} else if ($_FILES['new-image']['size'] > 5000000) {
 		$createSuccess = false;
 		$createError = "image";
 	} else if (strlen($eventContent) < 120) {
 		$createSuccess = false;
 		$createError = "contentLength";
 	} else {
+		//Upload image into clouds
+		$imageUrl = uploadImageNews($imageUrl);
+
 		// Menyimpan data ke database
 		setNewEvent($eventId, $eventTitle, $eventContent, $eventUrl, $dateRelease, $dateEvent, $videoUrl, $categoryId, $linkGoogleMap, $editorId, $imageUrl);
 
