@@ -76,7 +76,7 @@ function setAdminPhoto($adminId, $newPhotoHashed)
 
 function saveAdminPhoto($photoName)
 {
-    $imgtag = getImageProfile($photoName);
+    $imgtag = getImageCircle($photoName);
     if (isset($_COOKIE['loginStatus'])) {
         setcookie('profilePhoto', $imgtag, time() + (86400 * 7));
     } else {

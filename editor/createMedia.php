@@ -367,12 +367,12 @@ if (isset($_POST['media-submit'])) {
 
 							<label>Image URL</label>
 							<div class="input-group">
-								<input type="file" name="new-image" id="new-image">
+								<input type="file" name="new-image" id="new-image" required>
 							</div>
 
 							<label>Youtube Video URL</label>
 							<div class="input-group">
-								<input type="text" class="form-control" name="video-url" aria-label="video-url" aria-describedby="basic-addon2" placeholder="https://www.youtube.com/watch?v=abcdefg">
+								<input type="text" class="form-control" name="video-url" aria-label="video-url" aria-describedby="basic-addon2" placeholder="https://www.youtube.com/watch?v=abcdefg" required>
 							</div>
 
 							<label>Tag</label>

@@ -262,13 +262,14 @@ mysqli_close($conn);
 										$popularJobId = $data[0];
 										$popularJobTitle = $data[1];
 										$popularJobDate = $data[2];
+										$popularJobLogo = getImageCircle(decryptPhotoProfile($data[4]), 60, "Popular Job Company Logo");
 										echo <<<Buat
 											<div class="post post-list-sm circle">
 											<div class="thumb circle">
 												<span class="number">$number</span>
 												<a href="detailJobVacancies.php?jobId=$popularJobId">
 													<div class="inner">
-														<img src="images/posts/tabs-1.jpg" alt="post-title" />
+														$popularJobLogo
 													</div>
 												</a>
 											</div>

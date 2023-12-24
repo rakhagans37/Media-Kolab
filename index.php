@@ -8,10 +8,10 @@ $conn = getConnectionMysqli();
 $sql = "SELECT tb_blog.blog_title,tb_blog.date_release,tb_editor.username,tb_category_blog.category_name, tb_blog.blog_id, tb_blog.image_url FROM tb_blog inner join tb_editor on tb_blog.editor_id = tb_editor.editor_id inner join tb_category_blog on tb_blog.category_id = tb_category_blog.category_id";
 $req = mysqli_query($conn, $sql);
 $result = mysqli_fetch_all($req);
-$sql2 = "SELECT tb_blog.blog_title,tb_blog.date_release,tb_editor.username,tb_category_blog.category_name, tb_blog.blog_id  FROM tb_blog inner join tb_editor on tb_blog.editor_id = tb_editor.editor_id inner join tb_category_blog on tb_blog.category_id = tb_category_blog.category_id ORDER BY tb_blog.views desc limit 4";
+$sql2 = "SELECT tb_blog.blog_title,tb_blog.date_release,tb_editor.username,tb_category_blog.category_name, tb_blog.blog_id, tb_blog.image_url FROM tb_blog inner join tb_editor on tb_blog.editor_id = tb_editor.editor_id inner join tb_category_blog on tb_blog.category_id = tb_category_blog.category_id ORDER BY tb_blog.views desc limit 4";
 $req2 = mysqli_query($conn, $sql2);
 $result2 = mysqli_fetch_all($req2);
-$sqlRecentBlog = "SELECT tb_blog.blog_title,tb_blog.date_release,tb_editor.username,tb_category_blog.category_name, tb_blog.blog_id  FROM tb_blog inner join tb_editor on tb_blog.editor_id = tb_editor.editor_id inner join tb_category_blog on tb_blog.category_id = tb_category_blog.category_id ORDER BY tb_blog.date_release desc limit 4";
+$sqlRecentBlog = "SELECT tb_blog.blog_title,tb_blog.date_release,tb_editor.username,tb_category_blog.category_name, tb_blog.blog_id, tb_blog.image_url  FROM tb_blog inner join tb_editor on tb_blog.editor_id = tb_editor.editor_id inner join tb_category_blog on tb_blog.category_id = tb_category_blog.category_id ORDER BY tb_blog.date_release desc limit 4";
 $reqRecentBlog = mysqli_query($conn, $sqlRecentBlog);
 $resultRecentBlog = mysqli_fetch_all($reqRecentBlog);
 $sql3 = "SELECT tb_media.media_title,tb_media.date_release,tb_editor.username,tb_category_media.category_name, tb_media.media_id, tb_media.thumbnail FROM tb_media inner join tb_editor on tb_media.editor_id = tb_editor.editor_id inner join tb_category_media on tb_media.category_id = tb_category_media.category_id ORDER BY tb_media.date_release desc limit 6";
@@ -76,7 +76,7 @@ mysqli_close($conn);
 <body>
 
 	<!-- preloader -->
-	<div id="preloader">
+	<!-- <div id="preloader">
 		<div class="book">
 			<div class="inner">
 				<div class="left"></div>
@@ -104,7 +104,7 @@ mysqli_close($conn);
 				<li></li>
 			</ul>
 		</div>
-	</div>
+	</div> -->
 
 	<!-- site wrapper -->
 	<div class="site-wrapper">
@@ -205,23 +205,24 @@ mysqli_close($conn);
 										$blog_title = $data[0];
 										$date_release = $data[1];
 										$blogId = $data[4];
+										$postThumbnail = getImageCircle(decryptPhotoProfile($data[5]), 60, "Post Thumbnail");
 										echo <<<Buat
-									<div class="post post-list-sm circle">
-									<div class="thumb circle">
-										<a href="detailBlog.php?blogId=$blogId">
-											<div class="inner">
-												<img src="images/posts/tabs-2.jpg" alt="post-title" />
-											</div>
-										</a>
-									</div>
-									<div class="details clearfix">
-										<h6 class="post-title my-0"><a href="detailBlog.php?blogId=$blogId">$blog_title</a></h6>
-										<ul class="meta list-inline mt-1 mb-0">
-											<li class="list-inline-item">$date_release</li>
-										</ul>
-									</div>
-									</div>
-									Buat;
+										<div class="post post-list-sm circle">
+										<div class="thumb circle">
+											<a href="detailBlog.php?blogId=$blogId">
+												<div class="inner">
+													$postThumbnail
+												</div>
+											</a>
+										</div>
+										<div class="details clearfix">
+											<h6 class="post-title my-0"><a href="detailBlog.php?blogId=$blogId">$blog_title</a></h6>
+											<ul class="meta list-inline mt-1 mb-0">
+												<li class="list-inline-item">$date_release</li>
+											</ul>
+										</div>
+										</div>
+										Buat;
 									}
 									?>
 								</div>
@@ -233,12 +234,13 @@ mysqli_close($conn);
 										$blog_title = $data[0];
 										$date_release = $data[1];
 										$blogId = $data[4];
+										$postThumbnail = getImageCircle(decryptPhotoProfile($data[5]), 60, "Post Thumbnail");
 										echo <<<Buat
 										<div class="post post-list-sm circle">
 										<div class="thumb circle">
 											<a href="detailBlog.php?blogId=$blogId">
 												<div class="inner">
-													<img src="images/posts/tabs-2.jpg" alt="post-title" />
+													$postThumbnail
 												</div>
 											</a>
 										</div>
@@ -621,13 +623,14 @@ mysqli_close($conn);
 										$popularMediaId = $data[4];
 										$popularMediaTitle = $data[0];
 										$popularMediaDate = $data[1];
+										$popularMediaThumbnail = getImageCircle(decryptPhotoProfile($data[5]), 60, "Popular Media Thumbnail");
 										echo <<<Buat
 											<div class="post post-list-sm circle">
 											<div class="thumb circle">
 												<span class="number">$number</span>
 												<a href="detailMedia.php?mediaId=$popularMediaId">
 													<div class="inner">
-														<img src="images/posts/tabs-1.jpg" alt="post-title" />
+														$popularMediaThumbnail
 													</div>
 												</a>
 											</div>

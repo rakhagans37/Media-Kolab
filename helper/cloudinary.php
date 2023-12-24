@@ -32,12 +32,12 @@ Configuration::instance([
     ]
 ]);
 
-function addAltAttributeToImg($htmlCode)
+function addAltAttributeToImg($htmlCode, $message)
 {
     // Check if the <img> tag is present in the HTML code
     if (strpos($htmlCode, '<img') !== false) {
         // Add alt attribute if <img> tag is found
-        $modifiedCode = str_replace('<img', '<img alt="News thumbnail"', $htmlCode);
+        $modifiedCode = str_replace('<img', "<img alt='$message'", $htmlCode);
         return $modifiedCode;
     } else {
         // Return the original code if <img> tag is not found
@@ -59,35 +59,7 @@ function imageTagToURL($imgtag)
     }
 }
 
-function getAdminPhotoId($idAdmin)
-{
-    try {
-        $conn = getConnection();
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        $sql = "SELECT profile_photo FROM tb_admin WHERE admin_id = :adminId";
-        $request = $conn->prepare($sql);
-
-        $request->bindParam('adminId', $idAdmin);
-        $request->execute();
-
-        if ($result = $request->fetchAll()) {
-            $photoName = $result[0]['profile_photo'];
-            if (is_null($photoName)) {
-                $decryptPhotoName = null;
-            } else {
-                $decryptPhotoName = decryptPhotoProfile($photoName);
-            }
-        }
-        $conn = null;
-        return $decryptPhotoName;
-    } catch (PDOException $errorMessage) {
-        $error = $errorMessage->getMessage();
-        echo $error;
-    }
-}
-
-function getImageProfile($urlPhoto, $width = 60)
+function getImageCircle($urlPhoto, $width = 60, $altMessage = "Profile Photo")
 {
     $admin = new AdminApi();
     $assetData = $admin->asset($urlPhoto, [
@@ -113,14 +85,16 @@ function getImageProfile($urlPhoto, $width = 60)
             Format::auto()
         ));
 
-    return (string)$imgtag;
+    $finalImgTag = addAltAttributeToImg($imgtag, $altMessage);
+
+    return (string)$finalImgTag;
 }
 
 function getImageDefault($urlPhoto)
 {
     //Get Photo
     $imgtag = (new ImageTag($urlPhoto))
-        ->resize(Resize::limitFit()->width(1000)->height(670))
+        ->resize(Resize::limitFit()->width(1000)->height(520))
         ->delivery(Delivery::format(
             Format::auto()
         ))->delivery(Delivery::quality(60));
@@ -128,81 +102,28 @@ function getImageDefault($urlPhoto)
     return imageTagToURL($imgtag);
 }
 
-function getImageNews($urlPhoto)
+function getImageNews($urlPhoto, $altMessage = "Post Thumbnail")
 {
     $admin = new AdminApi();
     $assetData = $admin->asset($urlPhoto, [
         'colors' => TRUE
     ]);
-    $assetWidth = $assetData['width'];
-    $assetHeight = $assetData['height'];
-    $cropSize = $assetHeight <= $assetWidth ? $assetHeight : $assetWidth;
+    $assetTotal = $assetData['width'] + $assetData['height'];
+    $assetWidth = 16 / 26.7 * $assetTotal;
+    $assetHeight = 10.7 / 26.7 * $assetTotal;
     //Get Photo
     $imgtag = (new ImageTag($urlPhoto))
         ->resize(
-            Resize::crop()->width($cropSize)
-                ->height($cropSize)
+            Resize::crop()->width($assetWidth)
+                ->height($assetHeight)
         )
-        ->resize(Resize::scale()->width(1000)->height(670))
+        ->resize(Resize::scale()->width(999)->height(668))
         ->delivery(Delivery::format(
             Format::auto()
         ))->delivery(Delivery::quality(60));
 
-    $imgtag = addAltAttributeToImg($imgtag);
+    $imgtag = addAltAttributeToImg($imgtag, $altMessage);
     return (string)$imgtag;
-}
-
-function uploadImageAdmin($idAdmin, $photoTemp, $locationRedirect)
-{
-    $newPhotoSize = filesize($photoTemp);
-    $newPhotoType = mime_content_type($photoTemp);
-
-    if ($newPhotoSize <= 6000000 && ($newPhotoType == 'image/jpg' || $newPhotoType == 'image/png' || $newPhotoType == 'image/jpeg')) {
-        $photoName = random_int(0, PHP_INT_MAX) . date("dmYHis") . $idAdmin;
-        $photoNameHashed = hashPhotoProfile($photoName);
-
-        //Delete exPhoto
-        deleteImageAdmin($idAdmin);
-
-        //Upload into cloudinary process
-        $upload = new UploadApi();
-        $upload->upload($photoTemp, [
-            'public_id' => $photoName,
-            'use_filename' => TRUE,
-            'overwrite' => TRUE
-        ]);
-
-        try {
-            $conn = getConnection();
-            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            $sql = "UPDATE tb_admin SET profile_photo = :newPhoto WHERE admin_id = :idAdmin";
-            $request = $conn->prepare($sql);
-
-            $request->bindParam('idAdmin', $idAdmin);
-            $request->bindParam('newPhoto', $photoNameHashed);
-            $request->execute();
-
-            //Saving profile photo into cookies
-            $decrypt = decryptPhotoProfile($photoNameHashed);
-
-            //Automatically getting the Photo
-            $imgtag = getImageProfile($decrypt);
-            if (isset($_COOKIE['loginStatus'])) {
-                setcookie('profilePhoto', $imgtag, time() + (86400 * 7));
-            } else {
-                $_SESSION['profilePhoto'] = $imgtag;
-            }
-
-            $conn = null;
-            header("Location:$locationRedirect");
-        } catch (PDOException $errorMessage) {
-            $error = $errorMessage->getMessage();
-            echo $error;
-        }
-    } else {
-        echo "Gabisa cuy";
-    }
 }
 
 function uploadImage($photoTemp, $photoName)
@@ -214,44 +135,6 @@ function uploadImage($photoTemp, $photoName)
         'use_filename' => TRUE,
         'overwrite' => TRUE
     ]);
-}
-
-function deleteImageAdmin($idAdmin)
-{
-    $api = new UploadApi();
-    $photoId = getAdminPhotoId($idAdmin);
-
-    if (!is_null($photoId)) {
-        $api->destroy($photoId);
-
-        //Update table
-        try {
-            $conn = getConnection();
-            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            $sql = "UPDATE tb_admin SET profile_photo = :setToNull WHERE admin_id = :idAdmin";
-            $request = $conn->prepare($sql);
-            $setToNull = null;
-
-            //Set into null
-            $request->bindParam('idAdmin', $idAdmin);
-            $request->bindParam('setToNull', $setToNull);
-            $request->execute();
-
-            //Set cookie or session into default image
-            $imgtag = "<img class='profile-image' src='../assets/images/profiles/profile-1.png' alt='Profile Photo'>";
-            if (isset($_COOKIE['loginStatus'])) {
-                setcookie('profilePhoto', $imgtag, time() + (86400 * 7));
-            } else {
-                $_SESSION['profilePhoto'] = $imgtag;
-            }
-
-            $conn = null;
-        } catch (PDOException $errorMessage) {
-            $error = $errorMessage->getMessage();
-            echo $error;
-        }
-    }
 }
 
 //Function for uploading image for blog, event, job-vacancies, and media

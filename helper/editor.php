@@ -44,7 +44,7 @@ function setEditorImageToNull($editorId)
 
 function saveEditorPhoto($photoName)
 {
-    $imgtag = getImageProfile($photoName);
+    $imgtag = getImageCircle($photoName);
     if (isset($_COOKIE['editorLoginStatus'])) {
         setcookie('editorProfilePhoto', $imgtag, time() + (86400 * 7));
     } else {

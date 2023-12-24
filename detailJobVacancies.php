@@ -57,7 +57,7 @@ $resultExploreTag = mysqli_fetch_all($reqTag);
 
 //Get Editor Profile Photo
 if (!is_null($companyLogoUrl = $request['logo'])) {
-	$companyLogo = getImageProfile(decryptPhotoProfile($companyLogoUrl), 35);
+	$companyLogo = getImageCircle(decryptPhotoProfile($companyLogoUrl), 35);
 	$companyLogo =  substr_replace($companyLogo, " class='author'", 4, 0);
 } else {
 	$companyLogo = "<img src='../assets/images/profiles/profile-1.png' class='author' width='35' height='35' alt='author' />";
@@ -396,13 +396,14 @@ mysqli_close($conn);
 										$popularJobId = $data[0];
 										$popularJobTitle = $data[1];
 										$popularJobDate = $data[2];
+										$popularJobLogo = getImageCircle(decryptPhotoProfile($data[4]), 60, "Popular Job Company Logo");
 										echo <<<Buat
 											<div class="post post-list-sm circle">
 											<div class="thumb circle">
 												<span class="number">$number</span>
 												<a href="detailJobVacancies.php?jobId=$popularJobId">
 													<div class="inner">
-														<img src="images/posts/tabs-1.jpg" alt="post-title" />
+														$popularJobLogo
 													</div>
 												</a>
 											</div>

@@ -27,7 +27,7 @@ if (isset($_POST['login'])) {
 			$imgtag = "<img class='profile-image' src='../assets/images/profiles/profile-1.png' alt='Profile Photo'>";
 		} else {
 			//Saving profile photo into cookies
-			$imgtag = getImageProfile($photoUrl);
+			$imgtag = getImageCircle($photoUrl);
 		}
 
 		if ($remember) {

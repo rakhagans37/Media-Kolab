@@ -49,7 +49,7 @@ $resultExploreTag = mysqli_fetch_all($reqTag);
 
 //Get Editor Profile Photo
 if (!is_null($editorPhotoUrl = $request['profile_photo'])) {
-	$editorProfilePhoto = getImageProfile(decryptPhotoProfile($editorPhotoUrl), 35);
+	$editorProfilePhoto = getImageCircle(decryptPhotoProfile($editorPhotoUrl), 35);
 	$editorProfilePhoto =  substr_replace($editorProfilePhoto, " class='author'", 4, 0);
 } else {
 	$editorProfilePhoto = "<img src='../assets/images/profiles/profile-1.png' class='author' width='35' height='35' alt='author' />";
@@ -390,13 +390,14 @@ mysqli_close($conn);
 										$popularEventId = $data[0];
 										$popularEventTitle = $data[1];
 										$popularEventDate = $data[2];
+										$popularEventThumbnail = getImageCircle(decryptPhotoProfile($data[4]), 60, "Popular Event Thumbnail");
 										echo <<<Buat
 											<div class="post post-list-sm circle">
 											<div class="thumb circle">
 												<span class="number">$number</span>
 												<a href="detailEvent.php?eventId=$popularEventId">
 													<div class="inner">
-														<img src="images/posts/tabs-1.jpg" alt="post-title" />
+														$popularEventThumbnail
 													</div>
 												</a>
 											</div>

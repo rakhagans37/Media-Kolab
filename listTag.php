@@ -251,7 +251,7 @@ mysqli_close($conn);
                                     $mediaRelease = $mediaWithTag[$i]['date_release'];
                                     $mediaEditorUsername = $mediaWithTag[$i]['username'];
                                     $mediaCategory = $mediaWithTag[$i]['category_name'];
-                                    $mediaImage = getImageNews(decryptPhotoProfile($mediaWithTag[$i]['image_url']));
+                                    $mediaImage = getImageNews(decryptPhotoProfile($mediaWithTag[$i]['thumbnail']));
 
                                     printPost("detailMedia.php", "listMedia.php", "mediaId", $mediaId, $mediaTitle, $mediaCategory, $mediaRelease, $mediaEditorUsername, $mediaImage);
                                 }

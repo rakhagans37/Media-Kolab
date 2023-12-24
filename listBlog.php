@@ -265,13 +265,14 @@ mysqli_close($conn);
 										$popularBlogId = $data[0];
 										$popularBlogTitle = $data[1];
 										$popularBlogDate = $data[2];
+										$popularBlogThumbnail = getImageCircle(decryptPhotoProfile($data[4]), 60, "Popular Blog Thumbnail");
 										echo <<<Buat
 											<div class="post post-list-sm circle">
 											<div class="thumb circle">
 												<span class="number">$number</span>
 												<a href="detailBlog.php?blogId=$popularBlogId">
 													<div class="inner">
-														<img src="images/posts/tabs-1.jpg" alt="post-title" />
+														$popularBlogThumbnail
 													</div>
 												</a>
 											</div>

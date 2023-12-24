@@ -264,13 +264,14 @@ mysqli_close($conn);
 										$popularmediaId = $data[0];
 										$popularmediaTitle = $data[1];
 										$popularmediaDate = $data[2];
+										$popularmediaThumbnail = getImageCircle(decryptPhotoProfile($data[4]), 60, "Popular Media Thumbnail");
 										echo <<<Buat
 											<div class="post post-list-sm circle">
 											<div class="thumb circle">
 												<span class="number">$number</span>
 												<a href="detailMedia.php?mediaId=$popularmediaId">
 													<div class="inner">
-														<img src="images/posts/tabs-1.jpg" alt="post-title" />
+														$popularmediaThumbnail
 													</div>
 												</a>
 											</div>

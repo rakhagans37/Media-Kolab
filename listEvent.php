@@ -265,13 +265,14 @@ mysqli_close($conn);
 										$popularEventId = $data[0];
 										$popularEventTitle = $data[1];
 										$popularEventDate = $data[2];
+										$popularEventThumbnail = getImageCircle(decryptPhotoProfile($data[4]), 60, "Popular Event Thumbnail");
 										echo <<<Buat
 											<div class="post post-list-sm circle">
 											<div class="thumb circle">
 												<span class="number">$number</span>
 												<a href="detailEvent.php?eventId=$popularEventId">
 													<div class="inner">
-														<img src="images/posts/tabs-1.jpg" alt="post-title" />
+														$popularEventThumbnail
 													</div>
 												</a>
 											</div>
