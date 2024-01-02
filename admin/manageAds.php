@@ -3,8 +3,37 @@ require_once __DIR__ . "/../helper/getConnection.php";
 require_once __DIR__ . "/../helper/validateLogin.php";
 require_once __DIR__ . "/../helper/getConnectionMsqli.php";
 require_once __DIR__ . "/../helper/hash.php";
-
+require_once "../helper/cloudinary.php";
 $conn = getConnectionMysqli();
+
+// Include file koneksi database
+
+// Proses penambahan iklan ke dalam database
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $adsId = generateIdAd();
+    $title = $_POST['new-ads-title'];
+    $description = $_POST['new-ads-description'];// Anda perlu menangani unggahan file secara terpisah
+    $url = $_POST['new-ads-url'];
+    $dateRelease = $_POST['new-ads-dateRelease'];
+    $dateExpire = $_POST['new-ads-dateExpire'];
+    
+    // Simpan gambar ke direktori upload 
+    $imagePath = uploadImageNews($_FILES['new-ads-image']['tmp_name']);
+    
+    // Insert new ad into the 'tb_ad' table
+    $sql = "INSERT INTO tb_ad (ad_id,title,ad_description, image_path,ad_url, date_published, date_expired)
+            VALUES ('adsId','$title', '$description', '$imagePath', '$url', '$dateRelease', '$dateExpire')";
+
+    if ($conn->query($sql) === TRUE) {
+        echo "Iklan baru berhasil ditambahkan";
+    } else {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+    }
+}
+
+// Ambil data iklan dari database untuk ditampilkan di tabel
+$sqlGetData = "SELECT * FROM tb_ad";
+$resultGetData = $conn->query($sqlGetData);
 
 //Script php untuk delete ads
 if (isset($_GET['deleteButton'])) {
@@ -26,6 +55,8 @@ if (isset($_GET['deleteButton'])) {
 //Script php untuk update ads
 if (isset($_GET['editButton'])) {
     $adsId = $_GET['adsId'];
+    $adsTitle = $_GET['title'];
+    $adsimage = $_GET['image_path'];
     $dateReleased = $_GET['date-release'];
     $dateExpired = $_GET['date-expired'];
 
@@ -45,9 +76,9 @@ if (isset($_GET['editButton'])) {
 //Script Php untuk membuat request yuang mengambil detail data blog dari database
 if (isset($_GET['search-ads'])) {
     $searchAds = $_GET['searchorders'];
-    $sql = "SELECT ad_id, ad_title, date_published, date_expired FROM tb_ad WHERE ad_title LIKE %$searchAds%'";
+    $sql = "SELECT ad_id,title,ad_description,image_path,ad_url,date_published, date_expired FROM tb_ad WHERE ad_title LIKE %$searchAds%'";
 } else {
-    $sql = "SELECT ad_id, ad_title, date_published, date_expired FROM tb_ad";
+    $sql = "SELECT ad_id, title,ad_description,image_path,ad_url, date_published, date_expired FROM tb_ad";
 }
 
 $request = mysqli_query($conn, $sql);
@@ -289,6 +320,9 @@ $request = mysqli_query($conn, $sql);
                                             <tr>
                                                 <th class="cell">Ads ID</th>
                                                 <th class="cell">Title</th>
+                                                <th class="cell">Gambar Iklan</th>
+                                                <th class="cell">Deskripsi Iklan</th>
+                                                <th class="cell">Url Tujuan</th>
                                                 <th class="cell">Date Release</th>
                                                 <th class="cell">Date Expired</th>
                                                 <th class="cell"></th>
@@ -297,31 +331,43 @@ $request = mysqli_query($conn, $sql);
                                         </thead>
                                         <tbody>
                                             <?php
-                                            // Print data detail blog dari request yang telah dibuat sebelumnya
-                                            if (mysqli_num_rows($request) > 0) {
-                                                foreach ($result = mysqli_fetch_all($request) as $index) {
-                                                    $adsId = $index[0];
-                                                    $adsTitle = $index[1];
-                                                    $datePublished = $index[2];
-                                                    $dateExpired = $index[3];
+                                            if ($resultGetData->num_rows > 0) {
+                                                while ($row = $resultGetData->fetch_assoc()) {
+                                                    $adsId = $row['ad_id'];
+                                                    $adsTitle = $row['title'];
+                                                    $adsDescription = $row['ad_description'];
+                                                    $adsImagePath = $row['image_path'];
+                                                    $adsUrl = $row['ad_url'];
+                                                    $datePublished = $row['date_published'];
+                                                    $dateExpired = $row['date_expired'];
                                                     echo <<<TULIS
-															<tr>
-																<td class="cell">$adsId</td>
-																<td class="cell"><span class="truncate">$adsTitle</span></td>
-																<td class="cell"><span>$datePublished</span><span class="note">2:16 PM</span></td> <td class="cell"><span>$dateExpired</span><span class="note">2:16 PM</span></td>
-																<td class="cell">
-																	<a class="btn-sm app-btn-secondary" href="#">View</a>
-																</td> <td class="cell"> <a class="btn-sm app-btn-danger" data-toggle="modal" href="#edit-ads" onclick="getAdsId('conEditAds','$adsId')">Edit</a></td>
-																<td class="cell">
-																	<a class="btn-sm app-btn-danger" data-toggle="modal" href="#delete-ads" onclick="getAdsId('conDeleteAds','$adsId')">Delete</a>
-																</td>      
-															</tr>
-														TULIS;
+                                                                <tr>
+                                                                   <td class="cell">$adsId</td>
+                                                                   <td class="cell"><span class="truncate">$adsTitle</span></td>
+                                                                   <td class="cell"><span class="truncate">$adsImagePath</span></td>
+                                                                   <td class="cell"><span class="truncate">$adsDescription</span></td>
+                                                                   <td class="cell"><span class="truncate">$adsUrl</span></td>
+                                                                   <td class="cell"><span>$datePublished</span><span class="note">2:16 PM</span></td>
+                                                                   <td class="cell"><span>$dateExpired</span><span class="note">2:16 PM</span></td>
+                                                                   <td class="cell">
+                                                                     <a class="btn-sm app-btn-secondary" href="#">View</a>
+                                                                   </td>
+                                                                   <td class="cell">
+                                                                     <a class="btn-sm app-btn-danger" data-toggle="modal" href="#edit-ads" onclick="getAdsId('conEditAds','$adsId')">Edit</a>
+                                                                   </td>
+                                                                   <td class="cell">
+                                                                     <a class="btn-sm app-btn-danger" data-toggle="modal" href="#delete-ads" onclick="getAdsId('conDeleteAds','$adsId')">Delete</a>
+                                                                   </td>
+                                                                 </tr>
+                                                                TULIS;
                                                 }
+                                            } else {
+                                                echo "Tidak ada iklan ditemukan";
                                             }
 
                                             mysqli_close($conn);
                                             ?>
+
                                         </tbody>
                                     </table>
                                 </div><!--//table-responsive-->
@@ -357,14 +403,44 @@ $request = mysqli_query($conn, $sql);
                             </div>
                             <div class="modal-body">
                                 <p>Buatlah iklan!</p>
-                                <form action="manageAds.php" method="GET" enctype="multipart/form-data" id="add-new-ads">
-                                    <input type="text" name="new-ads-title" id="new-ads-title">
-                                    <input type="file" name="new-ads-image" id="new-ads-image">
-                                    <input type="date" name="new-ads-dateRelease" id="new-ads-dateRelease">
-                                    <input type="date" name="new-ads-dateExpire" id="new-ads-dateRelease">
-                                    <input type="submit" id="submit" name="deleteButton" class="btn app-btn-confirmation" value="Ya, saya yakin">
+                                <form action="manageAds.php" method="POST" enctype="multipart/form-data" id="add-new-ads">
+                                    <div class="form-group">
+                                        <label for="new-ads-title">Judul Iklan:</label>
+                                        <input type="text" name="new-ads-title" id="new-ads-title" class="form-control" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="new-ads-image">Gambar Iklan:</label>
+                                        <input type="file" name="new-ads-image" id="new-ads-image" class="form-control" accept="image/ads" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="new-ads-description">Deskripsi Iklan:</label>
+                                        <textarea name="new-ads-description" id="new-ads-description" class="form-control" rows="4" required></textarea>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="new-ads-url">URL Tujuan:</label>
+                                        <input type="url" name="new-ads-url" id="new-ads-url" class="form-control" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="new-ads-dateRelease">Tanggal Mulai:</label>
+                                        <input type="date" name="new-ads-dateRelease" id="new-ads-dateRelease" class="form-control" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="new-ads-dateExpire">Tanggal Berakhir:</label>
+                                        <input type="date" name="new-ads-dateExpire" id="new-ads-dateExpire" class="form-control" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <input type="submit" id="submit" name="submit" class="btn app-btn-confirmation" value="Buat Iklan">
+                                    </div>
                                 </form>
                             </div>
+
+
                             <div class="modal-footer">
                                 <button type="button" class="btn app-btn-secondary" data-dismiss="modal">Close</button>
                             </div>

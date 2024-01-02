@@ -26,6 +26,15 @@ $query4 = "SELECT blog_id, blog_title, date_release, views, image_url FROM tb_bl
 $data4 = mysqli_query($conn, $query4);
 $result4 = mysqli_fetch_all($data4);
 
+//ads
+
+// Eksekusi query dan dapatkan hasilnya
+$query5 = "SELECT tb_ad.ad_id, tb_ad.title,tb_ad.ad_description, tb_ad.image_path, tb_ad.ad_url, tb_ad.date_published, tb_ad.date_expired FROM tb_ad ORDER BY RAND() LIMIT 2";
+$data5 = mysqli_query($conn, $query5);
+$result5 = mysqli_fetch_all($data5);
+
+
+
 //Get all tag on tb_blog_tag
 $queryExploreTag = "SELECT DISTINCT tb_tag.tag_name, tb_tag.tag_id FROM tb_blog_tag INNER JOIN tb_tag ON tb_blog_tag.tag_id = tb_tag.tag_id";
 $reqTag = mysqli_query($conn, $queryExploreTag);
@@ -60,7 +69,6 @@ mysqli_close($conn);
 </head>
 
 <body>
-
 	<!-- preloader -->
 	<div id="preloader">
 		<div class="book">
@@ -91,6 +99,9 @@ mysqli_close($conn);
 			</ul>
 		</div>
 	</div>
+
+
+
 
 	<!-- site wrapper -->
 	<div class="site-wrapper">
@@ -314,12 +325,39 @@ mysqli_close($conn);
 							</div>
 
 							<!-- widget advertisement -->
-							<div class="widget no-container rounded text-md-center">
-								<span class="ads-title">- Sponsored Ad -</span>
-								<a href="#" class="widget-ads">
-									<img src="images/ads/ad-360.png" alt="Advertisement" />
-								</a>
-							</div>
+							<?php
+							// Gantilah $getImageDefault dengan fungsi yang sesuai
+
+
+							// Include file koneksi database
+							$conn = getConnectionMysqli();
+
+							// Query untuk mendapatkan satu iklan secara acak dari tb_ad
+							$sqlGetAd = "SELECT * FROM tb_ad ORDER BY RAND() LIMIT 1";
+							$resultGetAd = mysqli_query($conn, $sqlGetAd);
+
+							if (!is_null($result5) > 0) {
+								$adTitle = $result5[0][2];
+								$adImagePath = getImageAds(decryptPhotoProfile($result5[0][3]));
+								$adUrl = $result5[0][4];
+							?>
+
+								<div class="widget no-container rounded text-md-center">
+									<span class="ads-title">- Sponsored Ad -</span>
+									<a href="<?= $adUrl ?>" class="widget-ads">
+										<?php echo "<img src='$adImagePath' alt='$adTitle'/> "; ?>
+									</a>
+								</div>
+
+							<?php
+							} else {
+								echo "No ads found";
+							}
+
+							// Tutup koneksi ke database
+							mysqli_close($conn);
+							?>
+
 
 							<!-- widget tags -->
 							<div class="widget rounded">

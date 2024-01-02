@@ -92,3 +92,9 @@ function generateAdminPhotoName($adminId)
     $newAdminPhotoName = random_int(0, PHP_INT_MAX) . date("dmYHis") . $adminId;
     return $newAdminPhotoName;
 }
+
+function generateAdsPhotoName($adminId)
+{
+    $newAdminPhotoName = random_int(0, PHP_INT_MAX) . date("dmYHis") . $adminId;
+    return $newAdminPhotoName;
+}

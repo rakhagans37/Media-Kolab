@@ -102,6 +102,16 @@ function getImageDefault($urlPhoto)
     return imageTagToURL($imgtag);
 }
 
+function getImageAds($urlPhoto)
+{
+    //Get Photo
+    $imgtag = (new ImageTag($urlPhoto))
+        ->roundCorners(RoundCorners::byRadius(12))
+        ->delivery(Delivery::quality(60));
+
+    return imageTagToURL($imgtag);
+}
+
 function getImageNews($urlPhoto, $altMessage = "Post Thumbnail")
 {
     $admin = new AdminApi();

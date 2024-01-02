@@ -76,7 +76,7 @@ mysqli_close($conn);
 <body>
 
 	<!-- preloader -->
-	<!-- <div id="preloader">
+	<div id="preloader">
 		<div class="book">
 			<div class="inner">
 				<div class="left"></div>
@@ -104,7 +104,7 @@ mysqli_close($conn);
 				<li></li>
 			</ul>
 		</div>
-	</div> -->
+	</div>
 
 	<!-- site wrapper -->
 	<div class="site-wrapper">
@@ -116,7 +116,7 @@ mysqli_close($conn);
 			<nav class="navbar navbar-expand-lg">
 				<div class="container-xl">
 					<!-- site logo -->
-					<a class="navbar-brand" href="index.html"><img src="images/logo-text.png" width="130" alt="logo" /></a>
+					<a class="navbar-brand" href="index.php"><img src="images/logo-text.png" width="130" alt="logo" /></a>
 
 					<div class="collapse navbar-collapse">
 						<!-- menus -->
